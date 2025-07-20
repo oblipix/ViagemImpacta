@@ -46,7 +46,7 @@ function TravelCard({ travel, onCardClick, onSaveTravel, isTravelSaved }) {
       {/* Imagem do Card */}
       <div className="relative w-full h-2/3 overflow-hidden rounded-md">
         <img
-          src={travel.imageUrl || generateRandomImageUrl(travel.id)}
+          src={travel.mainImage|| generateRandomImageUrl(travel.id)}
           alt={travel.title}
           className="w-full h-full object-cover"
         />

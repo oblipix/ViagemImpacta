@@ -99,7 +99,8 @@ body {
 .promotion-data-button,
 .next-purchase,
 .reservation-button,
-.event-submit
+.event-submit,
+.search-button
  {
   background: linear-gradient(90deg, #2563EB 0%, #60A5FA 100%) !important; 
   color: #FFFFFF !important;        
@@ -109,7 +110,8 @@ body {
 .promotion-data-button:hover,
 .next-purchase:hover,
 .reservation-button:hover,
-.event-submit:hover {
+.event-submit:hover,
+.search-button:hover {
   background: linear-gradient(90deg, #60A5FA 0%,  #2563EB 100%) !important; 
 }
 
@@ -117,12 +119,17 @@ body {
 
 
 
+.searchHotelsBar {
+  background-image: linear-gradient(to right, #ADD8E6, #FFFFFF); /* Azul claro para Branco */
+}
 
 
-
-
-
-
+.psearchhotelsbar{
+  position: absolute;
+  color:#686868;
+  font-size: 8px;
+ right: 10px;
+}
 
 
 /* === ESTILOS ROBUSTOS PARA POSICIONAR A PAGINAÇÃO DO SWIPER ABAIXO DOS CARDS === */
@@ -169,18 +176,24 @@ color: transparent;
   border-radius: 9999px; 
 }
 
+/* preço do hotel em hotels  */
 
+.priceHotelsDetails{
+  background-color: #c3c3c3;
+  color: #fafafa;  
+  font-size: 15px;
+}
 
 
 /* Estilos para o react-calendar */
 .react-calendar__tile--booked {
-  background-color: #fca5a5; /* Um tom de vermelho claro */
-  color: #991b1b; /* Texto mais escuro */
+  background-color: #9cb7e5cd; /* Um tom de vermelho claro */
+  color: #0f1559; /* Texto mais escuro */
   font-weight: bold;
 }
 
 .react-calendar__tile--available {
-  background-color: #a7f3d0; /* Um tom de verde claro */
+  background-color: #10237b; /* Um tom de verde claro */
   color: #065f46; /* Texto mais escuro */
   font-weight: bold;
 }
@@ -195,8 +208,9 @@ color: transparent;
 }
 
 
-
-
+.react-calendar__month-view__days__day--weekend{
+  color: #bcbcbc !important;
+}
 
 /* Estilo para dias específicos do evento (destaque) */
 .react-calendar__tile--event-highlight {
@@ -211,11 +225,11 @@ color: transparent;
 
 /* Prioriza as cores de status sobre o destaque do evento */
 .react-calendar__tile--booked {
-  background-color: #fca5a5 !important; /* Um tom de vermelho claro */
-  color: #991b1b !important; /* Texto mais escuro */
+  background-color: #f1ff55 !important; /* Um tom de vermelho claro */
+  color: #115e30 !important; /* Texto mais escuro */
 }
 .react-calendar__tile--available {
-  background-color: #a7f3d0 !important; /* Um tom de verde claro */
+  background-color: #a7e1f3 !important; /* Um tom de verde claro */
   color: #065f46 !important; /* Texto mais escuro */
 }
 

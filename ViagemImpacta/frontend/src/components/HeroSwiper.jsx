@@ -83,9 +83,7 @@ function HeroSwiper() {
               <p className="text-base md:text-lg lg:text-xl drop-shadow-sm">
                 {slide.subtitle}
               </p>
-              <button className="main-action-button mt-8 bg-blue-600 text-white px-8 py-4 rounded-full text-lg md:text-xl font-semibold hover:bg-blue-700 transition duration-300 shadow-xl self-start">
-                Ver Pacotes
-              </button>
+             
             </div>
           </div>
         </SwiperSlide>

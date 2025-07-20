@@ -116,7 +116,7 @@ const PromotionDetailsPage = ({ promotionData, onBack, onNavigateToPurchase }) =
       {/* Botão para Voltar */}
       <button 
         onClick={onBack} 
-        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 mb-6"
+        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 mb-6 main-action-button"
       >
         ← Voltar para Promoções
       </button>
@@ -138,8 +138,8 @@ const PromotionDetailsPage = ({ promotionData, onBack, onNavigateToPurchase }) =
       {/* Seção de Preços "De X por Y" */}
       {promotionData.priceFrom && promotionData.priceTo && (
         <div className="text-center mb-10">
-          <p className="text-2xl text-red-700 line-through">De: {formatCurrency(promotionData.priceFrom)}</p>
-          <p className="text-5xl font-bold text-green-600 mt-2">Por: {formatCurrency(promotionData.priceTo)}</p>
+          <p className="text-2xl text-blue-400 line-through">De: {formatCurrency(promotionData.priceFrom)}</p>
+          <p className="text-5xl font-bold text-blue-600 mt-2">Por: {formatCurrency(promotionData.priceTo)}</p>
           <p className="text-lg text-gray-500 mt-1">Preço por pessoa em apartamento duplo. Consulte condições.</p>
         </div>
       )}
@@ -197,13 +197,13 @@ const PromotionDetailsPage = ({ promotionData, onBack, onNavigateToPurchase }) =
             </div>
             {/* Mensagens explicativas atualizadas */}
             <p className="text-gray-600 mt-6 text-sm">
-              * Dias em <span className="text-blue-500 font-semibold">azul claro</span> são datas do evento.
+              * Dias em <span className="text-blue-400 font-semibold">Azul</span> são datas do evento.
             </p>
             <p className="text-gray-600 text-sm">
-              * Datas em <span className="text-red-500 font-semibold">vermelho</span> estão reservadas.
+              * Datas em <span className="text-grey-500 font-semibold">Cinza</span> estão reservadas.
             </p>
             <p className="text-gray-600 text-sm">
-              * Datas em <span className="text-green-500 font-semibold">verde</span> estão disponíveis.
+              * Datas em <span className="text-yellow-500 font-semibold">Amarelo</span> estão disponíveis.
             </p>
             {promotionData.eventSpecificDates && promotionData.eventSpecificDates.length > 0 && (
                 <p className="text-gray-600 text-sm mt-4">

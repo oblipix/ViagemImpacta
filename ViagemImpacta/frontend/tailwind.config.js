@@ -1,13 +1,17 @@
+/* eslint-disable no-undef */
 // tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}", // Esta linha é fundamental para o JSX
+    "./src/**/*.{js,ts,jsx,tsx}", 
   ],
   theme: {
     extend: {},
   },
-  // eslint-disable-next-line no-undef
-  plugins: [require('@tailwindcss/line-clamp')],
+  
+  plugins: [
+    require('@tailwindcss/line-clamp'), 
+    require('@tailwindcss/typography'),  
+  ],
 }
