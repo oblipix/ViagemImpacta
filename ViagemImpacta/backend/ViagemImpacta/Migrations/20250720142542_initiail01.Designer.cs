@@ -11,9 +11,9 @@ using ViagemImpacta.Data;
 
 namespace ViagemImpacta.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
-    [Migration("20250719152040_UserControllerDelete")]
-    partial class UserControllerDelete
+    [DbContext(typeof(AgenciaDbContext))]
+    [Migration("20250720142542_initiail01")]
+    partial class initiail01
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,12 +61,17 @@ namespace ViagemImpacta.Migrations
                     b.Property<int>("Stars")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TravelPackageId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Wifi")
                         .HasColumnType("bit");
 
                     b.HasKey("HotelId");
 
-                    b.ToTable("Hotel");
+                    b.HasIndex("TravelPackageId");
+
+                    b.ToTable("Hotels");
                 });
 
             modelBuilder.Entity("ViagemImpacta.Models.Reservation", b =>
@@ -178,17 +183,12 @@ namespace ViagemImpacta.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TravelPackageId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("RoomId");
 
                     b.HasIndex("HotelId");
-
-                    b.HasIndex("TravelPackageId");
 
                     b.ToTable("Room");
                 });
@@ -210,8 +210,14 @@ namespace ViagemImpacta.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Destination")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("Promotion")
                         .HasColumnType("bit");
@@ -222,18 +228,12 @@ namespace ViagemImpacta.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TotalSeats")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
-
                     b.HasKey("TravelPackageId");
 
-                    b.ToTable("TravelPackage");
+                    b.ToTable("TravelPackages");
                 });
 
             modelBuilder.Entity("ViagemImpacta.Models.User", b =>
@@ -257,7 +257,7 @@ namespace ViagemImpacta.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DisabledAt")
+                    b.Property<DateTime?>("DisabledAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -284,12 +284,19 @@ namespace ViagemImpacta.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("ViagemImpacta.Models.Hotel", b =>
+                {
+                    b.HasOne("ViagemImpacta.Models.TravelPackage", null)
+                        .WithMany("Hotels")
+                        .HasForeignKey("TravelPackageId");
                 });
 
             modelBuilder.Entity("ViagemImpacta.Models.Reservation", b =>
@@ -334,10 +341,6 @@ namespace ViagemImpacta.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ViagemImpacta.Models.TravelPackage", null)
-                        .WithMany("Rooms")
-                        .HasForeignKey("TravelPackageId");
-
                     b.Navigation("Hotel");
                 });
 
@@ -348,11 +351,11 @@ namespace ViagemImpacta.Migrations
 
             modelBuilder.Entity("ViagemImpacta.Models.TravelPackage", b =>
                 {
+                    b.Navigation("Hotels");
+
                     b.Navigation("Reservations");
 
                     b.Navigation("Reviews");
-
-                    b.Navigation("Rooms");
                 });
 
             modelBuilder.Entity("ViagemImpacta.Models.User", b =>

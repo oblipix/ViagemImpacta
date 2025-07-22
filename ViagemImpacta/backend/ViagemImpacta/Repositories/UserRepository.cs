@@ -7,9 +7,9 @@ using ViagemImpacta.Repositories.Interfaces;
 
 public class UserRepository : Repository<User>, IUserRepository
 {
-    private readonly AppDbContext _context;
+    private readonly AgenciaDbContext _context;
 
-    public UserRepository(AppDbContext context) : base(context)
+    public UserRepository(AgenciaDbContext context) : base(context)
     {
         _context = context;
     }

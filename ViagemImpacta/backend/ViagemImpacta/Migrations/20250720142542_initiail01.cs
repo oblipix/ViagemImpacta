@@ -6,59 +6,59 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ViagemImpacta.Migrations
 {
     /// <inheritdoc />
-    public partial class UserControllerDelete : Migration
+    public partial class initiail01 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Username",
-                table: "Users",
-                newName: "Photo");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "UpdatedAt",
-                table: "Users",
-                type: "datetime2",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                oldClrType: typeof(DateTime),
-                oldType: "datetime2",
-                oldNullable: true);
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "DisabledAt",
-                table: "Users",
-                type: "datetime2",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                oldClrType: typeof(DateTime),
-                oldType: "datetime2",
-                oldNullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "FirstName",
-                table: "Users",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "LastName",
-                table: "Users",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Phone",
-                table: "Users",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+            migrationBuilder.CreateTable(
+                name: "TravelPackages",
+                columns: table => new
+                {
+                    TravelPackageId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    Promotion = table.Column<bool>(type: "bit", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Destination = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TravelPackages", x => x.TravelPackageId);
+                });
 
             migrationBuilder.CreateTable(
-                name: "Hotel",
+                name: "Users",
+                columns: table => new
+                {
+                    UserId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Age = table.Column<int>(type: "int", nullable: false),
+                    Photo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Cpf = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DisabledAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Active = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.UserId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Hotels",
                 columns: table => new
                 {
                     HotelId = table.Column<int>(type: "int", nullable: false)
@@ -71,33 +71,17 @@ namespace ViagemImpacta.Migrations
                     Parking = table.Column<bool>(type: "bit", nullable: false),
                     Stars = table.Column<int>(type: "int", nullable: false),
                     Gym = table.Column<bool>(type: "bit", nullable: false),
-                    Restaurant = table.Column<bool>(type: "bit", nullable: false)
+                    Restaurant = table.Column<bool>(type: "bit", nullable: false),
+                    TravelPackageId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Hotel", x => x.HotelId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TravelPackage",
-                columns: table => new
-                {
-                    TravelPackageId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalSeats = table.Column<int>(type: "int", nullable: false),
-                    Active = table.Column<bool>(type: "bit", nullable: false),
-                    Promotion = table.Column<bool>(type: "bit", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TravelPackage", x => x.TravelPackageId);
+                    table.PrimaryKey("PK_Hotels", x => x.HotelId);
+                    table.ForeignKey(
+                        name: "FK_Hotels_TravelPackages_TravelPackageId",
+                        column: x => x.TravelPackageId,
+                        principalTable: "TravelPackages",
+                        principalColumn: "TravelPackageId");
                 });
 
             migrationBuilder.CreateTable(
@@ -118,9 +102,9 @@ namespace ViagemImpacta.Migrations
                 {
                     table.PrimaryKey("PK_Reservation", x => x.ReservationId);
                     table.ForeignKey(
-                        name: "FK_Reservation_TravelPackage_TravelPackageId",
+                        name: "FK_Reservation_TravelPackages_TravelPackageId",
                         column: x => x.TravelPackageId,
-                        principalTable: "TravelPackage",
+                        principalTable: "TravelPackages",
                         principalColumn: "TravelPackageId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -148,9 +132,9 @@ namespace ViagemImpacta.Migrations
                 {
                     table.PrimaryKey("PK_Review", x => x.ReviewId);
                     table.ForeignKey(
-                        name: "FK_Review_TravelPackage_TravelPackageId",
+                        name: "FK_Review_TravelPackages_TravelPackageId",
                         column: x => x.TravelPackageId,
-                        principalTable: "TravelPackage",
+                        principalTable: "TravelPackages",
                         principalColumn: "TravelPackageId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -174,24 +158,23 @@ namespace ViagemImpacta.Migrations
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AverageDailyPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Available = table.Column<bool>(type: "bit", nullable: false),
-                    Accessible = table.Column<bool>(type: "bit", nullable: false),
-                    TravelPackageId = table.Column<int>(type: "int", nullable: true)
+                    Accessible = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Room", x => x.RoomId);
                     table.ForeignKey(
-                        name: "FK_Room_Hotel_HotelId",
+                        name: "FK_Room_Hotels_HotelId",
                         column: x => x.HotelId,
-                        principalTable: "Hotel",
+                        principalTable: "Hotels",
                         principalColumn: "HotelId",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Room_TravelPackage_TravelPackageId",
-                        column: x => x.TravelPackageId,
-                        principalTable: "TravelPackage",
-                        principalColumn: "TravelPackageId");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Hotels_TravelPackageId",
+                table: "Hotels",
+                column: "TravelPackageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservation_TravelPackageId",
@@ -217,11 +200,6 @@ namespace ViagemImpacta.Migrations
                 name: "IX_Room_HotelId",
                 table: "Room",
                 column: "HotelId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Room_TravelPackageId",
-                table: "Room",
-                column: "TravelPackageId");
         }
 
         /// <inheritdoc />
@@ -237,43 +215,13 @@ namespace ViagemImpacta.Migrations
                 name: "Room");
 
             migrationBuilder.DropTable(
-                name: "Hotel");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "TravelPackage");
+                name: "Hotels");
 
-            migrationBuilder.DropColumn(
-                name: "FirstName",
-                table: "Users");
-
-            migrationBuilder.DropColumn(
-                name: "LastName",
-                table: "Users");
-
-            migrationBuilder.DropColumn(
-                name: "Phone",
-                table: "Users");
-
-            migrationBuilder.RenameColumn(
-                name: "Photo",
-                table: "Users",
-                newName: "Username");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "UpdatedAt",
-                table: "Users",
-                type: "datetime2",
-                nullable: true,
-                oldClrType: typeof(DateTime),
-                oldType: "datetime2");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "DisabledAt",
-                table: "Users",
-                type: "datetime2",
-                nullable: true,
-                oldClrType: typeof(DateTime),
-                oldType: "datetime2");
+            migrationBuilder.DropTable(
+                name: "TravelPackages");
         }
     }
 }
