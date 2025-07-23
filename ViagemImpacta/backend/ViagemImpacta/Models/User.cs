@@ -6,7 +6,7 @@ namespace ViagemImpacta.Models;
 
 public class User
 {
-    public long UserId { get; set; } //TROCAR DE LONG PARA INT
+    public long UserId { get; set; }
     public string Email { get; set; }
     public string Password { get; set; }
     public string FirstName { get; set; }
@@ -26,10 +26,10 @@ public class User
 }
 
 /*
- * Marcelo : Mudanças que eu fiz
- * 
- * - O CAMPO IDADE PODERIA SER UM MÉTODO QUE CALCULA O ANO ATUAL - O ANO DE NASCIMENTO
- * - A DATA CREATEDAT DEVERIA SE INICIAR COM O DATETIME.NOW;
- * - DISABLED MUDARÁ DE ACORDO COM O ACTIVE ATRAVÉS DE UM MÉTODO SERVICE
- * - O CAMPO USERNAME FOI ALTERADO PARA NAME
+* Marcelo : Mudanças que eu fiz
+* 
+* - O CAMPO IDADE PODERIA SER UM MÉTODO QUE CALCULA O ANO ATUAL - O ANO DE NASCIMENTO
+* - A DATA CREATEDAT DEVERIA SE INICIAR COM O DATETIME.NOW;
+* - DISABLED MUDARÁ DE ACORDO COM O ACTIVE ATRAVÉS DE UM MÉTODO SERVICE
+* - O CAMPO USERNAME FOI ALTERADO PARA NAME
 */
