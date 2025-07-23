@@ -4,9 +4,9 @@ import BlogPostCard from './BlogPostCard';
 
 function BlogSection({ id, title, posts, onCardClick }) {
   return (
-    <section id={id} className="py-8 px-4 sm:px-6 lg:px-8 bg-gray-100">
+    <section id={id} className="bg-white py-8 px-4 sm:px-6 lg:px-8 bg-gray-100">
       <div className="container mx-auto">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+        <h2 className="TitleSection text-3xl font-bold text-gray-800 mb-6 text-center">
           {title}
         </h2>
         {/* ATENÇÃO AQUI: Mudando para GRID e definindo colunas e gap */}

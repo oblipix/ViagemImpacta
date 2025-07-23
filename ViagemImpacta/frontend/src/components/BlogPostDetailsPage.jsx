@@ -1,4 +1,4 @@
-// src/components/BlogPostDetailsPage.js
+
 import React from 'react';
 import './BlogPostDetailsPage.css'; // Mantenha a importação do CSS
 
@@ -35,7 +35,7 @@ function BlogPostDetailsPage({ postId, allBlogPosts, onBack, onCategoryClick }) 
           alt={post.title}
           className="w-full h-80 object-cover rounded-lg mb-6"
         />
-        <h1 className="text-4xl font-extrabold text-blue-800 mb-4">{post.title}</h1>
+        <h1 className="TittleDetails">{post.title}</h1>
 
         {/* Tornar a categoria clicável */}
         <p className="text-gray-600 text-sm mb-6">

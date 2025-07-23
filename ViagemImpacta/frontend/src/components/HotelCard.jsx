@@ -80,7 +80,7 @@ function HotelCard({ hotel, onImageClick, onSaveTravel, isHotelSaved, onDetailsC
               {hotel.location}
             </a>
           </p>
-          <p className="text-blue-400 bg-blue-50 p-3 rounded-md mb-2">
+          <p className="text-gray-600 bg-gray-100 p-6 rounded-md mb-2">
             {hotel.description}
           </p>
           {/* Exibir preço "A partir de" se houver roomOptions */}

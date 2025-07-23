@@ -118,9 +118,9 @@ function HotelDetailsPage({ hotel, onBack, onReserveRoom }) {
         )}
 
         {/* Informações Gerais do Hotel */}
-        <div className="mb-8">
+        <div className="mb-8 bgHotelDetails1">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Comodidades e Estrutura</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-gray-700">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-gray-700 ">
             {hotel.totalRooms && (
               <p className="flex items-center"><Icons.TotalRooms />Total de Quartos: <span className="font-semibold ml-1">{hotel.totalRooms}</span></p>
             )}
@@ -144,9 +144,10 @@ function HotelDetailsPage({ hotel, onBack, onReserveRoom }) {
 
         {/* Facilidades de Lazer */}
         {hotel.leisureFacilities && hotel.leisureFacilities.length > 0 && (
-          <div className="mb-8">
+          <div className="mb-8 bgHotelDetails2">
+
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Lazer e Entretenimento</h2>
-            <div className="flex flex-wrap gap-x-6 gap-y-2 text-gray-700">
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-gray-700 ">
               {hotel.leisureFacilities.map((facility, index) => {
                 const IconComponent = leisureIconMap[facility];
                 return (
@@ -186,7 +187,7 @@ function HotelDetailsPage({ hotel, onBack, onReserveRoom }) {
                     )}
                   </div>
                   <div className="mt-4 md:mt-0 md:ml-4 text-right">
-                    <p className="text-2xl font-bold text-green-600 mb-2">R$ {room.price.toFixed(2).replace('.', ',')}</p>
+                    <p className=" pHotelDetails text-2xl font-bold text-green-600 mb-2">R$ {room.price.toFixed(2).replace('.', ',')}</p>
                     {/* Botão Reservar */}
                     <button 
                       onClick={() => onReserveRoom(hotel, room)} // CHAMA onReserveRoom com hotel e quarto

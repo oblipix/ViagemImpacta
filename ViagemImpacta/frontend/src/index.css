@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@300;400;500;600;700&display=swap');
+
 
 @import "tailwindcss";
 
@@ -102,8 +104,9 @@ body {
 .event-submit,
 .search-button
  {
-  background: linear-gradient(90deg, #2563EB 0%, #60A5FA 100%) !important; 
-  color: #FFFFFF !important;        
+  background: linear-gradient(90deg, #111b32 0%, #60A5FA 100%) !important; 
+  color: #FFFFFF !important; 
+         
 }
 
 .main-action-button:hover,
@@ -112,15 +115,43 @@ body {
 .reservation-button:hover,
 .event-submit:hover,
 .search-button:hover {
-  background: linear-gradient(90deg, #60A5FA 0%,  #2563EB 100%) !important; 
+  background: linear-gradient(90deg, #60A5FA 0%,  #111b32 100%) !important; 
 }
 
 
 
 
+.searchHotelsBar,
+.HotelsSeachForm {
+  align-items: center;
+  text-align: center;
+  background-image: linear-gradient(to right, #c9f0fdb4, #f9f3f3cf); /* Azul claro para Branco */
+}
 
-.searchHotelsBar {
-  background-image: linear-gradient(to right, #ADD8E6, #FFFFFF); /* Azul claro para Branco */
+
+.HotelsSeachForm input{
+  text-align: center;
+}
+
+.HotelsSeachForm{
+  position: relative;
+  margin-bottom: 65px;
+  top: 55px;
+}
+
+
+.TitleSection{
+  
+ font-family: 'Lexend Deca';
+  font-style: normal;
+  font-weight: 200;
+  color: #1e3a8a;
+  text-align: center;
+  margin-bottom: 80px;
+  background-color: #f2f2f2;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 
@@ -155,17 +186,40 @@ body {
 
 
 .logo {
-font-size: 30px;
+font-size: 35px;
 font-weight: bold;
 background-image: linear-gradient(to right, #1e3a8a, #60a5fa); /* Azul escuro (#1e3a8a) para azul claro (#60a5fa) */
 -webkit-background-clip: text;
 color: transparent;
+ font-family: "Pacifico", cursive;
+  font-weight: 400;
+  font-style: normal;
+  z-index: 1000; 
+  
+}
+
+
+.pHotelDetails{
+color: #1e3a8a;
+}
+
+a{
+  text-decoration: none;
+}
+
+
+.bgHotelDetails1{
+  background-color: #e3f2fb;
+}
+
+.bgHotelDetails2{
+  background-color: #fbf9e3;
 }
 
 
 .explore{
   font-size: 12px;
-   background-color: #98c6ff;
+   background-image: linear-gradient(to right, #ADD8E6, #FFFFFF); 
    padding: 10px;
    margin-bottom: 50px;
    align-content: center;
@@ -179,9 +233,12 @@ color: transparent;
 /* preço do hotel em hotels  */
 
 .priceHotelsDetails{
-  background-color: #c3c3c3;
-  color: #fafafa;  
+  width: 250px;
+  background-image: linear-gradient(to right, #ADD8E6, #FFFFFF);
+  color: #145217;  
   font-size: 15px;
+  border-radius: 20px;
+  padding: 10px;
 }
 
 
@@ -193,7 +250,7 @@ color: transparent;
 }
 
 .react-calendar__tile--available {
-  background-color: #10237b; /* Um tom de verde claro */
+  background-color: #2f47b4; /* Um tom de verde claro */
   color: #065f46; /* Texto mais escuro */
   font-weight: bold;
 }
@@ -243,6 +300,59 @@ color: transparent;
 .react-calendar__tile:disabled:hover {
   background-color: #f0f0f0 !important;
 }
+
+
+
+
+
+.react-datepicker__input-container input {
+    width: 100% !important; /* Força a largura para 100% */
+    display: block !important; /* Garante que se comporte como bloco */
+    box-sizing: border-box !important; /* Inclui padding na largura */
+}
+
+/* Garante que o container do DatePicker também se estenda */
+.react-datepicker-wrapper {
+    width: 100% !important; /* Força a largura total do wrapper */
+}
+
+/* Opcional: Ajustar o cursor e aparência do calendário */
+.react-datepicker__input-container {
+    cursor: pointer;
+}
+
+/* Estilos para a borda vermelha de erro, caso já não esteja funcionando */
+.react-datepicker__input-container input.border-red-500 {
+    border-color: #EF4444 !important; /* Tailwind red-500 */
+}
+.react-datepicker__input-container input.border-green-500 {
+    border-color: #22C55E !important; /* Tailwind green-500 */
+}
+
+/* Estilos gerais para os inputs, se não estiverem em outro lugar */
+.shadow.appearance-none.border.rounded.w-full.py-2.px-3.text-gray-700.leading-tight.focus\:outline-none.focus\:shadow-outline {
+    /* Estas classes já vêm do Tailwind, mas se você precisar garantir a aplicação, pode repetir aqui */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #E2E8F0; /* gray-300 */
+    border-radius: 0.25rem; /* rounded */
+    width: 100%;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    color: #4A5568; /* gray-700 */
+    line-height: 1.25;
+    outline: none; /* focus:outline-none */
+}
+.shadow.appearance-none.border.rounded.w-full.py-2.px-3.text-gray-700.leading-tight.focus\:outline-none.focus\:shadow-outline:focus {
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); /* focus:shadow-outline, blue-500 semi-transparent */
+}
+
 
 
 

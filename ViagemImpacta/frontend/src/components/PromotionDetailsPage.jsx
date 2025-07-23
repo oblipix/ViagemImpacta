@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css'; 
+import './PromotionDetailsPage.css'; // Importando o CSS específico para este componente
 
 // Componente simples para exibir estrelas
 const StarRating = ({ rating }) => {

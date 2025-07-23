@@ -11,6 +11,7 @@ import entradaprincipalImage from '../assets/images/entradaprincipalPE.png';
 import piscinaImageRJ from '../assets/images/piscinaRJ.png';
 import cinemalRSImage from '../assets/images/salacinemaRS.png';
 import piscinaGAImage from '../assets/images/piscinaGA.png';
+import './HeroSwiper.css';
 
 
 function HeroSwiper() {
