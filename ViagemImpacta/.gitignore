@@ -1,0 +1,87 @@
+# Ignorar pasta de repositórios do backend
+backend/ViagemImpacta/Repositories/
+# Ignorar Program.cs do backend
+backend/ViagemImpacta/Program.cs
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code settings
+.vscode/
+
+# ASP.NET Core secrets
+secrets.json
+
+# IIS Express
+.vs/
+*.vspscc
+*.vssscc
+
+# NuGet packages
+*.nupkg
+packages/
+*.snupkg
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Publish output
+publish/
+wwwroot/
+
+# Rider
+.idea/
+*.sln.iml
+
+# Node.js / Frontend
+node_modules/
+dist/
+build/
+.env
+.env.*
+yarn.lock
+package-lock.json
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Others
+*.swp
+*.tmp
+*.bak
+*.orig
+*.rej
+
+# Ignore coverage reports
+coverage/
+
+# Ignore test output
+/test-results/
+
+# Ignore local tools
+.tools/
+
+# Configura��es locais e sens�veis
+appsettings.Development.json
+appsettings.Local.json
+
+# Bancos de dados locais e dumps
+*.mdf
+*.ldf
+*.sqlite
+*.db
+*.bak
+*.sql
+
+# Ignorar migra��es (se n�o quiser versionar)
+Migrations/
