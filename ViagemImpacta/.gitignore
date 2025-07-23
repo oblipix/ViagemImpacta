@@ -1,3 +1,7 @@
+# Ignorar pasta de repositórios do backend
+backend/ViagemImpacta/Repositories/
+# Ignorar Program.cs do backend
+backend/ViagemImpacta/Program.cs
 # Build results
 bin/
 obj/
@@ -66,3 +70,18 @@ coverage/
 
 # Ignore local tools
 .tools/
+
+# Configura��es locais e sens�veis
+appsettings.Development.json
+appsettings.Local.json
+
+# Bancos de dados locais e dumps
+*.mdf
+*.ldf
+*.sqlite
+*.db
+*.bak
+*.sql
+
+# Ignorar migra��es (se n�o quiser versionar)
+Migrations/
