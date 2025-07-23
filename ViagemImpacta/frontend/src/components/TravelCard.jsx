@@ -58,8 +58,13 @@ function TravelCard({ travel, onCardClick, onSaveTravel, isTravelSaved }) {
       {/* Imagem do pacote ou do hotel */}
       <div className="relative w-full h-48 overflow-hidden rounded-md">
         <img
+<<<<<<< HEAD
+          src={travel.mainImage|| generateRandomImageUrl(travel.id)}
+          alt={travel.title}
+=======
           src={hotel?.ImageUrl || generateRandomImageUrl(travel.id)}
           alt={hotelName}
+>>>>>>> origin/MeloR
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/40"></div>

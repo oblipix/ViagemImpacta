@@ -17,6 +17,13 @@ function LoginPage({ onNavigateToRegister, onLoginSuccess }) {
     }
   };
 
+ const handleForgotPassword = (e) => {
+   e.preventDefault();
+   alert('Link de recuperação de senha enviado para o seu email (funcionalidade simulada)!');
+   // Em uma aplicação real, aqui você redirecionaria para uma página de "Recuperar Senha"
+   // ou dispararia uma API para enviar o email de recuperação.
+ };
+
   return (
     <section className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg flex max-w-4xl w-full overflow-hidden">
@@ -65,30 +72,39 @@ function LoginPage({ onNavigateToRegister, onLoginSuccess }) {
                 required
               />
             </div>
-            <div className="flex items-center justify-between">
-              <button
-                type="submit"
-                className="main-action-button text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-              >
-                Login
-              </button>
-            </div>
-          </form>
+            <div className="flex items-center justify-between mt-2"> {/* Ajustei mt-2 para dar mais espaço */}
+             {/* Link Esqueceu Senha? */}
+             <a
+               href="#"
+               onClick={handleForgotPassword}
+               className="inline-block align-baseline font-bold text-sm text-blue-600 hover:text-blue-800 transition"
+             >
+               Esqueceu sua senha?
+             </a>
 
-          <div className="text-center mt-6 text-sm">
-            <p className="text-gray-600">Não tem uma conta?</p>
-            <a
-              href="#"
-              onClick={onNavigateToRegister} // Navega para a tela de cadastro
-              className="font-bold text-blue-600 hover:text-blue-800 transition"
-            >
-              Cadastrar-se
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
+               <button
+                 type="submit"
+                 className="main-action-button text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+               >
+                 Login
+               </button>
+             </div>
+           </form>
 
-export default LoginPage;
+           <div className="text-center mt-6 text-sm">
+             <p className="text-gray-600">Não tem uma conta?</p>
+             <a
+               href="#"
+               onClick={onNavigateToRegister} // Navega para a tela de cadastro
+               className="font-bold text-blue-600 hover:text-blue-800 transition"
+             >
+               Cadastrar-se
+             </a>
+           </div>
+         </div>
+       </div>
+     </section>
+   );
+ }
+
+ export default LoginPage;

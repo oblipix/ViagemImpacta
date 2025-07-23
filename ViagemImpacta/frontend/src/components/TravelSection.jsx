@@ -5,6 +5,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import './TravelSection.css'; 
+
 
 // Importa os módulos Swiper que você vai usar (Navigation, Pagination, A11y)
 import { Navigation, Pagination, A11y } from 'swiper/modules';
@@ -17,7 +19,7 @@ function TravelSection({ title, travels, id, className, onCardClick }) {
   return (
     <section id={id} className={`py-8 px-6 bg-white ${className}`}>
       <div className="container mx-auto">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">{title}</h2>
+        <h2 className="TitleSection text-3xl font-bold text-gray-800 mb-6">{title}</h2>
 
         <Swiper
           modules={[Navigation, Pagination, A11y]}
@@ -67,7 +69,7 @@ function TravelSection({ title, travels, id, className, onCardClick }) {
 
                     <div className="absolute inset-0 p-4 text-white flex flex-col justify-center items-start text-left">
                         <div>
-                            <h3 className="text-lg font-semibold mb-1">{travel.title}</h3>
+                            <h3 className="TittleCards">{travel.title}</h3>
                             <p className="text-xs mb-3 line-clamp-2">{travel.description}</p>
                         </div>
                         {/* === MUDANÇA AQUI: Adicionado cursor-pointer ao botão === */}
