@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 
 
 /* eslint-disable no-unused-vars */
@@ -144,7 +145,7 @@ import ImageAcademiaBH from './assets/images/academiaBH.png';
 import ImageBanheiroBH from './assets/images/banheiroBH.png';
 import ImageAreaKidsBH from './assets/images/kidsBH.png';
 
-const MAPS_API_KEY = 'AIzaSyBadK9gu4sGIAHWhVCZ59sOBVHkFOicbkU';
+const MAPS_API_KEY = import.meta.env.VITE_Maps_API_KEY;
 
 const removeAccents = (str) => {
     if (!str) return '';
