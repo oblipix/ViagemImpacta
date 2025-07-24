@@ -201,7 +201,7 @@ const allHotelsData = [
     elevators: 4,
     hasRestaurant: true,
     hasWifi: true,
-    leisureFacilities: ['Piscina na cobertura','Sala de Cinema', 'Academia', 'Bar', 'Jaguzza'],
+    leisureFacilities: ['Piscina','Sala de Cinema', 'Academia', 'Bar', 'Jaguzza'],
     galleryImages: [
       { id: 'h3m1', url: ImageCorredorPE, alt: 'Hotel Tripz Recife - Corredor' },
       { id: 'h3g1', url: ImagePiscinaPE , alt: 'Hotel Tripz Recife - Piscina' },

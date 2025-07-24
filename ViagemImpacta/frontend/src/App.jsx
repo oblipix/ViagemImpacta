@@ -1,4 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+
+
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import Header from './components/Header';
@@ -9,7 +10,8 @@ import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import TravelCard from './components/TravelCard';
 
-import HotelsPage from './components/HotelsPage'; // Passaremos allHotelsData para cá
+import HotelsPage from './components/HotelsPage';
+import HotelDetailsPage from './components/HotelDetailsPage';
 import EventBlogSection from './components/EventBlogSection';
 import EventReservationForm from './components/EventReservationForm';
 import PromotionDetailsPage from './components/PromotionDetailsPage';
@@ -20,15 +22,16 @@ import BlogSection from './components/BlogSection';
 import BlogPostCard from './components/BlogPostCard';
 import BlogPostDetailsPage from './components/BlogPostDetailsPage';
 
-// Importe o novo componente HotelsSearchForm
 import HotelsSearchForm from './components/HotelsSearchForm';
-
 import MyTravelsPage from './components/MyTravelsPage';
 
-// NOVO: Importe o componente de Hotéis Recomendados
 import RecommendedHotelsSection from './components/RecommendedHotelsSection';
-// NOVO: Importe o componente de Detalhes de Hotel Recomendado
 import RecommendedHotelDetailsPage from './components/RecommendedHotelDetailsPage';
+import NewsletterSection from './components/NewsletterSection';
+import HotelsMapSection from './components/HotelsMapSection';
+
+import { useJsApiLoader } from '@react-google-maps/api';
+
 
 // fotos para promoçoes section
 import ImageNatalRS from './assets/images/natal1RS.png';
@@ -141,6 +144,7 @@ import ImageAcademiaBH from './assets/images/academiaBH.png';
 import ImageBanheiroBH from './assets/images/banheiroBH.png';
 import ImageAreaKidsBH from './assets/images/kidsBH.png';
 
+const MAPS_API_KEY = 'AIzaSyBadK9gu4sGIAHWhVCZ59sOBVHkFOicbkU';
 
 const removeAccents = (str) => {
     if (!str) return '';
@@ -154,6 +158,9 @@ const allHotelsData = [
         title: 'Tripz Rio de Janeiro: Paraíso Carioca',
         description: 'Descubra o luxo à beira-mar no coração do Rio! Com vistas deslumbrantes do oceano, nosso hotel oferece uma experiência inesquecível com spa completo, gastronomia refinada e serviço impecável para sua estadia na Cidade Maravilhosa.',
         location: 'Rio de Janeiro, Brasil',
+        lat: -22.9068, // Latitude do Rio de Janeiro
+        lng: -43.1729, // Longitude do Rio de Janeiro
+        markerColor: '#EF4444', // Cor vermelha (Tailwind red-500)
         price: 1500.00, // Preço médio para filtro
         rating: 4.8, // NOVO: Avaliação média
         mapUrl: 'https://maps.google.com/?cid=5826605051265667662&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ',
@@ -199,6 +206,9 @@ const allHotelsData = [
         title: 'Tripz Gramado: Charme Serrano',
         description: 'Viva a magia da Serra Gaúcha no nosso aconchegante refúgio em Gramado! Desfrute de trilhas ecológicas, uma culinária regional de dar água na boca e a tranquilidade das montanhas, perfeito para uma escapada romântica ou em família.',
         location: 'Gramado, Brasil',
+        lat: -29.3797, // Latitude de Gramado
+        lng: -50.8732, // Longitude de Gramado
+        markerColor: '#3B82F6', // Cor azul (Tailwind blue-500)
         price: 1100.00,
         rating: 4.9,
         mapUrl: 'https://maps.google.com/?cid=12041541218583555750&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ',
@@ -241,8 +251,11 @@ const allHotelsData = [
         title: 'Tripz Recife: Urbano e Conectado',
         description: 'Hospede-se no coração pulsante de Recife! Nosso hotel moderno é ideal para viajantes a negócios e turistas que desejam explorar a cidade, com fácil acesso aos principais pontos e toda a comodidade que você precisa.',
         location: 'Recife, Pernambuco',
+        lat: -8.0578,
+        lng: -34.8820,
+        markerColor: '#22C55E',
         price: 900.00,
-        rating: 4.2, // NOVO: Avaliação média
+        rating: 4.2,
         mapUrl: 'https://maps.google.com/?cid=4368198245613338580&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ',
         totalRooms: 120,
         totalBathrooms: 125,
@@ -250,7 +263,7 @@ const allHotelsData = [
         elevators: 4,
         hasRestaurant: true,
         hasWifi: true,
-        leisureFacilities: ['Piscina na cobertura', 'Sala de Cinema', 'Academia', 'Bar', 'Jaguzza'],
+        leisureFacilities: ['Piscina', 'Sala de Cinema', 'Academia', 'Bar', 'Jaguzza'],
         galleryImages: [
             { id: 'h3m1', url: ImageCorredorPE, alt: 'Hotel Tripz Recife - Corredor' },
             { id: 'h3g1', url: ImagePiscinaPE, alt: 'Hotel Tripz Recife - Piscina' },
@@ -274,7 +287,7 @@ const allHotelsData = [
         ],
         feedbacks: [
             { id: 1, rating: 4, comment: 'Bom para viagens de trabalho, bem localizado.', guestName: 'Roberto S.' },
-            { id: 2, rating: 3, comment: 'Esperava mais da piscina na cobertura, mas os quartos são bons.', guestName: 'Fernanda D.' },
+            { id: 2, rating: 3, comment: 'Esperava mais da piscina, mas os quartos são bons.', guestName: 'Fernanda D.' },
         ]
     },
     {
@@ -283,9 +296,12 @@ const allHotelsData = [
         title: 'Tripz Garanhuns: Paraíso do Agreste',
         description: 'Descubra a tranquilidade em Garanhuns! Nosso refúgio oferece o ambiente perfeito para relaxar e se conectar com a natureza, com paisagens exuberantes e um clima agradável. Ideal para quem busca sossego e atividades ao ar livre.',
         location: 'Garanhus, Pernambuco',
-        price: 800.00, // Preço médio para filtro
-        rating: 4.7, // NOVO: Avaliação média
-        mapUrl: 'https://maps.google.com/?cid=5826605051265667662&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ',
+        lat: -8.8913,
+        lng: -36.4942,
+        markerColor: '#A855F7',
+        price: 800.00,
+        rating: 4.7,
+        mapUrl: 'https://maps.google.com/?cid=5826605051265667662&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlS`eYXJjaFRleHQ',
         totalRooms: 70,
         totalBathrooms: 70,
         parking: true,
@@ -306,13 +322,13 @@ const allHotelsData = [
             { id: 'h4g9', url: ImageLavanderiaGA, alt: 'Hotel Tripz Garanhus - Lavanderia' },
             { id: 'h4g10', url: ImageAcademiaGA, alt: 'Hotel Tripz GA - Academia' },
             { id: 'h4g11', url: ImageBanheiroGA, alt: 'Hotel Tripz GA - Banheiro' },
-            { id: 'h4g11', url: ImageRedariosGA, alt: 'Hotel Tripz Garanhus - Redários' },
+            { id: 'h4g12', url: ImageRedariosGA, alt: 'Hotel Tripz Garanhus - Redários' },
         ],
         roomOptions: [
             { type: 'Quarto Casal Standard', description: 'Básico e confortável para um ou dois.', price: 650.00, capacity: 2, minCapacity: 1, available: 7, bathrooms: 1, beds: '1 Cama Queen' },
             { type: 'Suíte Familiar', description: 'Duas camas de casal, para até 4 pessoas.', price: 1300.00, capacity: 4, minCapacity: 2, available: 2, bathrooms: 1, beds: '2 Camas Casal' }
         ],
-        feedbacks: [ // NOVO: Feedbacks específicos do hotel
+        feedbacks: [
             { id: 1, rating: 5, comment: 'Paz e tranquilidade em meio à natureza. Recomendo para recarregar as energias!', guestName: 'Mariana S.' },
             { id: 2, rating: 4, comment: 'Lugar encantador, mas o Wi-Fi podia ser melhor.', guestName: 'Lucas F.' },
         ]
@@ -323,8 +339,11 @@ const allHotelsData = [
         title: 'Tripz Brasilia',
         description: 'Um refúgio tropical com praias privativas, esportes aquáticos e bangalôs sobre a água.',
         location: 'Brasília',
-        price: 1300.00, // Preço médio para filtro
-        rating: 4.5, // NOVO: Avaliação média
+        lat: -15.7797,
+        lng: -47.9297,
+        markerColor: '#EAB308',
+        price: 1300.00,
+        rating: 4.5,
         mapUrl: 'https://maps.google.com/?cid=8323902137611668004&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ',
         totalRooms: 100,
         totalBathrooms: 100,
@@ -345,15 +364,15 @@ const allHotelsData = [
             { id: 'h5g8', url: ImageSalaArtesBSB, alt: 'Hotel Tripz Brasília - Sala de Artes' },
             { id: 'h5g9', url: ImageLavanderiaBSB, alt: 'Hotel Tripz Brasília - Lavanderia' },
             { id: 'h5g10', url: ImageAcademiaBSB, alt: 'Hotel Tripz Brasília - Academia' },
-            { id: 'h6g11', url: ImageBanheiroBSB, alt: 'Hotel Tripz Brasília - Banheiro' },
-            { id: 'h6g12', url: ImageSpaBSB, alt: 'Hotel Tripz Brasília - Spa' }
+            { id: 'h5g11', url: ImageBanheiroBSB, alt: 'Hotel Tripz Brasília - Banheiro' },
+            { id: 'h5g12', url: ImageSpaBSB, alt: 'Hotel Tripz Brasília - Spa' }
         ],
         roomOptions: [
             { type: 'Quarto Casal Standard', description: 'Básico e confortável para um ou dois.', price: 650.00, capacity: 2, minCapacity: 1, available: 7, bathrooms: 1, beds: '1 Cama Queen' },
             { type: 'Quarto Duplo Superior', description: 'Duas camas de solteiro, para amigos ou família (até 2 pessoas).', price: 1400.00, capacity: 2, minCapacity: 1, available: 6, bathrooms: 1, beds: '2 Camas Solteiro' },
             { type: 'Suíte Presidencial Luxo', description: 'Amplo espaço, vista panorâmica e serviço exclusivo para um ou dois.', price: 2500.00, capacity: 2, minCapacity: 1, available: 1, bathrooms: 2, beds: '1 Cama King' }
         ],
-        feedbacks: [ // NOVO: Feedbacks específicos do hotel
+        feedbacks: [
             { id: 1, rating: 5, comment: 'Hotel impecável e moderno, ideal para quem visita a capital. Recomendo!', guestName: 'Pedro H.' },
             { id: 2, rating: 4, comment: 'Bom custo-benefício. A piscina é ótima.', guestName: 'Clara G.' },
         ]
@@ -364,8 +383,11 @@ const allHotelsData = [
         title: 'Tripz Belo Horizonte: Encanto Mineiro',
         description: 'Descubra a capital de Minas Gerais no nosso charmoso hotel em Belo Horizonte. Ideal para explorar a rica cultura local, a deliciosa gastronomia mineira e os principais pontos turísticos. Conforto e conveniência esperam por você no coração da cidade.',
         location: 'Belo Horizonte, Minas Gerais',
-        price: 1000.00, // Preço médio para filtro
-        rating: 4.6, // NOVO: Avaliação média
+        lat: -19.9190,
+        lng: -43.9388,
+        markerColor: '#F97316',
+        price: 1000.00,
+        rating: 4.6,
         mapUrl: 'https://www.google.com/maps/place/Belo+Horizonte,+MG',
         totalRooms: 130,
         totalBathrooms: 130,
@@ -393,15 +415,107 @@ const allHotelsData = [
             { type: 'Quarto Casal Standard', description: 'Ideal para uma estadia confortável e econômica para um ou dois.', price: 850.00, capacity: 2, minCapacity: 1, available: 12, bathrooms: 1, beds: '1 Cama Queen' },
             { type: 'Quarto Família Plus', description: 'Comodidade para até 4 pessoas.', price: 1600.00, capacity: 4, minCapacity: 2, available: 4, bathrooms: 1, beds: '1 Cama Casal, 2 solteiros' }
         ],
-        feedbacks: [ // NOVO: Feedbacks específicos do hotel
+        feedbacks: [
             { id: 1, rating: 5, comment: 'Localização excelente para explorar BH e o hotel é muito confortável.', guestName: 'Paula R.' },
             { id: 2, rating: 4, comment: 'Culinária mineira do restaurante é sensacional!', guestName: 'Thiago B.' },
         ]
     },
 ];
 
+const allPromotionalTravels = [
+    {
+        id: 13,
+        title: 'Carnaval Tripz Folia em Recife!',
+        description: 'Sinta a energia contagiante do Carnaval em Recife! Nosso Hotel Tripz, com sua arquitetura moderna e vibrante, é o cenário perfeito para você se jogar no frevo. Garanta pacotes exclusivos e esteja no coração da festa mais democrática do Brasil.',
+        imageUrl: ImageCarnavelPe,
+        type: 'Nacional',
+        status: 'Em Andamento',
+        eventDate: '15/02/2027',
+        priceFrom: 2500.00,
+        priceTo: 1999.00,
+        packagePrices: { casal: 3800.00, solteiro: 1999.00, familia: 5500.00 },
+        reviews: [
+            { rating: 5, comment: 'Energia incrível! O hotel estava perfeito para o Carnaval. Voltarei!', guestName: 'Maria S.' },
+            { rating: 4, comment: 'Adorei a localização e a estrutura. A festa foi sensacional.', guestName: 'João P.' },
+            { rating: 5, comment: 'Recife é demais no Carnaval, e o Tripz tornou a experiência ainda melhor.', guestName: 'Ana L.' },
+        ]
+    },
+    {
+        id: 16,
+        title: 'Réveillon Tripz: Brilho e Emoção em Copacabana!',
+        description: 'Prepare-se para a maior festa de Réveillon do mundo! O Hotel Tripz em Copacabana te coloca no centro da celebração. Com um telão exclusivo no jardim, uma cascata de fogos de artifício no céu e a energia da praia mais famosa do Brasil, sua virada de ano será inesquecível.',
+        imageUrl: ImageAnoNovoRJ,
+        type: 'Nacional',
+        status: 'Em Andamento',
+        eventDate: '31/12/2026',
+        priceFrom: 4000.00,
+        priceTo: 3200.00,
+        packagePrices: { casal: 6000.00, solteiro: 3200.00, familia: 8500.00 },
+        reviews: [
+            { rating: 5, comment: 'Melhor Réveillon da vida! A vista dos fogos foi espetacular e a festa do hotel, impecável.', guestName: 'Paula G.' },
+            { rating: 5, comment: 'Experiência única. Tudo muito bem organizado e seguro.', guestName: 'Ricardo F.' },
+            { rating: 4, comment: 'Incrível! Poderia ter mais opções de comida no buffet, mas a festa foi nota 10.', guestName: 'Camila B.' },
+        ]
+    },
+    {
+        id: 18,
+        title: 'Natal Mágico na Montanha - Tripz Garanhuns!',
+        description: 'Viva a magia do Natal em Garanhuns! Nosso hotel de arquitetura em madeira se transforma num refúgio aconchegante com decorações festivas, ceia especial e um clima europeu que encanta a todos. Perfeito para um Natal inesquecível em família.',
+        imageUrl: ImageNatalRS,
+        type: 'Nacional',
+        status: 'Em Andamento',
+        eventDate: '24/12/2025',
+        priceFrom: 2100.00,
+        priceTo: 1850.00,
+        packagePrices: { casal: 3600.00, solteiro: 1850.00, familia: 5200.00 },
+        reviews: [
+            { rating: 5, comment: 'Natal mais lindo que já tive! A decoração estava deslumbrante e a ceia maravilhosa.', guestName: 'Aline V.' },
+            { rating: 5, comment: 'O clima natalino no hotel é super acolhedor. Me senti em um filme.', guestName: 'Bruno F.' },
+            { rating: 4, comment: 'Tudo muito bom, só achei que poderia ter mais atividades para crianças pequenas.', guestName: 'Carla A.' },
+        ]
+    },
+];
 
+const blogPosts = [
+    {
+        id: 1,
+        title: '10 Dicas Essenciais para Arrumar a Mala Perfeita',
+        description: 'Descubra como otimizar espaço e evitar excesso de bagagem com estas dicas de ouro.',
+        imageUrl: BlogMala,
+        category: 'Planejamento',
+        fullContent: '<p>Arrumar a mala pode ser um desafio, mas com algumas estratégias simples, você pode otimizar o espaço e garantir que não esqueça nada essencial. Comece fazendo uma lista de tudo o que você realmente precisa, priorizando itens versáteis e que combinem entre si. </p><p>Uma técnica popular é a de enrolar as roupas. Roupas enroladas ocupam menos espaço e tendem a amassar menos. Use organizadores de mala ou sacos a vácuo para comprimir itens e separar categorias. Não se esqueça de itens de higiene personalizadas em embalagens pequenas e de levar uma troca de roupa na bagagem de mão, por segurança.</p><p>Para economizar espaço, vista as peças mais volumosas, como casacos e botas, no dia da viagem. Use os sapatos para guardar meias ou outros pequenos objetos. E o mais importante: tente levar apenas o necessário, evitando o "e se..." que geralmente leva a excesso de peso!</p>'
+    },
+    {
+        id: 2,
+        title: 'Viajar com Economia: Guia Completo para Orçamentos Pequenos',
+        description: 'Explore o mundo sem esvaziar a carteira! Dicas de passagens, hospedagem e alimentação barata.',
+        imageUrl: BlogEconomia,
+        category: 'Economia',
+        fullContent: '<p>Viajar com um orçamento limitado é totalmente possível! A chave está no planejamento inteligente e na flexibilidade. Primeiramente, seja flexível com as datas e destinos. Voos e hospedagens em baixa temporada ou em dias de semana costumam ser mais baratos. Considere destinos menos óbvios, que ofereçam custo de vida mais baixo.</p><p>Para transporte, utilize milhas, passagens promocionais ou considere viajar de ônibus ou trem. Em relação à hospedagem, hostels, pousadas simples ou aluguel de quartos via plataformas como Airbnb podem ser mais econômicos que hotéis tradicionais. Se for cozinhar algumas refeições, isso economiza bastante.</p><p>Na alimentação, explore mercados locais, feiras de rua e restaurantes frequentados por moradores. Evite restaurantes em pontos turísticos muito caros. Andar a pé ou usar transporte público também é uma ótima maneira de economizar e conhecer melhor o lugar. Lembre-se, uma viagem econômica não significa abrir mão da experiência, mas sim priorizar o que realmente importa para você!</p>'
+    },
+    {
+        id: 3,
+        title: 'Seu Pet na Aventura: Viajando com Animais de Estimação',
+        description: 'Tudo o que você precisa saber para levar seu amigo de quatro patas na próxima viagem.',
+        imageUrl: BlogPet,
+        category: 'Dicas',
+        fullContent: '<p>Levar seu pet em viagens pode ser uma experiência maravilhosa para ambos, mas exige planejamento. O primeiro passo é verificar as regras da companhia aérea ou terrestre para transporte de animais, incluindo tipo de caixa de transporte, documentação necessária (carteira de vacinação, atestado de saúde) e taxas.</p><p>No destino, pesquise por hotéis, pousadas ou aluguéis de temporada que sejam realmente pet-friendly. Muitos lugares aceitam animais, mas impõem restrições de tamanho ou raça, e podem cobrar taxas adicionais. Verifique também se há parques ou áreas onde seu pet possa se exercitar.</p><p>Durante a viagem, leve brinquedos familiares, a ração habitual e potes para água e comida. Mantenha seu pet hidratado e faça paradas regulares se for uma viagem de carro. Um colar de identificação com seu telefone é indispensável. Com preparação, a viagem do seu pet será tão prazerosa quanto a sua!</p>'
+    },
+    {
+        id: 4,
+        title: 'Segurança em Viagens Internacionais: O que Você Precisa Saber',
+        description: 'Dicas cruciais para manter sua segurança e tranquilidade em destinos estrangeiros.',
+        imageUrl: BlogViagem,
+        category: 'Segurança',
+        fullContent: '<p>Viajar para o exterior é emocionante, mas a segurança deve ser sempre uma prioridade. Antes de viajar, pesquise sobre o destino: costumes locais, áreas a evitar, e se há alguma instabilidade política ou social. Cadastre-se no serviço de registro de brasileiros no exterior do seu país (consulado), se aplicável, para ser localizado em caso de emergência.</p><p>Durante a viagem, evite exibir objetos de valor, use doleiras ou cintos de dinheiro para guardar documentos e grandes quantias de dinheiro. Tenha cópias digitais de todos os documentos importantes. Preferia usar caixas eletrônicos em locais seguros e movimentados, e informe seu banco sobre a viagem para evitar bloqueios no cartão.</p><p>No transporte, use serviços de táxi ou aplicativos conhecidos. À noite, evite andar sozinho em ruas desertas. Confie na sua intuição. E o mais importante: faça um seguro viagem abrangente, que cubra desde emergências médicas até extravio de bagagem. Estar preparado é a melhor forma de aproveitar sua viagem com tranquilidade!</p>'
+    },
+];
 function App() {
+    const { isLoaded, loadError } = useJsApiLoader({
+        id: 'google-map-script',
+        googleMapsApiKey: MAPS_API_KEY,
+    });
+    
     const [selectedPackageId, setSelectedPackageId] = useState(null);
     const [selectedFlightId, setSelectedFlightId] = useState(null);
     const [selectedPromotionId, setSelectedPromotionId] = useState(null);
@@ -414,29 +528,26 @@ function App() {
     const [promotionToPurchase, setPromotionToPurchase] = useState(null);
     const [selectedBlogPostId, setSelectedBlogPostId] = useState(null);
     const [selectedBlogCategory, setSelectedBlogCategory] = useState(null);
-    // NOVO: Estado para armazenar o ID do hotel recomendado selecionado para ver detalhes
     const [selectedRecommendedHotelId, setSelectedRecommendedHotelId] = useState(null);
+    const [selectedHotelIdFromMap, setSelectedHotelIdFromMap] = useState(null);
 
-    // NOVO: Estado para as informações do usuário logado (mockado)
     const [loggedInUser, setLoggedInUser] = useState({
         name: 'Cliente Tripz',
         email: 'cliente@tripz.com.br',
-        phone: '(81) 99876-5432', // Adicionado telefone
-        address: 'Rua das Viagens, 100', // Adicionado endereço
-        city: 'Recife', // Adicionado cidade
-        state: 'PE', // Adicionado estado
-        zipCode: '50000-000', // Adicionado CEP
-        avatar: 'https://via.placeholder.com/150/CCCCCC/FFFFFF?text=Avatar', // Avatar padrão
-        points: 1250, // Pontos iniciais
+        phone: '(81) 99876-5432',
+        address: 'Rua das Viagens, 100',
+        city: 'Recife',
+        state: 'PE',
+        zipCode: '50000-000',
+        avatar: 'https://via.placeholder.com/150/CCCCCC/FFFFFF?text=Avatar',
+        points: 1250,
     });
 
-    // NOVO: Estado para hotéis já visitados (simulação)
     const [userVisitedHotels, setUserVisitedHotels] = useState([
         allHotelsData[0], // Exemplo: Rio de Janeiro
         allHotelsData[2], // Exemplo: Recife
     ]);
 
-    // ESTADOS E LÓGICA DE FILTRO PARA HOTÉIS (MOVIDO DO HotelsPage)
     const [hotelSearchFilters, setHotelSearchFilters] = useState({
         destination: '',
         checkInDate: '',
@@ -447,21 +558,9 @@ function App() {
         maxPrice: 5000,
         selectedAmenities: [],
     });
-    const [filteredHotels, setFilteredHotels] = useState(allHotelsData); // Começa com todos os hotéis
-
-    // Função que será passada para HotelsSearchForm para atualizar os filtros
-    const handleHotelSearch = (filters) => {
-        setHotelSearchFilters(filters);
-        // Ao realizar uma busca, queremos ir para a página de hotéis
-        setCurrentPage('hotels');
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // Rola para o topo ao pesquisar
-    };
-
-    // Efeito para recalcular os hotéis filtrados sempre que os filtros mudarem
+    const [filteredHotels, setFilteredHotels] = useState(allHotelsData);
     React.useEffect(() => {
         let tempHotels = [...allHotelsData];
-
-        // 1. Filtrar por destino
         if (hotelSearchFilters.destination) {
             const normalizedDestination = removeAccents(hotelSearchFilters.destination).toLowerCase();
             tempHotels = tempHotels.filter(hotel =>
@@ -469,21 +568,12 @@ function App() {
                 removeAccents(hotel.title).toLowerCase().includes(normalizedDestination)
             );
         }
-
-        // 2. Filtrar por avaliação mínima
         if (hotelSearchFilters.minRating > 0) {
             tempHotels = tempHotels.filter(hotel => hotel.rating >= hotelSearchFilters.minRating);
         }
-
-        // 3. Filtrar por preço máximo
         if (hotelSearchFilters.maxPrice) {
             tempHotels = tempHotels.filter(hotel => hotel.price <= hotelSearchFilters.maxPrice);
         }
-
-        // 4. Filtrar por tipo de quarto e capacidade de hóspedes
-        // Se um roomType específico for selecionado, o hotel deve ter um quarto desse tipo
-        // que também acomode o número de hóspedes.
-        // Se não houver roomType específico, o hotel deve ter QUALQUER quarto que acomode os hóspedes.
         if (hotelSearchFilters.roomType || hotelSearchFilters.guests > 0) {
             tempHotels = tempHotels.filter(hotel =>
                 hotel.roomOptions.some(room => {
@@ -493,8 +583,6 @@ function App() {
                 })
             );
         }
-
-        // 5. Filtrar por comodidades selecionadas
         if (hotelSearchFilters.selectedAmenities && hotelSearchFilters.selectedAmenities.length > 0) {
             tempHotels = tempHotels.filter(hotel =>
                 hotelSearchFilters.selectedAmenities.every(amenity =>
@@ -502,16 +590,15 @@ function App() {
                 )
             );
         }
-
-        // TODO: Lógica de filtro por datas (checkInDate/checkOutDate)
-        // Isso é mais complexo e exigiria um sistema de disponibilidade de quartos por data em cada hotel.
-        // Por agora, as datas no filtro do HotelsSearchForm são apenas para coleta de input.
-
         setFilteredHotels(tempHotels);
-    }, [hotelSearchFilters, allHotelsData]);
+    }, [hotelSearchFilters]);
 
+    const handleHotelSearch = (filters) => {
+        setHotelSearchFilters(filters);
+        setCurrentPage('hotels');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
-    // Função para converter data de DD/MM/AAAA para AAAA-MM-DD
     const convertDdMmYyyyToYyyyMmDd = (dateString) => {
         if (!dateString) return null;
         const parts = dateString.split('/');
@@ -521,111 +608,15 @@ function App() {
         return dateString;
     };
 
+    const handleHotelSelectFromMap = (hotel) => {
+        setSelectedHotelIdFromMap(hotel.id);
+        setCurrentPage('mapHotelDetails');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
-    const allPromotionalTravels = [
-        {
-            id: 13,
-            title: 'Carnaval Tripz Folia em Recife!',
-            description: 'Sinta a energia contagiante do Carnaval em Recife! Nosso Hotel Tripz, com sua arquitetura moderna e vibrante, é o cenário perfeito para você se jogar no frevo. Garanta pacotes exclusivos e esteja no coração da festa mais democrática do Brasil.',
-            imageUrl: ImageCarnavelPe,
-            type: 'Nacional',
-            status: 'Em Andamento',
-            eventDate: '15/02/2027',
-            priceFrom: 2500.00,
-            priceTo: 1999.00,
-            packagePrices: {
-                casal: 3800.00,
-                solteiro: 1999.00,
-                familia: 5500.00
-            },
-            reviews: [
-                { rating: 5, comment: 'Energia incrível! O hotel estava perfeito para o Carnaval. Voltarei!', guestName: 'Maria S.' },
-                { rating: 4, comment: 'Adorei a localização e a estrutura. A festa foi sensacional.', guestName: 'João P.' },
-                { rating: 5, comment: 'Recife é demais no Carnaval, e o Tripz tornou a experiência ainda melhor.', guestName: 'Ana L.' },
-            ]
-        },
-        {
-            id: 16,
-            title: 'Réveillon Tripz: Brilho e Emoção em Copacabana!',
-            description: 'Prepare-se para a maior festa de Réveillon do mundo! O Hotel Tripz em Copacabana te coloca no centro da celebração. Com um telão exclusivo no jardim, uma cascata de fogos de artifício no céu e a energia da praia mais famosa do Brasil, sua virada de ano será inesquecível.',
-            imageUrl: ImageAnoNovoRJ,
-            type: 'Nacional',
-            status: 'Em Andamento',
-            eventDate: '31/12/2026',
-            priceFrom: 4000.00,
-            priceTo: 3200.00,
-            packagePrices: {
-                casal: 6000.00,
-                solteiro: 3200.00,
-                familia: 8500.00
-            },
-            reviews: [
-                { rating: 5, comment: 'Melhor Réveillon da vida! A vista dos fogos foi espetacular e a festa do hotel, impecável.', guestName: 'Paula G.' },
-                { rating: 5, comment: 'Experiência única. Tudo muito bem organizado e seguro.', guestName: 'Ricardo F.' },
-                { rating: 4, comment: 'Incrível! Poderia ter mais opções de comida no buffet, mas a festa foi nota 10.', guestName: 'Camila B.' },
-            ]
-        },
-        {
-            id: 18,
-            title: 'Natal Mágico na Montanha - Tripz Garanhuns!',
-            description: 'Viva a magia do Natal em Garanhuns! Nosso hotel de arquitetura em madeira se transforma num refúgio aconchegante com decorações festivas, ceia especial e um clima europeu que encanta a todos. Perfeito para um Natal inesquecível em família.',
-            imageUrl: ImageNatalRS,
-            type: 'Nacional',
-            status: 'Em Andamento',
-            eventDate: '24/12/2025',
-            priceFrom: 2100.00,
-            priceTo: 1850.00,
-            packagePrices: {
-                casal: 3600.00,
-                solteiro: 1850.00,
-                familia: 5200.00
-            },
-            reviews: [
-                { rating: 5, comment: 'Natal mais lindo que já tive! A decoração estava deslumbrante e a ceia maravilhosa.', guestName: 'Aline V.' },
-                { rating: 5, comment: 'O clima natalino no hotel é super acolhedor. Me senti em um filme.', guestName: 'Bruno F.' },
-                { rating: 4, comment: 'Tudo muito bom, só achei que poderia ter mais atividades para crianças pequenas.', guestName: 'Carla A.' },
-            ]
-        },
-    ];
-
-
-    const allAvailableTravels = [...allPromotionalTravels];
-
-    const blogPosts = [
-        {
-            id: 1,
-            title: '10 Dicas Essenciais para Arrumar a Mala Perfeita',
-            description: 'Descubra como otimizar espaço e evitar excesso de bagagem com estas dicas de ouro.',
-            imageUrl: BlogMala,
-            category: 'Planejamento',
-            fullContent: '<p>Arrumar a mala pode ser um desafio, mas com algumas estratégias simples, você pode otimizar o espaço e garantir que não esqueça nada essencial. Comece fazendo uma lista de tudo o que você realmente precisa, priorizando itens versáteis e que combinem entre si. </p><p>Uma técnica popular é a de enrolar as roupas. Roupas enroladas ocupam menos espaço e tendem a amassar menos. Use organizadores de mala ou sacos a vácuo para comprimir itens e separar categorias. Não se esqueça de itens de higiene personalizadas em embalagens pequenas e de levar uma troca de roupa na bagagem de mão, por segurança.</p><p>Para economizar espaço, vista as peças mais volumosas, como casacos e botas, no dia da viagem. Use os sapatos para guardar meias ou outros pequenos objetos. E o mais importante: tente levar apenas o necessário, evitando o "e se..." que geralmente leva a excesso de peso!</p>'
-        },
-        {
-            id: 2,
-            title: 'Viajar com Economia: Guia Completo para Orçamentos Pequenos',
-            description: 'Explore o mundo sem esvaziar a carteira! Dicas de passagens, hospedagem e alimentação barata.',
-            imageUrl: BlogEconomia,
-            category: 'Economia',
-            fullContent: '<p>Viajar com um orçamento limitado é totalmente possível! A chave está no planejamento inteligente e na flexibilidade. Primeiramente, seja flexível com as datas e destinos. Voos e hospedagens em baixa temporada ou em dias de semana costumam ser mais baratos. Considere destinos menos óbvios, que ofereçam custo de vida mais baixo.</p><p>Para transporte, utilize milhas, passagens promocionais ou considere viajar de ônibus ou trem. Em relação à hospedagem, hostels, pousadas simples ou aluguel de quartos via plataformas como Airbnb podem ser mais econômicos que hotéis tradicionais. Se for cozinhar algumas refeições, isso economiza bastante.</p><p>Na alimentação, explore mercados locais, feiras de rua e restaurantes frequentados por moradores. Evite restaurantes em pontos turísticos muito caros. Andar a pé ou usar transporte público também é uma ótima maneira de economizar e conhecer melhor o lugar. Lembre-se, uma viagem econômica não significa abrir mão da experiência, mas sim priorizar o que realmente importa para você!</p>'
-        },
-        {
-            id: 3,
-            title: 'Seu Pet na Aventura: Viajando com Animais de Estimação',
-            description: 'Tudo o que você precisa saber para levar seu amigo de quatro patas na próxima viagem.',
-            imageUrl: BlogPet,
-            category: 'Dicas',
-            fullContent: '<p>Levar seu pet em viagens pode ser uma experiência maravilhosa para ambos, mas exige planejamento. O primeiro passo é verificar as regras da companhia aérea ou terrestre para transporte de animais, incluindo tipo de caixa de transporte, documentação necessária (carteira de vacinação, atestado de saúde) e taxas.</p><p>No destino, pesquise por hotéis, pousadas ou aluguéis de temporada que sejam realmente pet-friendly. Muitos lugares aceitam animais, mas impõem restrições de tamanho ou raça, e podem cobrar taxas adicionais. Verifique também se há parques ou áreas onde seu pet possa se exercitar.</p><p>Durante a viagem, leve brinquedos familiares, a ração habitual e potes para água e comida. Mantenha seu pet hidratado e faça paradas regulares se for uma viagem de carro. Um colar de identificação com seu telefone é indispensável. Com preparação, a viagem do seu pet será tão prazerosa quanto a sua!</p>'
-        },
-        {
-            id: 4,
-            title: 'Segurança em Viagens Internacionais: O que Você Precisa Saber',
-            description: 'Dicas cruciais para manter sua segurança e tranquilidade em destinos estrangeiros.',
-            imageUrl: BlogViagem,
-            category: 'Segurança',
-            fullContent: '<p>Viajar para o exterior é emocionante, mas a segurança deve ser sempre uma prioridade. Antes de viajar, pesquise sobre o destino: costumes locais, áreas a evitar, e se há alguma instabilidade política ou social. Cadastre-se no serviço de registro de brasileiros no exterior do seu país (consulado), se aplicável, para ser localizado em caso de emergência.</p><p>Durante a viagem, evite exibir objetos de valor, use doleiras ou cintos de dinheiro para guardar documentos e grandes quantias de dinheiro. Tenha cópias digitais de todos os documentos importantes. Preferia usar caixas eletrônicos em locais seguros e movimentados, e informe seu banco sobre a viagem para evitar bloqueios no cartão.</p><p>No transporte, use serviços de táxi ou aplicativos conhecidos. À noite, evite andar sozinho em ruas desertas. Confie na sua intuição. E o mais importante: faça um seguro viagem abrangente, que cubra desde emergências médicas até extravio de bagagem. Estar preparado é a melhor forma de aproveitar sua viagem com tranquilidade!</p>'
-        },
-    ];
-
+    const handleReserveRoom = (hotel, room) => {
+        alert(`Redirecionando para reserva do quarto ${room.type} no hotel ${hotel.title}`);
+    };
 
     const handlePromotionClick = (promotionId) => {
         setSelectedPromotionId(promotionId);
@@ -638,17 +629,13 @@ function App() {
         setCurrentPage('purchase');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-
-    const handleSaveTravel = (travelToSave) => {
+const handleSaveTravel = (travelToSave) => {
         const isAlreadySaved = savedUserTravels.some(saved => saved.id === travelToSave.id);
-
         if (isAlreadySaved) {
             setSavedUserTravels(prevSaved => prevSaved.filter(saved => saved.id !== travelToSave.id));
-            console.log(`Viagem ${travelToSave.title} removida dos salvos.`);
         } else {
             const travelWithStatus = { ...travelToSave, status: 'Salva', type: travelToSave.type || 'Internacional' };
             setSavedUserTravels(prevSaved => [...prevSaved, travelWithStatus]);
-            console.log(`Viagem ${travelToSave.title} salva!`);
         }
     };
 
@@ -658,13 +645,10 @@ function App() {
 
     const handleSaveHotel = (hotelToSave) => {
         const isHotelAlreadySaved = savedUserHotels.some(saved => saved.id === hotelToSave.id);
-
         if (isHotelAlreadySaved) {
             setSavedUserHotels(prevSaved => prevSaved.filter(saved => saved.id !== hotelToSave.id));
-            console.log(`Hotel ${hotelToSave.title} removido dos salvos.`);
         } else {
             setSavedUserHotels(prevSaved => [...prevSaved, hotelToSave]);
-            console.log(`Hotel ${hotelToSave.title} salvo!`);
         }
     };
 
@@ -677,72 +661,36 @@ function App() {
         alert('Hotel removido da sua lista de desejos.');
     };
 
-    const handleGlobalSearch = (term) => {
-        console.log("Busca no Header desativada. Termo:", term);
-        setCurrentPage('home');
-        setActiveFilterButton('');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handlePackageClick = (packageId) => {
-        console.log("Card de pacote genérico clicado:", packageId);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleFlightCardClick = (flightId) => {
-        setSelectedFlightId(flightId);
-        setCurrentPage('flightDetails');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
     const handleBackToList = () => {
-        if (currentPage === 'flightDetails') {
-            setCurrentPage('flights');
-        } else if (currentPage === 'promotionDetails') {
+        if (currentPage === 'mapHotelDetails') {
+            setCurrentPage('home');
+            setSelectedHotelIdFromMap(null);
+        } else if (currentPage === 'promotionDetails' || currentPage === 'purchase') {
             setCurrentPage('home');
             setSelectedPromotionId(null);
-        } else if (currentPage === 'purchase') {
-            setCurrentPage('promotionDetails');
             setPromotionToPurchase(null);
         } else if (currentPage === 'institutional') {
             setCurrentPage('home');
-        } else if (currentPage === 'blogPostDetails') {
+        } else if (currentPage === 'blogPostDetails' || currentPage === 'blogCategory') {
             setCurrentPage('home');
             setSelectedBlogPostId(null);
             setSelectedBlogCategory(null);
-        } else if (currentPage === 'blogCategory') {
-            setCurrentPage('home');
-            setSelectedBlogCategory(null);
-                       
         } else if (currentPage === 'hotels') {
             setCurrentPage('home');
-            setHotelSearchFilters({
-                destination: '',
-                checkInDate: '',
-                checkOutDate: '',
-                guests: 2,
-                roomType: '',
-                minRating: 0,
-                maxPrice: 5000,
-                selectedAmenities: [],
-            });
-            setFilteredHotels(allHotelsData);
-        // NOVO: Lógica de retorno para a página de recomendados
         } else if (currentPage === 'recommendedHotelDetails') {
-            setCurrentPage('home'); // Ou 'recommended', se você criar uma página só para isso
+            setCurrentPage('home');
             setSelectedRecommendedHotelId(null);
-            setActiveFilterButton('recommended'); // Volta a ativar o botão de recomendados
-             // Rola para a seção de recomendados após voltar
-             setTimeout(() => {
-                document.getElementById('recomendado-viajantes')?.scrollIntoView({ behavior: 'smooth' });
-            }, 100);
         }
         else {
             setCurrentPage('home');
             setActiveFilterButton('');
         }
-        setSelectedPackageId(null);
-        setSelectedFlightId(null);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleNavigateToHome = () => {
+        setCurrentPage('home');
+        setActiveFilterButton('');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -752,46 +700,6 @@ function App() {
         } else {
             setCurrentPage('myTravels');
         }
-        setSelectedPackageId(null);
-        setSelectedFlightId(null);
-        setActiveFilterButton('');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleNavigateToHome = () => {
-        setCurrentPage('home');
-        setSelectedPackageId(null);
-        setSelectedFlightId(null);
-        setActiveFilterButton('');
-        setSelectedBlogCategory(null);
-        setSelectedRecommendedHotelId(null); // Reseta o hotel recomendado selecionado
-        setHotelSearchFilters({
-            destination: '',
-            checkInDate: '',
-            checkOutDate: '',
-            guests: 2,
-            roomType: '',
-            minRating: 0,
-            maxPrice: 5000,
-            selectedAmenities: [],
-        });
-        setFilteredHotels(allHotelsData);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleNavigateToLogin = () => {
-        setCurrentPage('login');
-        setSelectedPackageId(null);
-        setSelectedFlightId(null);
-        setActiveFilterButton('');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleNavigateToRegister = () => {
-        setCurrentPage('register');
-        setSelectedPackageId(null);
-        setSelectedFlightId(null);
-        setActiveFilterButton('');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -811,38 +719,21 @@ function App() {
         alert('Você foi desconectado com sucesso!');
     };
 
-    const handleUpdateUser = (updatedUser) => {
-        setLoggedInUser(updatedUser);
-    };
-
-    const handleNavigateToFlights = () => {
-        setCurrentPage('flights');
-        setSelectedPackageId(null);
-        setSelectedFlightId(null);
-        setActiveFilterButton('');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
     const handleSelectPromos = () => {
         setActiveFilterButton('promos');
         setCurrentPage('home');
-        window.scrollTo({ top: document.getElementById('viagens-promocao')?.offsetTop || 0, behavior: 'smooth' });
+        setTimeout(() => document.getElementById('viagens-promocao')?.scrollIntoView({ behavior: 'smooth' }), 0);
     };
 
     const handleSelectRecommended = () => {
         setActiveFilterButton('recommended');
-        setCurrentPage('home'); // Permanece na home para mostrar a seção de recomendados
-        // Rola até a seção de recomendados
-        setTimeout(() => {
-            document.getElementById('recomendado-viajantes')?.scrollIntoView({ behavior: 'smooth' });
-        }, 100); // Pequeno atraso para garantir que o DOM seja atualizado
+        setCurrentPage('home');
+        setTimeout(() => document.getElementById('recomendado-viajantes')?.scrollIntoView({ behavior: 'smooth' }), 100);
     };
 
     const handleNavigateToHotels = () => {
         setCurrentPage('hotels');
         setActiveFilterButton('hotels');
-        setSelectedPackageId(null);
-        setSelectedFlightId(null);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -854,237 +745,104 @@ function App() {
     const handleBlogPostClick = (postId) => {
         setSelectedBlogPostId(postId);
         setCurrentPage('blogPostDetails');
-        setSelectedBlogCategory(null);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleBlogCategoryClick = (category) => {
-        setSelectedBlogCategory(category);
-        setCurrentPage('blogCategory');
-        setSelectedBlogPostId(null);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    // NOVO: Função para lidar com o clique em "Ver Detalhes" de um hotel recomendado
     const handleRecommendedHotelDetailsClick = (hotelId) => {
         setSelectedRecommendedHotelId(hotelId);
         setCurrentPage('recommendedHotelDetails');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleOpenEventReservationForm = () => {
-        setShowEventReservationForm(true);
+    const handleOpenEventReservationForm = () => setShowEventReservationForm(true);
+    const handleCloseEventReservationForm = () => setShowEventReservationForm(false);
+    
+    // ✅ NOVAS FUNÇÕES DE NAVEGAÇÃO PARA O FOOTER
+    const handleNavigateToEvents = () => {
+        setCurrentPage('events');
+        setActiveFilterButton('events');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleCloseEventReservationForm = () => {
-        setShowEventReservationForm(false);
+    const handleNavigateToBlog = () => {
+        setCurrentPage('home');
+        setTimeout(() => document.getElementById('dicas-de-viagem')?.scrollIntoView({ behavior: 'smooth' }), 0);
     };
 
-    const selectedGenericPackage = allAvailableTravels.find(
-        (travel) => travel.id === selectedPackageId
-    );
-
-    const selectedPromotionData = allPromotionalTravels.find(
-        (promo) => promo.id === selectedPromotionId
-    );
-
-    const filteredBlogPosts = selectedBlogCategory
-        ? blogPosts.filter(post => post.category === selectedBlogCategory)
-        : blogPosts;
-
-
-    // NOVO: Encontra o hotel recomendado selecionado
+    const currentMapHotel = allHotelsData.find(h => h.id === selectedHotelIdFromMap);
+    const selectedPromotionData = allPromotionalTravels.find(promo => promo.id === selectedPromotionId);
     const currentRecommendedHotel = allHotelsData.find(h => h.id === selectedRecommendedHotelId);
-
+    const filteredBlogPosts = selectedBlogCategory ? blogPosts.filter(post => post.category === selectedBlogCategory) : blogPosts;
 
     return (
         <div className="min-h-screen flex flex-col">
             <Header
-                onSearch={handleGlobalSearch}
-                onNavigateToMyTravels={handleNavigateToMyTravels}
                 onNavigateToHome={handleNavigateToHome}
-                onNavigateToFlights={handleNavigateToFlights}
                 onNavigateToHotels={handleNavigateToHotels}
                 onNavigateToInstitutional={handleNavigateToInstitutional}
+                onNavigateToMyTravels={handleNavigateToMyTravels}
                 currentPage={currentPage}
             />
-
             <main className="flex-grow">
-                {/* HeroSwiper agora sempre visível */}
                 <HeroSwiper />
-
-                {/* Seção de botões de categoria. Visível em quase todas as páginas, exceto login, registro e minhas viagens */}
-                {currentPage !== 'login' &&
-                    currentPage !== 'register' &&
-                    currentPage !== 'myTravels' &&
-                    currentPage !== 'institutional' && ( 
-                        <section className="bg-white rounded-t-[50px] shadow-md -mt-5 md:-mt-10 relative z-10 py-4 px-6">
-                            <div className="container mx-auto flex flex-wrap justify-center gap-4">
-                                {/* Seus botões de Promoção, Recomendado, Hotéis, Eventos */}
-                                <a
-                                    href="#viagens-promocao"
-                                    onClick={handleSelectPromos}
-                                    className={`btn-common-style ${activeFilterButton === 'promos' ? 'btn-active-style' : 'btn-hover-style'} flex items-center`}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5.98a2 2 0 012 2v6c0 1.105-.895 2-2 2H7a2 2 0 01-2-2V5c0-1.105.895-2 2-2zM4 15h16M4 21h16M14 17l-2 2-2-2" />
-                                    </svg>
-                                    Promoção
-                                </a>
-                                <a
-                                    href="#recomendado-viajantes"
-                                    onClick={handleSelectRecommended}
-                                    className={`btn-common-style ${activeFilterButton === 'recommended' ? 'btn-active-style' : 'btn-hover-style'} flex items-center`}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674h4.914c.95 0 1.371 1.24.588 1.81l-3.976 2.888 1.519 4.674c.3.921-.755 1.688-1.539 1.157L12 17.635l-4.067 2.954c-.783.53-1.838-.236-1.539-1.157l1.519-4.674-3.976-2.888c-.784-.57-.362-1.81.588-1.81h4.914l1.519-4.674z" />
-                                    </svg>
-                                    Recomendado por Viajantes
-                                </a>
-                                <button
-                                    onClick={handleNavigateToHotels}
-                                    className={`reset-btn-style btn-common-style ${activeFilterButton === 'hotels' ? 'btn-active-style' : 'btn-hover-style'} flex items-center`}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a2 2 0 012-2h2a2 2 0 012 2v5m-10 0h10" />
-                                    </svg>
-                                    Hotéis
-                                </button>
-                                <button
-                                    onClick={() => setCurrentPage('events')}
-                                    className={`reset-btn-style btn-common-style ${activeFilterButton === 'events' ? 'btn-active-style' : 'btn-hover-style'} flex items-center`}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    Eventos
-                                </button>
-                            </div>
-                        </section>
-                    )}
-
-                {/* Renderiza a barra de pesquisa de hotéis, APENAS na Home */}
+                {currentPage !== 'login' && currentPage !== 'register' && currentPage !== 'myTravels' && currentPage !== 'institutional' && (
+                    <section className="bg-white rounded-t-[50px] shadow-md -mt-5 md:-mt-10 relative z-10 py-4 px-6">
+                        <div className="container mx-auto flex flex-wrap justify-center gap-4">
+                            <a href="#viagens-promocao" onClick={handleSelectPromos} className={`btn-common-style ${activeFilterButton === 'promos' ? 'btn-active-style' : 'btn-hover-style'} flex items-center`}>Promoção</a>
+                            <a href="#recomendado-viajantes" onClick={handleSelectRecommended} className={`btn-common-style ${activeFilterButton === 'recommended' ? 'btn-active-style' : 'btn-hover-style'} flex items-center`}>Recomendado por Viajantes</a>
+                            <button onClick={handleNavigateToHotels} className={`reset-btn-style btn-common-style ${activeFilterButton === 'hotels' ? 'btn-active-style' : 'btn-hover-style'} flex items-center`}>Hotéis</button>
+                            <button onClick={handleNavigateToEvents} className={`reset-btn-style btn-common-style ${activeFilterButton === 'events' ? 'btn-active-style' : 'btn-hover-style'} flex items-center`}>Eventos</button>
+                        </div>
+                    </section>
+                )}
                 {currentPage === 'home' && (
-                    <section className="px-6 -mt-10 md:-mt-16 relative z-0"> {/* <--- Ajuste aqui: -mt-10 md:-mt-16 */}
+                    <section className="px-6 -mt-10 md:-mt-16 relative z-0">
                         <div className="container mx-auto max-w-full">
                             <HotelsSearchForm onSearch={handleHotelSearch} allHotelsData={allHotelsData} />
                         </div>
                     </section>
                 )}
-
-
-                {/* Lógica de Renderização de CONTEÚDO ESPECÍFICO da página */}
-                {selectedFlightId ? (
-                    <p>Flight Details Page (Componente não fornecido na amostra)</p>
-                ) : currentPage === 'login' ? (
-                    <LoginPage onNavigateToRegister={handleNavigateToRegister} onLoginSuccess={handleLoginSuccess} />
-                ) : currentPage === 'register' ? (
-                    <RegisterPage onNavigateToLogin={handleNavigateToLogin} />
-                ) : currentPage === 'myTravels' ? (
-                    <MyTravelsPage
-                        user={loggedInUser}
-                        onUpdateUser={handleUpdateUser}
-                        onBack={handleBackToList}
-                        onLogout={handleLogout}
-                        savedHotels={savedUserHotels}
-                        visitedHotels={userVisitedHotels}
-                        onRemoveSavedHotel={handleRemoveSavedHotel}
-                    />
-                ) : currentPage === 'hotels' ? (
-                    <HotelsPage
-                        hotels={filteredHotels}
-                        onSaveHotel={handleSaveHotel}
-                        isHotelSaved={isHotelSaved}
-                        onBackToList={handleBackToList}
-                    />
-                ) : currentPage === 'events' ? (
-                    <EventBlogSection onOpenReservationForm={handleOpenEventReservationForm} />
-                ) : currentPage === 'promotionDetails' && selectedPromotionData ? (
-                    <PromotionDetailsPage
-                        promotionData={selectedPromotionData}
-                        onBack={handleBackToList}
-                        onNavigateToPurchase={handleNavigateToPurchase}
-                    />
-                ) : currentPage === 'purchase' && promotionToPurchase ? (
-                    <PurchasePage
-                        promotionData={promotionToPurchase}
-                        onBack={handleBackToList}
-                    />
-                ) : currentPage === 'institutional' ? (
-                    <InstitutionalPage />
-                ) : currentPage === 'blogPostDetails' && selectedBlogPostId ? (
-                    <BlogPostDetailsPage
-                        postId={selectedBlogPostId}
-                        allBlogPosts={blogPosts}
-                        onBack={handleBackToList}
-                        onCategoryClick={handleBlogCategoryClick}
-                    />
-                ) : currentPage === 'blogCategory' && selectedBlogCategory ? (
+                
+                {currentPage === 'login' ? <LoginPage onNavigateToRegister={() => setCurrentPage('register')} onLoginSuccess={handleLoginSuccess} />
+                : currentPage === 'register' ? <RegisterPage onNavigateToLogin={() => setCurrentPage('login')} />
+                : currentPage === 'myTravels' ? <MyTravelsPage user={loggedInUser} onBack={handleBackToList} onLogout={handleLogout} savedHotels={savedUserHotels} visitedHotels={userVisitedHotels} onRemoveSavedHotel={(id) => setSavedUserHotels(savedUserHotels.filter(h => h.id !== id))} />
+                : currentPage === 'mapHotelDetails' && currentMapHotel ? <HotelDetailsPage hotel={currentMapHotel} onBack={handleBackToList} onReserveRoom={handleReserveRoom} />
+                : currentPage === 'hotels' ? <HotelsPage hotels={filteredHotels} onSaveHotel={handleSaveHotel} isHotelSaved={isHotelSaved} onBackToList={handleBackToList} />
+                : currentPage === 'events' ? <EventBlogSection onOpenReservationForm={handleOpenEventReservationForm} />
+                : currentPage === 'promotionDetails' && selectedPromotionData ? <PromotionDetailsPage promotionData={selectedPromotionData} onBack={handleBackToList} onNavigateToPurchase={(data) => { setPromotionToPurchase(data); setCurrentPage('purchase'); }} />
+                : currentPage === 'purchase' && promotionToPurchase ? <PurchasePage promotionData={promotionToPurchase} onBack={() => setCurrentPage('promotionDetails')} />
+                : currentPage === 'institutional' ? <InstitutionalPage />
+                : currentPage === 'blogPostDetails' && selectedBlogPostId ? <BlogPostDetailsPage postId={selectedBlogPostId} allBlogPosts={blogPosts} onBack={handleBackToList} onCategoryClick={(cat) => { setSelectedBlogCategory(cat); setCurrentPage('blogCategory'); }} />
+                : currentPage === 'blogCategory' && selectedBlogCategory ? (
                     <div className="container mx-auto py-8 px-6">
-                        <button
-                            onClick={handleBackToList}
-                            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mb-8 transition duration-300"
-                        >
-                            ← Voltar para Dicas de Viagem
-                        </button>
-                        <h1 className="text-3xl font-bold text-gray-800 mb-6">
-                            Posts na Categoria: "{selectedBlogCategory}"
-                        </h1>
-                        {filteredBlogPosts.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {filteredBlogPosts.map(post => (
-                                    <BlogPostCard
-                                        key={post.id}
-                                        post={post}
-                                        onCardClick={handleBlogPostClick}
-                                        wrapperClasses="w-full"
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-gray-600">Nenhum post encontrado nesta categoria.</p>
-                        )}
+                        <h1 className="text-3xl font-bold mb-6">Categoria: "{selectedBlogCategory}"</h1>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {filteredBlogPosts.map(post => <BlogPostCard key={post.id} post={post} onCardClick={handleBlogPostClick} />)}
+                        </div>
                     </div>
-                // NOVO: Renderiza a página de detalhes do hotel recomendado
-                ) : currentPage === 'recommendedHotelDetails' && currentRecommendedHotel ? (
-                    <RecommendedHotelDetailsPage
-                        hotel={currentRecommendedHotel}
-                        onBack={handleBackToList}
-                    />
-                ) : (
-                    // Conteúdo da HOME (promoções, recomendados, blog)
+                )
+                : currentPage === 'recommendedHotelDetails' && currentRecommendedHotel ? <RecommendedHotelDetailsPage hotel={currentRecommendedHotel} onBack={handleBackToList} />
+                : (
                     <>
-                        <TravelSection
-                            id="viagens-promocao"
-                            title="Nossas Promoções"
-                            travels={allPromotionalTravels}
-                            onCardClick={handlePromotionClick}
-                            onSaveTravel={handleSaveTravel}
-                            isTravelSaved={isTravelSaved}
-                            CardComponent={TravelCard}
-                        />
-                        {/* NOVO: Seção de Hotéis Recomendados, visível na home */}
-                        <RecommendedHotelsSection
-                            hotels={allHotelsData} // Passa todos os dados de hotéis para que ele possa filtrar os top
-                            onHotelClick={handleRecommendedHotelDetailsClick}
-                        />
-                        
-                        <BlogSection
-                            id="dicas-de-viagem"
-                            title="Dicas de Viagem: Prepare sua Aventura!"
-                            posts={filteredBlogPosts}
-                            onCardClick={handleBlogPostClick}
-                        />
+                        <TravelSection id="viagens-promocao" title="Nossas Promoções" travels={allPromotionalTravels} onCardClick={handlePromotionClick} onSaveTravel={handleSaveTravel} isTravelSaved={isTravelSaved} CardComponent={TravelCard} />
+                        <RecommendedHotelsSection id="recomendado-viajantes" hotels={allHotelsData} onHotelClick={handleRecommendedHotelDetailsClick} />
+                        <BlogSection id="dicas-de-viagem" title="Dicas de Viagem: Prepare sua Aventura!" posts={blogPosts} onCardClick={handleBlogPostClick} />
+                        <HotelsMapSection hotels={allHotelsData} onHotelSelect={handleHotelSelectFromMap} isLoaded={isLoaded} />
+                        <NewsletterSection />
                     </>
                 )}
             </main>
-
-            {showEventReservationForm && (
-                <EventReservationForm onClose={handleCloseEventReservationForm} />
-            )}
-
-            <Footer />
+            {showEventReservationForm && <EventReservationForm onClose={handleCloseEventReservationForm} />}
+            
+            <Footer 
+                isLoaded={isLoaded}
+                onNavigateToHotels={handleNavigateToHotels}
+                onSelectPromos={handleSelectPromos}
+                onNavigateToEvents={handleNavigateToEvents}
+                onNavigateToMyTravels={handleNavigateToMyTravels}
+                onNavigateToInstitutional={handleNavigateToInstitutional}
+                onNavigateToBlog={handleNavigateToBlog}
+            />
         </div>
     );
 }

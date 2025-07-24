@@ -56,10 +56,10 @@ function TravelSection({ title, travels, id, className, onCardClick }) {
             <SwiperSlide key={travel.id}>
               {/* O card principal não precisa de cursor-pointer se apenas o botão é clicável */}
               <div
-                className="bg-white rounded-lg shadow-xl border border-gray-200 p-2 max-w-[220px] mx-auto relative h-full flex flex-col"
+                className="cardSombra bg-white rounded-lg border border-gray-200 p-2  transform transition duration-300 hover:scale-105 max-w-[620px] mx-2 relative h-full flex flex-col"
               >
                 {/* Restante do código do card permanece o mesmo */}
-                <div className="relative w-full h-72 overflow-hidden rounded-md">
+                <div className="relative w-full h-92 overflow-hidden rounded-md">
                     <img
                         src={travel.imageUrl || generateRandomImageUrl(travel.id)}
                         alt={travel.title}

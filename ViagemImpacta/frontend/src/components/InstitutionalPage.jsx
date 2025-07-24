@@ -1,5 +1,5 @@
 import React from 'react';
-import './InstitutionalPage.css';
+import '../components/InstitutionalPage.css'; // Importando o CSS específico do InstitutionalPage
 
 import devPhoto1 from '../assets/images/team/carol.png';
 import devPhoto2 from '../assets/images/team/maxi.png';

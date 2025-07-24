@@ -9,27 +9,26 @@ function HotelsSearchForm({ onSearch, allHotelsData }) {
     const [roomType, setRoomType] = useState('');
     const [minRating, setMinRating] = useState(0); // 0 para sem filtro
     const [maxPrice, setMaxPrice] = useState(5000); // Preço máximo padrão
-    const [selectedAmenities, setSelectedAmenities] = useState([]);
+    // Removido: const [selectedAmenities, setSelectedAmenities] = useState([]);
 
-    // Coleta todas as comodidades únicas de todos os hotéis para as opções de checkbox
-    const availableAmenities = Array.from(new Set(
-        allHotelsData.flatMap(hotel => hotel.leisureFacilities || [])
-    )).sort();
+    // Removido: Coleta todas as comodidades únicas de todos os hotéis para as opções de checkbox
+    // const availableAmenities = Array.from(new Set(
+    //     allHotelsData.flatMap(hotel => hotel.leisureFacilities || [])
+    // )).sort();
 
     // Coleta todos os tipos de quartos únicos de todos os hotéis para as opções de dropdown
     const availableRoomTypes = Array.from(new Set(
         allHotelsData.flatMap(hotel => hotel.roomOptions ? hotel.roomOptions.map(room => room.type) : [])
     )).sort();
 
-
-    const handleAmenityChange = (event) => {
-        const { value, checked } = event.target;
-        if (checked) {
-            setSelectedAmenities(prev => [...prev, value]);
-        } else {
-            setSelectedAmenities(prev => prev.filter(amenity => amenity !== value));
-        }
-    };
+    // Removido: const handleAmenityChange = (event) => {
+    //     const { value, checked } = event.target;
+    //     if (checked) {
+    //         setSelectedAmenities(prev => [...prev, value]);
+    //     } else {
+    //         setSelectedAmenities(prev => prev.filter(amenity => amenity !== value));
+    //     }
+    // };
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -41,15 +40,12 @@ function HotelsSearchForm({ onSearch, allHotelsData }) {
             roomType,
             minRating: parseFloat(minRating),
             maxPrice: parseFloat(maxPrice),
-            selectedAmenities,
+            // Removido: selectedAmenities,
         });
     };
 
     return (
-        // REMOVA TODAS AS CLASSES DE LAYOUT DAQUI.
-        // A section externa no App.jsx já gerencia o espaçamento e background.
-        <section> {/* <--- ALTERADO AQUI: Removidas as classes de estilo e layout */}
-            {/* O container interno agora com max-w-full para garantir 100% de largura dentro do padding da section externa no App.jsx */}
+        <section>
             <div className="container mx-auto max-w-full">
                 <form onSubmit={handleSubmit} className="HotelsSeachForm p-8 rounded-xl shadow-lg px-6 -mt-10 md:-mt-10 relative z-0">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -165,26 +161,6 @@ function HotelsSearchForm({ onSearch, allHotelsData }) {
                         </div>
                     </div>
 
-                    {/* Comodidades */}
-                    <div className="mb-6">
-                        <label className="labelForms">Comodidades</label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                            {availableAmenities.map(amenity => (
-                                <div key={amenity} className="flex items-cente r">
-                                    <input
-                                        type="checkbox"
-                                        id={`amenity-${amenity}`}
-                                        value={amenity}
-                                        checked={selectedAmenities.includes(amenity)}
-                                        onChange={handleAmenityChange}
-                                        className="form-checkbox h-4 w-4 text-blue-800 rounded focus:ring-blue-500"
-                                    />
-                                    <label htmlFor={`amenity-${amenity}`} className="labelOption">{amenity}</label>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
                     {/* Botão Pesquisar */}
                     <div className="text-center">
                         <button
@@ -195,8 +171,8 @@ function HotelsSearchForm({ onSearch, allHotelsData }) {
                         </button>
                     </div>
                     <p className="text-right text-blue-800 text-sm mt-4 psearchhotelsbar"> 
-          Ao continuar, estou de acordo com os <a href="#" className="underline font-bold text-blue-800">Termos de Uso</a> 
-        </p>
+                        Ao continuar, estou de acordo com os <a href="#" className="underline font-bold text-blue-800">Termos de Uso</a> 
+                    </p>
                 </form>
             </div>
         </section>

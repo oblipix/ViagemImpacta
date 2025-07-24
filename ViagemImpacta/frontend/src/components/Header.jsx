@@ -1,42 +1,62 @@
 import React from 'react';
 
-function Header({ onNavigateToMyTravels, onNavigateToHome, onNavigateToInstitutional, currentPage }) { // Adicionado onNavigateToInstitutional
+function Header({ onNavigateToMyTravels, onNavigateToHome, onNavigateToInstitutional, currentPage }) {
+  
+  const getButtonClasses = (pageName) => {
+    let isActive = currentPage === pageName;
+
+    // Condição especial para o botão 'Minhas Viagens'
+    if (pageName === 'myTravels') {
+      isActive = ['myTravels', 'login', 'register'].includes(currentPage);
+    }
+
+    // ✅ Lógica atualizada para usar a nova classe CSS para o efeito
+    return `
+      buttonHeader 
+      text-gray-300 hover:text-white 
+      font-medium focus:outline-none 
+      transition-colors duration-300
+      ${isActive ? 'active-link' : ''}
+    `;
+  };
+
   return (
-    <header className="w-full bg-white shadow-md py-4 sticky top-0 z-20">
+    <header className="w-full bg-slate-900 shadow-lg py-4 sticky top-0 z-50">
       <div className="container mx-auto px-6 flex items-center justify-between">
-        {/* Logo - Clicável para ir para a Home */}
+        
         <div
           className="flex items-center cursor-pointer"
           onClick={onNavigateToHome}
         >
-          <span className="logo">Tripz</span>
+          <span className="logo">
+            Tripz
+          </span>
         </div>
 
-        {/* Navegação Principal */}
         <nav>
-          <ul className="flex space-x-6">
+          <ul className="flex items-center space-x-8">
             <li>
               <button
                 onClick={onNavigateToHome}
-                className={`text-gray-700 hover:text-blue-600 font-medium focus:outline-none ${currentPage === 'home' ? 'text-blue-600' : ''}`}
+                className={getButtonClasses('home')}
               >
                 Início
               </button>
             </li>
-           
-            {/* NOVO: Botão Institucional */}
+            
             <li>
               <button
-                onClick={onNavigateToInstitutional} // Chama a nova função de navegação
-                className={`text-gray-700 hover:text-blue-600 font-medium focus:outline-none ${currentPage === 'institutional' ? 'text-blue-600' : ''}`}
+                onClick={onNavigateToInstitutional}
+                className={getButtonClasses('institutional')}
               >
                 Institucional
               </button>
             </li>
+
             <li>
               <button
                 onClick={onNavigateToMyTravels}
-                className={`text-gray-700 hover:text-blue-600 font-medium focus:outline-none ${currentPage === 'myTravels' || currentPage === 'login' || currentPage === 'register' ? 'text-blue-600' : ''}`}
+                className={getButtonClasses('myTravels')}
               >
                 Minhas Viagens
               </button>

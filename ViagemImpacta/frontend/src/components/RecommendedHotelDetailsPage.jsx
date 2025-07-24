@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React from 'react';
+import React, { useState } from 'react'; // Importe useState
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Thumbs, FreeMode } from 'swiper/modules';
 import 'swiper/css';
@@ -24,6 +24,33 @@ const RecommendedHotelDetailsPage = ({ hotel, onBack }) => {
     }
 
     const [thumbsSwiper, setThumbsSwiper] = React.useState(null);
+    // NOVO ESTADO: Para controlar o modal de imagem
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    // Função para abrir o modal com a imagem clicada
+    const openImageModal = (index) => {
+        setCurrentImageIndex(index);
+        setIsModalOpen(true);
+    };
+
+    // Função para fechar o modal
+    const closeImageModal = () => {
+        setIsModalOpen(false);
+    };
+
+    // Navegação no modal (opcional, para próxima/anterior)
+    const goToNextImage = () => {
+        setCurrentImageIndex((prevIndex) =>
+            (prevIndex + 1) % hotel.galleryImages.length
+        );
+    };
+
+    const goToPrevImage = () => {
+        setCurrentImageIndex((prevIndex) =>
+            (prevIndex - 1 + hotel.galleryImages.length) % hotel.galleryImages.length
+        );
+    };
 
     return (
         <div className="container mx-auto py-12 px-6">
@@ -52,7 +79,13 @@ const RecommendedHotelDetailsPage = ({ hotel, onBack }) => {
                         >
                             {hotel.galleryImages.map((image, index) => (
                                 <SwiperSlide key={image.id || index}>
-                                    <img src={image.url} alt={image.alt} className="w-full h-96 object-cover rounded-lg" />
+                                    {/* Adicionado onClick para abrir o modal */}
+                                    <img
+                                        src={image.url}
+                                        alt={image.alt}
+                                        className="w-full h-96 object-cover rounded-lg cursor-pointer"
+                                        onClick={() => openImageModal(index)} // <-- Torna a imagem clicável
+                                    />
                                 </SwiperSlide>
                             ))}
                         </Swiper>
@@ -68,29 +101,39 @@ const RecommendedHotelDetailsPage = ({ hotel, onBack }) => {
                         >
                             {hotel.galleryImages.map((image, index) => (
                                 <SwiperSlide key={`thumb-${image.id || index}`}>
-                                    <img src={image.url} alt={`Thumbnail ${image.alt}`} className="w-full h-20 object-cover rounded-md cursor-pointer opacity-70 hover:opacity-100 transition-opacity" />
+                                    {/* Adicionado onClick para abrir o modal também nas miniaturas */}
+                                    <img
+                                        src={image.url}
+                                        alt={`Thumbnail ${image.alt}`}
+                                        className="w-full h-20 object-cover rounded-md cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
+                                        onClick={() => openImageModal(index)} // <-- Torna a miniatura clicável
+                                    />
                                 </SwiperSlide>
                             ))}
                         </Swiper>
                     </div>
                 )}
 
-                <h2 className="text-3xl font-bold text-gray-800 mb-4">Sobre o Hotel</h2>
-                <p className="text-gray-700 text-lg leading-relaxed mb-6">{hotel.description}</p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div>
-                        <h3 className="text-2xl font-bold text-gray-800 mb-3">Avaliação Geral</h3>
-                        <div className="flex items-center text-blue-600">
-                            <span className="text-5xl font-extrabold mr-2">{hotel.rating}</span>
-                            <span className="text-3xl font-semibold">/ 5.0</span>
-                            <svg className="w-8 h-8 text-yellow-500 ml-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.538 1.157L10 16.324l-2.806 2.034c-.783.57-1.838-.196-1.538-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.927 8.72c-.783-.57-.381-1.81.588-1.81h3.462a1 1 0 00.95-.69L9.049 2.927z" />
-                            </svg>
+                {/* Seções "Sobre o Hotel" e "Comodidades" lado a lado em telas maiores */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"> {/* Contêiner grid para as duas colunas principais */}
+                    <div> {/* Coluna da esquerda: Sobre o Hotel e Avaliação Geral */}
+                        <h2 className="text-3xl font-bold text-gray-800 mb-4">Sobre o Hotel</h2>
+                        <p className="text-gray-700 text-lg leading-relaxed mb-6">{hotel.description}</p>
+                        
+                        <div className="flex flex-col justify-center bg-blue-50 border border-blue-200 rounded-lg p-5 shadow-sm"> {/* Contêiner para Avaliação Geral */}
+                            <h3 className="text-2xl font-bold text-gray-800 mb-8 ">Avaliação Geral</h3>
+                            <div className="flex items-center text-blue-600">
+                                <span className="text-5xl font-extrabold mr-2">{hotel.rating}</span>
+                                <span className="text-3xl font-semibold">/ 5.0</span>
+                                <svg className="w-8 h-8 text-yellow-500 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.538 1.157L10 16.324l-2.806 2.034c-.783.57-1.838-.196-1.538-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.927 8.72c-.783-.57-.381-1.81.588-1.81h3.462a1 1 0 00.95-.69L9.049 2.927z" />
+                                </svg>
+                            </div>
+                            <p className="text-gray-600">Baseado em {hotel.feedbacks.length} avaliações de hóspedes.</p>
                         </div>
-                        <p className="text-gray-600">Baseado em {hotel.feedbacks.length} avaliações de hóspedes.</p>
                     </div>
-                    <div>
+
+                    <div> {/* Coluna da direita: Comodidades */}
                         <h3 className="text-2xl font-bold text-gray-800 mb-3">Comodidades</h3>
                         <ul className="list-disc list-inside text-gray-700 text-lg">
                             {hotel.hasRestaurant && <li>Restaurante no local</li>}
@@ -146,6 +189,44 @@ const RecommendedHotelDetailsPage = ({ hotel, onBack }) => {
                     <p className="text-gray-600">Não há avaliações para este hotel ainda.</p>
                 )}
             </div>
+
+            {/* Modal de Imagem */}
+            {isModalOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"
+                    onClick={closeImageModal} // Fecha o modal ao clicar fora da imagem
+                >
+                    <div className="relative" onClick={(e) => e.stopPropagation()}> {/* Impede que o clique na imagem feche o modal */}
+                        <img
+                            src={hotel.galleryImages[currentImageIndex].url}
+                            alt={hotel.galleryImages[currentImageIndex].alt}
+                            className="max-h-[90vh] max-w-[90vw] object-contain"
+                        />
+                        <button
+                            onClick={closeImageModal}
+                            className="absolute top-4 right-4 text-white text-4xl font-bold bg-gray-800 bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center hover:bg-opacity-75 transition-colors"
+                            aria-label="Fechar"
+                        >
+                            &times;
+                        </button>
+                        {/* Botões de navegação (opcional) */}
+                        <button
+                            onClick={goToPrevImage}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-5xl bg-gray-800 bg-opacity-50 rounded-full w-16 h-16 flex items-center justify-center hover:bg-opacity-75 transition-colors"
+                            aria-label="Imagem anterior"
+                        >
+                            &#8249;
+                        </button>
+                        <button
+                            onClick={goToNextImage}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-5xl bg-gray-800 bg-opacity-50 rounded-full w-16 h-16 flex items-center justify-center hover:bg-opacity-75 transition-colors"
+                            aria-label="Próxima imagem"
+                        >
+                            &#8250;
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

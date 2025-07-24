@@ -29,24 +29,24 @@ function NewsletterSection() {
     };
 
     return (
-        <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16 px-6 shadow-lg">
+        <section className="NewsLetterSection text-blue-900 py-16 px-6 shadow-lg">
             <div className="container mx-auto text-center max-w-full">
-                <h2 className="text-4xl font-bold mb-4">Receba Nossas Melhores Ofertas!</h2>
-                <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+                <h2 className="text-2xl font-bold mb-4">Receba Nossas Melhores Ofertas!</h2>
+                <p className="text-1xl mb-8 opacity-90 max-w-2xl mx-auto">
                     Assine nossa newsletter e seja o primeiro a saber sobre promoções exclusivas, novos destinos e dicas de viagem imperdíveis.
                 </p>
                 <form onSubmit={handleSubmit} className="max-w-xl mx-auto flex flex-col sm:flex-row gap-4">
                     <input
                         type="email"
                         placeholder="Seu melhor e-mail aqui..."
-                        className="flex-grow p-3 rounded-lg border-2 border-white focus:outline-none focus:border-blue-300 bg-white bg-opacity-20 text-white placeholder-white"
+                        className="flex-grow p-3 rounded-lg border-2 border-white focus:outline-none focus:border-blue-300 bg-white bg-opacity-20 text-gray-800 placeholder-white"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
                     />
                     <button
                         type="submit"
-                        className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-3 px-8 rounded-lg transition duration-300 ease-in-out transform hover:scale-105"
+                        className="event-submit bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-3 px-8 rounded-lg transition duration-300 ease-in-out transform hover:scale-105"
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? 'Enviando...' : 'Assinar Agora'}

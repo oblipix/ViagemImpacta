@@ -70,7 +70,7 @@ function HotelCard({ hotel, onImageClick, onSaveTravel, isHotelSaved, onDetailsC
         <div>
           <h3 className="text-2xl font-bold text-blue-800 mb-2">{hotel.title}</h3>
           <p className="text-gray-600 text-sm mb-2 flex items-center">
-            <svg className="w-4 h-4 mr-1 text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd"></path></svg>
+            <svg className="w-4 h-4 mr-1 text-blue-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd"></path></svg>
             <a
               href={hotel.mapUrl}
               target="_blank"

@@ -16,6 +16,7 @@ html {
 
 body {
   font-family: sans-serif;
+
 }
 
 
@@ -106,6 +107,7 @@ body {
  {
   background: linear-gradient(90deg, #111b32 0%, #60A5FA 100%) !important; 
   color: #FFFFFF !important; 
+  cursor: pointer;
          
 }
 
@@ -122,7 +124,8 @@ body {
 
 
 .searchHotelsBar,
-.HotelsSeachForm {
+.HotelsSeachForm,
+.NewsLetterSection {
   align-items: center;
   text-align: center;
   background-image: linear-gradient(to right, #c9f0fdb4, #f9f3f3cf); /* Azul claro para Branco */
@@ -194,8 +197,65 @@ color: transparent;
  font-family: "Pacifico", cursive;
   font-weight: 400;
   font-style: normal;
-  z-index: 1000; 
+  z-index: 10001; 
+  height: 70px;
   
+}
+
+.buttonHeader{
+  background-color: transparent; /* Azul escuro */
+  color: white; /* Texto branco */
+  padding: 10px 20px; /* Espaçamento interno */
+  border-radius: 9999px; /* Borda arredondada completa */
+  text-decoration: none; /* Remove sublinhado */
+  font-weight:normal; /* Texto em negrito */
+  transition: background-color 0.3s ease; /* Transição suave para hover */
+   cursor: pointer;
+}
+
+.buttonHeader:hover {
+  background-color: #1e3a8a; /* Azul escuro no hover */
+  color: white; /* Texto branco no hover */
+}
+
+
+/* Nova classe para o link ATIVO */
+.active-link {
+  color: white !important; /* Força o texto a ficar branco quando ativo */
+}
+
+/* O traço curvado mágico! */
+.active-link::after {
+  content: ''; /* Necessário para o pseudo-elemento aparecer */
+  position: absolute; /* Posição relativa ao botão */
+  bottom: 0; /* Alinha na parte de baixo do botão */
+  left: 0;
+  right: 0;
+  margin: 0 auto; /* Centraliza o traço horizontalmente */
+  
+  width: 90%; /* O traço terá 90% da largura do texto */
+  height: 8px;  /* Altura da "curva" */
+  
+  /* A mágica da curva acontece aqui: */
+  border-bottom: 4px solid #22d3ee; /* Cor (ciano) e espessura do traço */
+  border-radius: 0 0 10px 10px; /* Arredonda as bordas inferiores para criar o arco */
+}
+
+
+
+
+.footer-curve::before {
+  content: '';
+  position: absolute;
+  top: 0; /* Posiciona a curva no topo do footer */
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 15px; /* A "profundidade" da curva */
+
+  /* A mágica da curva invertida: */
+  border-top: 5px solid #22d3ee; /* Cor (ciano) e espessura do traço */
+  border-radius: 15px 15px 0 0; /* Arredonda as bordas superiores para criar o arco */
 }
 
 

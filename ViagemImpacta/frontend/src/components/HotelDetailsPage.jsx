@@ -32,6 +32,7 @@ function HotelDetailsPage({ hotel, onBack, onReserveRoom }) {
   // Mapeamento de nomes de comodidades para componentes de ícone
   const leisureIconMap = {
     'Piscina': Icons.Pool,
+    'Jaguzza': Icons.Spa,
     'Academia': Icons.Gym,
     'Spa': Icons.Spa,
     'Sauna': Icons.Sauna,
@@ -96,7 +97,7 @@ function HotelDetailsPage({ hotel, onBack, onReserveRoom }) {
           onClick={() => handleImageClick(hotel.galleryImages || [], hotel.galleryImages?.[0]?.id)}
         />
         <h1 className="text-4xl font-extrabold text-blue-800 mb-2">{hotel.title}</h1>
-        <p className="text-gray-600 text-lg mb-4">{hotel.location}</p>
+        <p className="text-gray-400 text-lg mb-4">{hotel.location}</p>
         <p className="text-gray-700 leading-relaxed mb-8">{hotel.description}</p>
 
         {/* Galeria de Imagens do Hotel - AGORA CLICÁVEL */}
