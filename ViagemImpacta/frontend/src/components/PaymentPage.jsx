@@ -44,8 +44,8 @@ function PaymentPage({ hotel, room, onBackToHotelDetails, onCompletePayment }) {
           <p className="text-2xl font-bold text-green-600 mb-4">Total a Pagar: R$ {room.price.toFixed(2).replace('.', ',')}</p>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Dados de Pagamento</h2>
-        {/* Formulário de Pagamento Simplificado */}
+       {/*  <h2 className="text-2xl font-bold text-gray-800 mb-4">Dados de Pagamento</h2>
+       
         <form className="space-y-4 mb-8">
           <div>
             <label htmlFor="cardName" className="block text-gray-700 text-sm font-bold mb-2">Nome no Cartão</label>
@@ -65,7 +65,7 @@ function PaymentPage({ hotel, room, onBackToHotelDetails, onCompletePayment }) {
               <input type="text" id="cvv" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="XXX" />
             </div>
           </div>
-        </form>
+        </form> */}
 
         <button
           onClick={handlePaymentSubmit}
