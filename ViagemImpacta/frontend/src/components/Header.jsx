@@ -2,7 +2,7 @@ import React from 'react';
 // 🎯 MIGRAÇÃO GRADUAL - Importando atoms para coexistir com legacy
 import { Button, Text } from './atoms';
 
-function Header({ onNavigateToMyTravels, onNavigateToHome, onNavigateToInstitutional, onNavigateToTestAtomic, currentPage }) {
+function Header({ onNavigateToMyTravels, onNavigateToHome, onNavigateToInstitutional, onNavigateToTestAtomic, onNavigateToBackendTest, currentPage }) {
   
   const getButtonClasses = (pageName) => {
     let isActive = currentPage === pageName;
@@ -78,6 +78,18 @@ function Header({ onNavigateToMyTravels, onNavigateToHome, onNavigateToInstituti
                 style={{ backgroundColor: '#10B981', borderRadius: '4px', padding: '6px 12px' }}
               >
                 🧪 Nova Landing
+              </Button>
+            </li>
+            
+            {/* 🌐 BOTÃO PARA TESTE BACKEND */}
+            <li>
+              <Button
+                onClick={onNavigateToBackendTest}
+                className={getButtonClasses('testBackend')}
+                variant="primary"
+                style={{ backgroundColor: '#F59E0B', borderRadius: '4px', padding: '6px 12px' }}
+              >
+                🌐 Backend Test
               </Button>
             </li>
           </ul>

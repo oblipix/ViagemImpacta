@@ -31,6 +31,7 @@ import RecommendedHotelsSection from './components/RecommendedHotelsSection';
 import RecommendedHotelDetailsPage from './components/RecommendedHotelDetailsPage';
 import TestAtomicComponents from './components/TestAtomicComponents'; // 🧪 TESTE ATOMIC
 import TestLandingPage from './components/TestLandingPage'; // 🎯 NOVA LANDING PAGE ATÔMICA
+import TestBackendIntegration from './components/TestBackendIntegration'; // 🌐 TESTE BACKEND INTEGRATION
 import NewsletterSection from './components/NewsletterSection';
 import HotelsMapSection from './components/HotelsMapSection';
 
@@ -758,6 +759,12 @@ const handleSaveTravel = (travelToSave) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    // 🌐 FUNÇÃO PARA NAVEGAR PARA TESTE BACKEND
+    const handleNavigateToBackendTest = () => {
+        setCurrentPage('testBackend');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleBlogPostClick = (postId) => {
         setSelectedBlogPostId(postId);
         setCurrentPage('blogPostDetails');
@@ -798,6 +805,7 @@ const handleSaveTravel = (travelToSave) => {
                 onNavigateToInstitutional={handleNavigateToInstitutional}
                 onNavigateToMyTravels={handleNavigateToMyTravels}
                 onNavigateToTestAtomic={handleNavigateToTestAtomic}
+                onNavigateToBackendTest={handleNavigateToBackendTest}
                 currentPage={currentPage}
             />
             <main className="flex-grow">
@@ -858,7 +866,8 @@ const handleSaveTravel = (travelToSave) => {
                         currentPage={currentPage}
                     />
                 )
-                : currentPage === 'testComponents' ? <TestAtomicComponents /> 
+                : currentPage === 'testComponents' ? <TestAtomicComponents />
+                : currentPage === 'testBackend' ? <TestBackendIntegration />
                 : currentPage === 'recommendedHotelDetails' && currentRecommendedHotel ? <RecommendedHotelDetailsPage hotel={currentRecommendedHotel} onBack={handleBackToList} />
                 : (
                     <>
