@@ -10,7 +10,6 @@ namespace ViagemImpacta.Data
         public DbSet<Hotel> Hotels { get; set; } = null!;
         public DbSet<Room> Rooms { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
-        public DbSet<ReservationBook> ReservationBooks { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Reservation> Reservations { get; set; } = null!;
         public DbSet<Payment> Payments { get; set; } = null!;
@@ -21,14 +20,14 @@ namespace ViagemImpacta.Data
 
             // Configuração explícita da relação Many-to-Many
             // O EF Core cria uma tabela de junção "HotelReservationBook" automaticamente
-            modelBuilder.Entity<ReservationBook>()
+            modelBuilder.Entity<Reservation>()
                 .HasMany(p => p.Hotels)
                 .WithMany()
                 .UsingEntity(j => j.ToTable("ReservationBookHotels")); // Se Hotel não tiver uma coleção de ReservationBook, essa é a forma mais simples.
 
-            modelBuilder.Entity<ReservationBook>(entity =>
+            modelBuilder.Entity<Reservation>(entity =>
             {
-                entity.HasKey(e => e.ReservationBookId);
+                entity.HasKey(e => e.ReservationId);
                 entity.Property(e => e.Title).HasMaxLength(200);
                 entity.Property(e => e.Description).HasMaxLength(1000);
                 entity.Property(e => e.Destination).HasMaxLength(100);

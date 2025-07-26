@@ -3,14 +3,19 @@
     public class Reservation
     {
         public int ReservationId { get; set; }
-        public int ReservationBookId { get; set; }
-        public ReservationBook? ReservationBook { get; set; }
-        public int UserId { get; set; }
-        public User? User { get; set; }
-        public DateTime ReservationDate { get; set; }
-        public bool IsConfirmed { get; set; }
+        public int UserId { get; set; } //user de quem fez a reserva (codigo)
+        public User? User { get; set; } //user que fez a reserva 
+        public DateTime CheckIn { get; set; }
+        public DateTime CheckOut { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        //campo cancelado (data e boolean)
+        public decimal FinalPrice { get; set; }
+        public bool Active { get; set; }
+        public int HotelId { get; set; }
+        public Hotel Hotel { get; set; }
+        public ICollection<Traveller>? Travellers { get; set; }
+
     }
-}
+      
+    }
+
