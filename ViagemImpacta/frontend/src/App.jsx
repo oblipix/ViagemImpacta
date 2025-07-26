@@ -24,10 +24,13 @@ import BlogPostCard from './components/BlogPostCard';
 import BlogPostDetailsPage from './components/BlogPostDetailsPage';
 
 import HotelsSearchForm from './components/HotelsSearchForm';
+import { HotelsSearchFormAtomic } from './components/molecules'; // 🎯 MIGRAÇÃO GRADUAL
 import MyTravelsPage from './components/MyTravelsPage';
 
 import RecommendedHotelsSection from './components/RecommendedHotelsSection';
 import RecommendedHotelDetailsPage from './components/RecommendedHotelDetailsPage';
+import TestAtomicComponents from './components/TestAtomicComponents'; // 🧪 TESTE ATOMIC
+import TestLandingPage from './components/TestLandingPage'; // 🎯 NOVA LANDING PAGE ATÔMICA
 import NewsletterSection from './components/NewsletterSection';
 import HotelsMapSection from './components/HotelsMapSection';
 
@@ -743,6 +746,18 @@ const handleSaveTravel = (travelToSave) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    // 🧪 FUNÇÃO TEMPORÁRIA PARA TESTE
+    const handleNavigateToTestAtomic = () => {
+        setCurrentPage('testAtomic');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // 🔧 FUNÇÃO PARA NAVEGAR PARA COMPONENTES DE TESTE
+    const handleNavigateToComponentsTest = () => {
+        setCurrentPage('testComponents');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleBlogPostClick = (postId) => {
         setSelectedBlogPostId(postId);
         setCurrentPage('blogPostDetails');
@@ -782,11 +797,12 @@ const handleSaveTravel = (travelToSave) => {
                 onNavigateToHotels={handleNavigateToHotels}
                 onNavigateToInstitutional={handleNavigateToInstitutional}
                 onNavigateToMyTravels={handleNavigateToMyTravels}
+                onNavigateToTestAtomic={handleNavigateToTestAtomic}
                 currentPage={currentPage}
             />
             <main className="flex-grow">
                 <HeroSwiper />
-                {currentPage !== 'login' && currentPage !== 'register' && currentPage !== 'myTravels' && currentPage !== 'institutional' && (
+                {currentPage !== 'login' && currentPage !== 'register' && currentPage !== 'myTravels' && currentPage !== 'institutional' && currentPage !== 'testAtomic' && currentPage !== 'testComponents' && (
                     <section className="bg-white rounded-t-[50px] shadow-md -mt-5 md:-mt-10 relative z-10 py-4 px-6">
                         <div className="container mx-auto flex flex-wrap justify-center gap-4">
                             <a href="#viagens-promocao" onClick={handleSelectPromos} className={`btn-common-style ${activeFilterButton === 'promos' ? 'btn-active-style' : 'btn-hover-style'} flex items-center`}>Promoção</a>
@@ -799,7 +815,10 @@ const handleSaveTravel = (travelToSave) => {
                 {currentPage === 'home' && (
                     <section className="px-6 -mt-10 md:-mt-16 relative z-0">
                         <div className="container mx-auto max-w-full">
-                            <HotelsSearchForm onSearch={handleHotelSearch} allHotelsData={allHotelsData} />
+                            {/* 🎯 MIGRAÇÃO GRADUAL - Usando componente atômico */}
+                           {/* <HotelsSearchFormAtomic onSearch={handleHotelSearch} allHotelsData={allHotelsData} /> */}
+                           {/* Legacy: <HotelsSearchForm onSearch={handleHotelSearch} allHotelsData={allHotelsData} /> */}
+                           <HotelsSearchForm onSearch={handleHotelSearch} allHotelsData={allHotelsData} />
                         </div>
                     </section>
                 )}
@@ -822,6 +841,24 @@ const handleSaveTravel = (travelToSave) => {
                         </div>
                     </div>
                 )
+                : currentPage === 'testAtomic' ? (
+                    <TestLandingPage 
+                        allHotelsData={allHotelsData}
+                        allPromotionalTravels={allPromotionalTravels}
+                        blogPosts={blogPosts}
+                        onHotelSearch={handleHotelSearch}
+                        onPromotionClick={handlePromotionClick}
+                        onBlogPostClick={handleBlogPostClick}
+                        onHotelSelectFromMap={handleHotelSelectFromMap}
+                        isMapLoaded={isLoaded}
+                        onNavigateToComponentsTest={handleNavigateToComponentsTest}
+                        onNavigateToHome={handleNavigateToHome}
+                        onNavigateToInstitutional={handleNavigateToInstitutional}
+                        onNavigateToMyTravels={handleNavigateToMyTravels}
+                        currentPage={currentPage}
+                    />
+                )
+                : currentPage === 'testComponents' ? <TestAtomicComponents /> 
                 : currentPage === 'recommendedHotelDetails' && currentRecommendedHotel ? <RecommendedHotelDetailsPage hotel={currentRecommendedHotel} onBack={handleBackToList} />
                 : (
                     <>

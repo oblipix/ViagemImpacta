@@ -1,6 +1,8 @@
 import React from 'react';
+// 🎯 MIGRAÇÃO GRADUAL - Importando atoms para coexistir com legacy
+import { Button, Text } from './atoms';
 
-function Header({ onNavigateToMyTravels, onNavigateToHome, onNavigateToInstitutional, currentPage }) {
+function Header({ onNavigateToMyTravels, onNavigateToHome, onNavigateToInstitutional, onNavigateToTestAtomic, currentPage }) {
   
   const getButtonClasses = (pageName) => {
     let isActive = currentPage === pageName;
@@ -36,30 +38,47 @@ function Header({ onNavigateToMyTravels, onNavigateToHome, onNavigateToInstituti
         <nav>
           <ul className="flex items-center space-x-8">
             <li>
-              <button
+              {/* 🧪 TESTE GRADUAL - Usando atom Button */}
+              <Button
                 onClick={onNavigateToHome}
                 className={getButtonClasses('home')}
               >
                 Início
-              </button>
+              </Button>
             </li>
             
             <li>
-              <button
+              {/* 🎯 MIGRAÇÃO GRADUAL - Botão Institucional usando atom Button */}
+              <Button
                 onClick={onNavigateToInstitutional}
                 className={getButtonClasses('institutional')}
+                variant="ghost"
               >
                 Institucional
-              </button>
+              </Button>
             </li>
 
             <li>
-              <button
+              {/* 🎯 MIGRAÇÃO GRADUAL - Botão Minhas Viagens usando atom Button */}
+              <Button
                 onClick={onNavigateToMyTravels}
                 className={getButtonClasses('myTravels')}
+                variant="ghost"
               >
                 Minhas Viagens
-              </button>
+              </Button>
+            </li>
+            
+            {/* 🧪 BOTÃO TEMPORÁRIO PARA TESTE - Usando atom Button */}
+            <li>
+              <Button
+                onClick={onNavigateToTestAtomic}
+                className={getButtonClasses('testAtomic')}
+                variant="primary"
+                style={{ backgroundColor: '#10B981', borderRadius: '4px', padding: '6px 12px' }}
+              >
+                🧪 Nova Landing
+              </Button>
             </li>
           </ul>
         </nav>

@@ -1,0 +1,22 @@
+// 🧬 MOLECULES - Combinações de atoms
+export { HotelCard } from './HotelCard/HotelCard';
+export { SearchForm } from './SearchForm/SearchForm';
+export { TravelCard } from './TravelCard/TravelCard';
+export { default as HotelsSearchFormAtomic } from './HotelsSearchFormAtomic';
+export { EventReservationFormAtomic } from './EventReservationFormAtomic';
+export { HeaderAtomic } from './HeaderAtomic';
+export { FooterAtomic } from './FooterAtomic';
+export { HeroAtomic } from './HeroAtomic';
+export { FilterBarAtomic } from './FilterBarAtomic';
+export { default as TravelSectionAtomic } from './TravelSectionAtomic';
+export { default as RecommendedHotelsSectionAtomic } from './RecommendedHotelsSectionAtomic';
+export { default as BlogSectionAtomic } from './BlogSectionAtomic';
+export { default as NewsletterForm } from './NewsletterForm';
+export { default as NewsletterSectionAtomic } from './NewsletterSectionAtomic';
+export { default as HotelsMapSectionAtomic } from './HotelsMapSectionAtomic';
+export { default as HotelGallery } from './HotelGallery';
+export { default as HotelAmenities } from './HotelAmenities';
+export { default as HotelLeisureFacilities } from './HotelLeisureFacilities';
+export { default as HotelRoomCard } from './HotelRoomCard';
+export { default as HotelRoomsSection } from './HotelRoomsSection';
+export { default as HotelDetailsPageAtomic } from './HotelDetailsPageAtomic';
