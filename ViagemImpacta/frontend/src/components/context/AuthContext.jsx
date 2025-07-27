@@ -29,27 +29,45 @@ export const AuthProvider = ({ children }) => {
     const [savedHotels, setSavedHotels] = useState([]);
     const [visitedHotels, setVisitedHotels] = useState([]);
     const [isLoadingAuth, setIsLoadingAuth] = useState(true); // Para indicar que a checagem inicial está acontecendo
-    const navigate = useNavigate();
+    
+    // Usar navigate de forma segura
+    let navigate;
+    try {
+        navigate = useNavigate();
+    } catch (error) {
+        console.warn('useNavigate não está disponível, navegação será ignorada');
+        navigate = () => console.warn('Navegação ignorada - fora do contexto do router');
+    }
 
     // Efeito para verificar autenticação no localStorage ao carregar a aplicação
     useEffect(() => {
         const storedToken = localStorage.getItem('authToken');
         const storedUser = localStorage.getItem('authUser');
+        
         if (storedToken && storedUser) {
             try {
                 const user = JSON.parse(storedUser);
-                setCurrentUser(user);
-                setToken(storedToken);
-                setIsLoggedIn(true);
-                // Em um cenário real, você carregaria saved/visited hotels do backend aqui após a autenticação
-                // Por enquanto, continuam mockados ou persistidos de alguma forma se houver
-                setSavedHotels(mockSavedHotels); // Mantém mockado por enquanto
-                setVisitedHotels(mockVisitedHotels); // Mantém mockado por enquanto
-
+                if (user && typeof user === 'object' && user.email) {
+                    setCurrentUser(user);
+                    setToken(storedToken);
+                    setIsLoggedIn(true);
+                    // Em um cenário real, você carregaria saved/visited hotels do backend aqui após a autenticação
+                    // Por enquanto, continuam mockados ou persistidos de alguma forma se houver
+                    setSavedHotels(mockSavedHotels); // Mantém mockado por enquanto
+                    setVisitedHotels(mockVisitedHotels); // Mantém mockado por enquanto
+                } else {
+                    // Se os dados do usuário são inválidos, limpa o localStorage
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('authUser');
+                }
             } catch (e) {
                 console.error("Falha ao analisar dados de usuário armazenados:", e);
                 // Se houver erro, assume que os dados estão corrompidos e desloga
-                logout();
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('authUser');
+                setCurrentUser(null);
+                setIsLoggedIn(false);
+                setToken(null);
             }
         }
         setIsLoadingAuth(false); // A checagem inicial terminou
@@ -57,53 +75,102 @@ export const AuthProvider = ({ children }) => {
 
     // <<<<<<<<<<<< FUNÇÃO DE LOGIN COM CHAMADA AO BACKEND >>>>>>>>>>>>
     const login = async (email, password) => {
+        // Validações básicas antes da requisição
+        if (!email || !password) {
+            throw new Error("Email e senha são obrigatórios");
+        }
+
+        if (typeof email !== 'string' || typeof password !== 'string') {
+            throw new Error("Email e senha devem ser strings válidas");
+        }
+
         try {
-            const response = await fetch('http://localhost:5155/api/auth/login', {
+            const response = await fetch('http://localhost:5155/api/Auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ 
+                    email: email.trim(), 
+                    password: password 
+                })
             });
 
+            // Verifica se a resposta foi bem-sucedida
             if (!response.ok) {
-                const errorData = await response.text();
-                // Assumindo que o backend pode retornar mensagens de erro específicas
-                throw new Error(errorData || 'Falha ao fazer login. Verifique suas credenciais.');
+                // Tenta extrair mensagem de erro da resposta
+                let errorMessage = 'Erro no login';
+                
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorData.error || `Erro ${response.status}: ${response.statusText}`;
+                } catch {
+                    // Se não conseguir parsear o JSON do erro
+                    errorMessage = `Erro ${response.status}: ${response.statusText}`;
+                }
+                
+                throw new Error(errorMessage);
             }
 
+            // Parse da resposta JSON
             const data = await response.json();
             console.log('Login bem-sucedido (dados do backend):', data);
 
-            // Ajuste aqui conforme a estrutura REAL da sua resposta do backend
-            // Por exemplo, se o backend retorna { accessToken: "...", user: { id: ..., name: ... } }
-            const receivedToken = data.token || data.accessToken || data.jwt; // Tenta pegar de várias propriedades
-            const userInfo = data.user || data.profile || data.userData; // Tenta pegar de várias propriedades
+            // Verificação mais robusta dos dados recebidos
+            if (!data || typeof data !== 'object') {
+                throw new Error("Resposta inválida do servidor");
+            }
 
-            if (!receivedToken || !userInfo) {
-                throw new Error("Resposta do servidor incompleta: token ou informações do usuário ausentes.");
+            // Tenta extrair token de diferentes possíveis propriedades
+            const receivedToken = data.token || data.accessToken || data.jwt || data.authToken;
+            
+            // Tenta extrair informações do usuário de diferentes possíveis propriedades
+            const userInfo = data.user || data.profile || data.userData || data;
+
+            // Validação mais rigorosa dos dados recebidos
+            if (!userInfo || typeof userInfo !== 'object') {
+                throw new Error("Informações do usuário não encontradas na resposta");
+            }
+
+            if (!userInfo.email || typeof userInfo.email !== 'string') {
+                throw new Error("Email do usuário inválido recebido da API");
             }
 
             // Atualiza estados locais
-            setToken(receivedToken);
+            setToken(receivedToken || null);
             setCurrentUser(userInfo);
             setIsLoggedIn(true);
 
             // Salva no localStorage para persistência da sessão
-            localStorage.setItem('authToken', receivedToken);
+            if (receivedToken) {
+                localStorage.setItem('authToken', receivedToken);
+            }
             localStorage.setItem('authUser', JSON.stringify(userInfo));
 
             // Em um cenário real, aqui você faria chamadas para carregar
             // os hotéis salvos e visitados do usuário real, usando o token.
-            // Por enquanto, continuam mockados ou baseados em alguma lógica.
+            // Por enquanto, continuam mockados
             setSavedHotels(mockSavedHotels);
             setVisitedHotels(mockVisitedHotels);
 
             // Redireciona para a página principal após o login
-            navigate('/minhas-viagens'); // Ou '/dashboard', '/' etc.
+            try {
+                navigate('/minhas-viagens');
+            } catch (navError) {
+                console.error('Erro na navegação:', navError);
+                // Se a navegação falhar, ainda considera o login bem-sucedido
+            }
 
         } catch (error) {
             console.error('Erro no login:', error);
+            
+            // Limpa dados em caso de erro
+            setCurrentUser(null);
+            setIsLoggedIn(false);
+            setToken(null);
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('authUser');
+            
             // Re-lança o erro para que o componente de Login possa exibir a mensagem
             throw error;
         }
@@ -118,7 +185,15 @@ export const AuthProvider = ({ children }) => {
         setVisitedHotels([]);
         localStorage.removeItem('authToken');
         localStorage.removeItem('authUser');
-        navigate('/login'); // Redireciona para a página de login
+        
+        // Navega para login de forma segura
+        try {
+            navigate('/login');
+        } catch (error) {
+            console.warn('Não foi possível navegar para /login:', error);
+            // Fallback: recarregar a página para ir para a rota padrão
+            window.location.href = '/login';
+        }
     };
 
     const updateUser = (updatedData) => {

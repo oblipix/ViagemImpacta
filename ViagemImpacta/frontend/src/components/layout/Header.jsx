@@ -20,11 +20,41 @@ function Header() {
 
     const UserLoginLink = () => {
         if (isLoggedIn) {
+            // Debug temporário - remover após corrigir
+            console.log('Debug currentUser no Header:', currentUser);
+            
+            // Função para obter o primeiro nome do usuário de forma segura
+            const getFirstName = () => {
+                if (!currentUser) return 'Usuário';
+                
+                // Tenta diferentes propriedades que podem conter o nome
+                const possibleNames = [
+                    currentUser.name,
+                    currentUser.firstName,
+                    currentUser.fullName,
+                    currentUser.username,
+                    currentUser.email
+                ];
+                
+                for (const nameField of possibleNames) {
+                    if (nameField && typeof nameField === 'string' && nameField.trim()) {
+                        // Se for email, pega a parte antes do @
+                        if (nameField.includes('@')) {
+                            return nameField.split('@')[0];
+                        }
+                        // Se for nome completo, pega o primeiro nome
+                        return nameField.split(' ')[0];
+                    }
+                }
+                
+                return 'Usuário'; // Fallback
+            };
+
             return (
                 <div className="flex items-center space-x-2">
                     <NavLink to="/minhas-viagens" className="text-gray-300 hover:text-white transition-colors flex items-center">
                         <UserCircleIcon className="h-8 w-8 md:h-7 md:w-7" />
-                        <span className="ml-2 hidden lg:inline-block">Olá, {currentUser?.name.split(' ')[0]}!</span>
+                        <span className="ml-2 hidden lg:inline-block">Olá, {getFirstName()}!</span>
                     </NavLink>
                     <button
                         onClick={logout}

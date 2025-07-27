@@ -41,17 +41,19 @@ import ContactPage from './components/pages/ContactPage.jsx';
 
 // Componente que agrupa os provedores e o layout principal
 const AppLayout = () => (
-    <AuthProvider>
-        <ModalProvider>
-            <App />
-        </ModalProvider>
-    </AuthProvider>
+    <ModalProvider>
+        <App />
+    </ModalProvider>
 );
 
 // Configuração de todas as rotas da aplicação
 const router = createBrowserRouter([
     {
-        element: <AppLayout />,
+        element: (
+            <AuthProvider>
+                <AppLayout />
+            </AuthProvider>
+        ),
         children: [
             { path: '/', element: <HomePage /> }, 
             { path: '/login', element: <LoginPage /> },
