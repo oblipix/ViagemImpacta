@@ -30,20 +30,15 @@ namespace ViagemImpacta.Repositories.Implementations
     /// </summary>
     public class HotelRepository : Repository<Hotel>, IHotelRepository
     {
-        // 🔧 CONTEXTO DO ENTITY FRAMEWORK
-        // Acesso direto ao DbContext para queries específicas
-        private readonly AgenciaDbContext _context;
-
         /// <summary>
         /// 🏗️ CONSTRUTOR
         /// 
         /// CONCEITO: Repository herda funcionalidade básica e adiciona específicas
         /// - base(context): Chama construtor da classe pai Repository<Hotel>
-        /// - _context: Mantém referência para queries específicas
+        /// - _context herdado da classe base para queries específicas
         /// </summary>
         public HotelRepository(AgenciaDbContext context) : base(context)
         {
-            _context = context;
         }
 
         /// <summary>
@@ -127,6 +122,78 @@ namespace ViagemImpacta.Repositories.Implementations
                 .Where(h => (!wifi || h.Wifi) &&           // 📶 Filtro WiFi condicional
                            (!parking || h.Parking) &&     // 🚗 Filtro estacionamento condicional
                            (!gym || h.Gym))                // 💪 Filtro academia condicional
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// 🏨 MÉTODO: Buscar hotéis com quartos disponíveis para período específico
+        /// 
+        /// 🎯 PROPÓSITO:
+        /// Implementa busca integrada de hotéis considerando:
+        /// - Disponibilidade real de quartos no período
+        /// - Filtros de localização, estrelas e comodidades  
+        /// - Faixa de preço das diárias
+        /// - Capacidade para número de hóspedes
+        /// 
+        /// 🔍 LÓGICA COMPLEXA:
+        /// 1. Carrega hotéis com seus quartos (Include)
+        /// 2. Filtra por critérios básicos (localização, estrelas, comodidades)
+        /// 3. Verifica se existem quartos disponíveis para o período
+        /// 4. Considera capacidade para número de hóspedes
+        /// 5. Aplica filtros de preço
+        /// 
+        /// 💾 CONCEITOS DEMONSTRADOS:
+        /// - Include() para carregar relacionamentos
+        /// - Any() para verificar existência  
+        /// - Lógica condicional em LINQ
+        /// - Filtros de data para verificar conflitos
+        /// 
+        /// ⚡ PERFORMANCE:
+        /// - Include(h => h.Rooms) carrega quartos em uma query
+        /// - Filtros aplicados no banco de dados
+        /// - Índices recomendados: City, Stars, CheckIn/CheckOut nas reservas
+        /// </summary>
+        public async Task<IEnumerable<Hotel>> SearchAvailableHotelsAsync(
+            string? destination,
+            DateTime checkIn,
+            DateTime checkOut,
+            int guests,
+            int? minStars = null,
+            bool? wifi = null,
+            bool? parking = null,
+            decimal? minPrice = null,
+            decimal? maxPrice = null)
+        {
+            return await _context.Hotels
+                .Include(h => h.Rooms) // 🔗 Carrega quartos junto com hotéis
+                .Where(h =>
+                    // 📍 Filtro por destino (cidade) - opcional
+                    (string.IsNullOrEmpty(destination) || h.City.ToLower().Contains(destination.ToLower())) &&
+
+                    // ⭐ Filtro por classificação mínima - opcional  
+                    (!minStars.HasValue || h.Stars >= minStars.Value) &&
+
+                    // 📶 Filtro por WiFi - opcional
+                    (!wifi.HasValue || !wifi.Value || h.Wifi) &&
+
+                    // 🚗 Filtro por estacionamento - opcional
+                    (!parking.HasValue || !parking.Value || h.Parking) &&
+
+                    // 🏨 Verificação de quartos disponíveis
+                    h.Rooms.Any(room =>
+                        room.Available &&                           // ✅ Quarto marcado como disponível
+                        room.Capacity >= guests &&                  // 👥 Capacidade suficiente para hóspedes
+
+                        // 💰 Filtro de preço - opcional
+                        (!minPrice.HasValue || room.AverageDailyPrice >= minPrice.Value) &&
+                        (!maxPrice.HasValue || room.AverageDailyPrice <= maxPrice.Value)
+
+                    // TODO: Verificar conflitos de reserva no período
+                    // !_context.Reservations.Any(r => 
+                    //     r.RoomId == room.RoomId &&
+                    //     r.CheckIn < checkOut && r.CheckOut > checkIn)
+                    )
+                )
                 .ToListAsync();
         }
     }

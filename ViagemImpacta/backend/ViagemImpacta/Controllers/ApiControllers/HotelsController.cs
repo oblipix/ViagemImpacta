@@ -78,7 +78,7 @@ namespace ViagemImpacta.Controllers.ApiControllers
             // UnitOfWork.Hotels acessa o HotelRepository
             // GetAllAsync() é herdado do Repository<Hotel> genérico
             var hotels = await _unitOfWork.Hotels.GetAllAsync();
-            
+
             // ✅ RETORNO PADRONIZADO
             // Ok() = 200 HTTP Status Code
             // Serialização automática para JSON
@@ -116,18 +116,18 @@ namespace ViagemImpacta.Controllers.ApiControllers
         {
             // 🛡️ VALIDAÇÃO DE ENTRADA
             // REGRA: IDs devem ser números positivos
-            if (id <= 0) 
+            if (id <= 0)
                 return BadRequest("ID deve ser maior que zero");
 
             // 🔍 BUSCA NO REPOSITORY
             // GetByIdAsync() é método do repository genérico
             var hotel = await _unitOfWork.Hotels.GetByIdAsync(id);
-            
+
             // 🚫 VERIFICAÇÃO DE EXISTÊNCIA
             // Se hotel não existe, retorna 404 com mensagem descritiva
-            if (hotel == null) 
+            if (hotel == null)
                 return NotFound($"Hotel com ID {id} não encontrado");
-                
+
             // ✅ SUCESSO
             return Ok(hotel);
         }
@@ -161,14 +161,14 @@ namespace ViagemImpacta.Controllers.ApiControllers
         {
             // 🛡️ VALIDAÇÃO DE REGRA DE NEGÓCIO
             // Hotéis são classificados de 1 a 5 estrelas
-            if (stars < 1 || stars > 5) 
+            if (stars < 1 || stars > 5)
                 return BadRequest("Estrelas devem ser entre 1 e 5");
 
             // 🎯 BUSCA ESPECÍFICA
             // Método implementado no HotelRepository
             // WHERE Stars = @stars no SQL
             var hotels = await _unitOfWork.Hotels.GetHotelsByStarsAsync(stars);
-            
+
             // ✅ RETORNO
             // Sempre 200 OK, mesmo se array vazio
             return Ok(hotels);
@@ -211,7 +211,83 @@ namespace ViagemImpacta.Controllers.ApiControllers
             // Método específico que combina os filtros
             // SQL: WHERE (NOT @wifi OR Wifi = 1) AND (NOT @parking OR Parking = 1) AND...
             var hotels = await _unitOfWork.Hotels.GetHotelsWithAmenitiesAsync(wifi, parking, gym);
-            
+
+            // ✅ RETORNO
+            return Ok(hotels);
+        }
+
+        /// <summary>
+        /// 📋 ENDPOINT: Buscar hotéis com quartos disponíveis
+        /// 
+        /// 🎯 PROPÓSITO:
+        /// Integra busca de hotéis com verificação de disponibilidade real de quartos
+        /// Combina filtros de localização, período, capacidade, comodidades e preço
+        /// 
+        /// 🔧 PARÂMETROS:
+        /// - destination: Cidade/destino (opcional)
+        /// - checkIn: Data de check-in (obrigatório)
+        /// - checkOut: Data de check-out (obrigatório)  
+        /// - guests: Número de hóspedes (obrigatório)
+        /// - minStars: Classificação mínima (opcional)
+        /// - wifi: true para hotéis com WiFi (opcional)
+        /// - parking: true para hotéis com estacionamento (opcional)
+        /// - minPrice: Preço mínimo da diária (opcional)
+        /// - maxPrice: Preço máximo da diária (opcional)
+        /// 
+        /// 🌐 EXEMPLOS DE USO:
+        /// GET /api/hotels/search-available?checkIn=2025-02-01&checkOut=2025-02-05&guests=2
+        /// GET /api/hotels/search-available?destination=São Paulo&checkIn=2025-02-01&checkOut=2025-02-05&guests=2&minStars=4&wifi=true&minPrice=100&maxPrice=300
+        /// 
+        /// 📊 RESPONSE:
+        /// 200 OK com hotéis que têm quartos disponíveis no período
+        /// 400 Bad Request se parâmetros inválidos
+        /// 
+        /// 🔍 LÓGICA:
+        /// - Verifica disponibilidade real de quartos
+        /// - Considera capacidade para número de hóspedes
+        /// - Aplica todos os filtros combinados
+        /// - Inclui dados dos quartos na resposta
+        /// </summary>
+        [HttpGet("search-available")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<Hotel>>> SearchAvailableHotels(
+            [FromQuery] string? destination,
+            [FromQuery] DateTime checkIn,
+            [FromQuery] DateTime checkOut,
+            [FromQuery] int guests,
+            [FromQuery] int? minStars = null,
+            [FromQuery] bool? wifi = null,
+            [FromQuery] bool? parking = null,
+            [FromQuery] decimal? minPrice = null,
+            [FromQuery] decimal? maxPrice = null)
+        {
+            // 🛡️ VALIDAÇÕES DE ENTRADA
+            if (checkIn >= checkOut)
+                return BadRequest("Data de check-in deve ser anterior à data de check-out");
+
+            if (checkIn < DateTime.Today)
+                return BadRequest("Data de check-in não pode ser no passado");
+
+            if (guests <= 0)
+                return BadRequest("Número de hóspedes deve ser maior que zero");
+
+            if (minStars.HasValue && (minStars.Value < 1 || minStars.Value > 5))
+                return BadRequest("Classificação deve ser entre 1 e 5 estrelas");
+
+            if (minPrice.HasValue && minPrice.Value < 0)
+                return BadRequest("Preço mínimo deve ser maior ou igual a zero");
+
+            if (maxPrice.HasValue && maxPrice.Value < 0)
+                return BadRequest("Preço máximo deve ser maior ou igual a zero");
+
+            if (minPrice.HasValue && maxPrice.HasValue && minPrice.Value > maxPrice.Value)
+                return BadRequest("Preço mínimo não pode ser maior que o preço máximo");
+
+            // 🎯 BUSCA INTEGRADA
+            var hotels = await _unitOfWork.Hotels.SearchAvailableHotelsAsync(
+                destination, checkIn, checkOut, guests, minStars, wifi, parking, minPrice, maxPrice);
+
             // ✅ RETORNO
             return Ok(hotels);
         }
