@@ -20,14 +20,13 @@ namespace ViagemImpacta.Services.Implementations
         
         public async Task<IEnumerable<ReservationBookDto>> GetAllPackagesAsync()
         {
-            var packages = await _unitOfWork.ReservationBooks.GetAllAsync(p => p.Active, 
-                include: q => q.Include(p => p.Hotels));
+            var packages = await _unitOfWork.ReservationBooks.GetActivePackagesAsync();
             return _mapper.Map<IEnumerable<ReservationBookDto>>(packages);
         }
 
         public async Task<ReservationBookDto?> GetPackageByIdAsync(int id)
         {
-            var package = await _unitOfWork.ReservationBooks.GetAsync(p => p.ReservationBookId == id && p.Active, include: q => q.Include(p => p.Hotels));
+            var package = await _unitOfWork.ReservationBooks.GetPackageWithDetailsAsync(id);
             return package == null ? null : _mapper.Map<ReservationBookDto>(package);
         }
 
@@ -36,8 +35,16 @@ namespace ViagemImpacta.Services.Implementations
             package.CreatedAt = DateTime.UtcNow;
             package.UpdatedAt = DateTime.UtcNow;
 
-            var selectedHotels = await _unitOfWork.Hotels.GetAllAsync(h => hotelIds.Contains(h.HotelId));
-            package.Hotels = selectedHotels.ToList();
+            var selectedHotels = new List<Hotel>();
+            foreach (var hotelId in hotelIds)
+            {
+                var hotel = await _unitOfWork.Hotels.GetByIdAsync(hotelId);
+                if (hotel != null)
+                {
+                    selectedHotels.Add(hotel);
+                }
+            }
+            package.Hotels = selectedHotels;
 
             await _unitOfWork.ReservationBooks.AddAsync(package);
             await _unitOfWork.CommitAsync();
@@ -47,15 +54,23 @@ namespace ViagemImpacta.Services.Implementations
 
         public async Task<bool> UpdatePackageAsync(ReservationBook package, List<int> hotelIds)
         {
-            var existingPackage = await _unitOfWork.ReservationBooks.GetAsync(p => p.ReservationBookId == package.ReservationBookId, include: q => q.Include(p => p.Hotels));
+            var existingPackage = await _unitOfWork.ReservationBooks.GetPackageWithDetailsAsync(package.ReservationBookId);
             if (existingPackage == null) return false;
 
             _mapper.Map(package, existingPackage);
 
-            var selectedHotels = await _unitOfWork.Hotels.GetAllAsync(h => hotelIds.Contains(h.HotelId));
-            existingPackage.Hotels = selectedHotels.ToList();
+            var selectedHotels = new List<Hotel>();
+            foreach (var hotelId in hotelIds)
+            {
+                var hotel = await _unitOfWork.Hotels.GetByIdAsync(hotelId);
+                if (hotel != null)
+                {
+                    selectedHotels.Add(hotel);
+                }
+            }
+            existingPackage.Hotels = selectedHotels;
 
-            _unitOfWork.ReservationBooks.Update(existingPackage);
+            await _unitOfWork.ReservationBooks.UpdateAsync(existingPackage);
             await _unitOfWork.CommitAsync();
 
             return true;
@@ -63,11 +78,11 @@ namespace ViagemImpacta.Services.Implementations
 
         public async Task<bool> DeletePackageAsync(int id)
         {
-            var packageToDelete = await _unitOfWork.ReservationBooks.GetAsync(p => p.ReservationBookId == id);
+            var packageToDelete = await _unitOfWork.ReservationBooks.GetPackageWithDetailsAsync(id);
             if (packageToDelete == null) return false;
 
             packageToDelete.Active = false;
-            _unitOfWork.ReservationBooks.Update(packageToDelete);
+            await _unitOfWork.ReservationBooks.UpdateAsync(packageToDelete);
             await _unitOfWork.CommitAsync();
 
             return true;
@@ -80,15 +95,14 @@ namespace ViagemImpacta.Services.Implementations
 
         public async Task<IEnumerable<ReservationBookDto>> SearchPackagesAsync(string searchTerm)
         {
-            var packages = await _unitOfWork.ReservationBooks.GetAllAsync(
-                p => p.Active && (p.Title.Contains(searchTerm) || p.Description.Contains(searchTerm)),
-                include: q => q.Include(p => p.Hotels));
+            var packages = await _unitOfWork.ReservationBooks.GetPackagesAsync(
+                p => p.Active && (p.Title.Contains(searchTerm) || p.Description.Contains(searchTerm)));
             return _mapper.Map<IEnumerable<ReservationBookDto>>(packages);
         }
 
         public async Task<IEnumerable<ReservationBookDto>> GetPackagesWithFiltersAsync(string? destination, decimal? minPrice, decimal? maxPrice, DateTime? checkIn, DateTime? checkOut, bool? promotion, int skip, int take)
         {
-            var packages = await _unitOfWork.ReservationBooks.GetAllAsync(
+            var packages = await _unitOfWork.ReservationBooks.GetPackagesAsync(
                 p => p.Active &&
                     (string.IsNullOrEmpty(destination) || p.Destination.Contains(destination)) &&
                     (!minPrice.HasValue || p.FinalPrice >= minPrice.Value) &&
@@ -96,8 +110,9 @@ namespace ViagemImpacta.Services.Implementations
                     (!checkIn.HasValue || p.CheckIn >= checkIn.Value) &&
                     (!checkOut.HasValue || p.CheckOut <= checkOut.Value) &&
                     (!promotion.HasValue || p.Promotion == promotion.Value),
-                include: q => q.Include(p => p.Hotels));
-            return _mapper.Map<IEnumerable<ReservationBookDto>>(packages.Skip(skip).Take(take));
+                skip,
+                take);
+            return _mapper.Map<IEnumerable<ReservationBookDto>>(packages);
         }
     }
 }

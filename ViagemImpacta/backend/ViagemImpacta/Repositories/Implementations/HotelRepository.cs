@@ -28,18 +28,53 @@ namespace ViagemImpacta.Repositories.Implementations
     /// - Async/await patterns
     /// - Query optimization
     /// </summary>
-    public class HotelRepository : Repository<Hotel>, IHotelRepository
+
+    public class HotelRepository : IHotelRepository
     {
-        /// <summary>
-        /// 🏗️ CONSTRUTOR
-        /// 
-        /// CONCEITO: Repository herda funcionalidade básica e adiciona específicas
-        /// - base(context): Chama construtor da classe pai Repository<Hotel>
-        /// - _context herdado da classe base para queries específicas
-        /// </summary>
-        public HotelRepository(AgenciaDbContext context) : base(context)
+        private readonly AgenciaDbContext _context;
+
+        public HotelRepository(AgenciaDbContext context)
         {
+            _context = context;
         }
+
+        // Métodos obrigatórios da interface IHotelRepository
+        public async Task<List<Hotel>> GetAllAsync()
+        {
+            return await _context.Hotels
+                .Include(h => h.RoomTypes)
+                .Include(h => h.Rooms)
+                .ToListAsync();
+        }
+
+        public async Task<Hotel?> GetByIdAsync(int id)
+        {
+            return await _context.Hotels
+                .Include(h => h.RoomTypes)
+                .Include(h => h.Rooms)
+                .FirstOrDefaultAsync(h => h.HotelId == id);
+        }
+
+        public async Task AddAsync(Hotel hotel)
+        {
+            await _context.Hotels.AddAsync(hotel);
+        }
+
+        public async Task UpdateAsync(Hotel hotel)
+        {
+            _context.Hotels.Update(hotel);
+            await Task.CompletedTask;
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var hotel = await _context.Hotels.FindAsync(id);
+        if (hotel != null)
+        {
+            _context.Hotels.Remove(hotel);
+        }
+    }
+
 
         /// <summary>
         /// 🌟 MÉTODO: Buscar hotéis por número de estrelas
@@ -281,9 +316,7 @@ CREATE INDEX IX_Hotels_Stars ON Hotels(Stars);
 CREATE INDEX IX_Hotels_Amenities ON Hotels(Wifi, Parking, Gym);
 
 -- Índice composto para filtros combinados
-CREATE INDEX IX_Hotels_Stars_Amenities ON Hotels(Stars, Wifi, Parking, Gym);
-```     
-     10. 🚀 MELHORIAS FUTURAS PARA ESTUDAR:
+CREATE INDEX IX_Hotels_Stars_Amenities ON Hotels(Stars, Wifi, Parking, Gym);     10. 🚀 MELHORIAS FUTURAS PARA ESTUDAR:
          - Specification Pattern para queries complexas
          - Repository genérico com Expression<Func<T, bool>>
          - Cache de consultas frequentes

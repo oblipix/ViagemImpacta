@@ -7,7 +7,8 @@ namespace ViagemImpacta.Repositories
         IUserRepository Users { get; }
         IReservationBookRepository ReservationBooks { get; }
         IHotelRepository Hotels { get; }
-
+        IRoomTypeRepository RoomTypes { get; }
+        IAvailabilityRepository Availabilities { get; }
         Task<bool> CommitAsync();
     }
 }

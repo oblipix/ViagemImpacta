@@ -1,5 +1,4 @@
 ﻿@model ViagemImpacta.Models.Hotel
-@using ViagemImpacta.Models.Enums
 
 @{
     ViewData["Title"] = "Editar Hotel";
@@ -79,7 +78,7 @@
                         <div class="form-group mb-2">
                             <label>Nome do Quarto</label>
                             <input type="text" name="Rooms[@i].Name" value="@room.Name" class="form-control" />
-    </div>
+                        </div>
                         <div class="form-group mb-2">
                             <label>Tipo de Quarto</label>
                             <select name="Rooms[@i].Type" class="form-control">
@@ -127,7 +126,7 @@
         </div>
         <div class="form-group mb-2">
             <label>Tipo de Quarto</label>
-            <select name="Rooms[__index__].Type" class="form-control" asp-items="Html.GetEnumSelectList<RoomType>()"></select>
+            <select name="Rooms[__index__].Type" class="form-control" asp-items="Html.GetEnumSelectList<ViagemImpacta.Models.Enums.RoomType>()"></select>
         </div>
         <div class="form-group mb-2">
             <label>Preço Médio Diária</label>

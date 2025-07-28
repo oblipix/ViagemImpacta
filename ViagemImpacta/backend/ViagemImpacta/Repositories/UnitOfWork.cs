@@ -9,6 +9,8 @@ namespace ViagemImpacta.Repositories.Implementations
         public IUserRepository Users { get; private set; }
         public IReservationBookRepository ReservationBooks { get; private set; }
         public IHotelRepository Hotels { get; private set; }
+        public IRoomTypeRepository RoomTypes { get; private set; }
+        public IAvailabilityRepository Availabilities { get; private set; }
 
         public UnitOfWork(AgenciaDbContext context)
         {
@@ -16,6 +18,8 @@ namespace ViagemImpacta.Repositories.Implementations
             Users = new UserRepository(_context);
             ReservationBooks = new ReservationBookRepository(_context);
             Hotels = new HotelRepository(_context);
+            RoomTypes = new RoomTypeRepository(_context);
+            Availabilities = new AvailabilityRepository(_context);
         }
 
         // Marcelo: Troquei para <bool> por ser mais semântico, mas a ideia é a mesma.

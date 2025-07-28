@@ -14,6 +14,8 @@ namespace ViagemImpacta.Data
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Reservation> Reservations { get; set; } = null!;
         public DbSet<Payment> Payments { get; set; } = null!;
+        public DbSet<RoomType> RoomTypes { get; set; } = null!;
+        public DbSet<Availability> Availabilities { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

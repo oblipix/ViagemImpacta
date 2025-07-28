@@ -19,18 +19,18 @@ namespace ViagemImpacta.Services.Interfaces
 
         public async Task<IEnumerable<HotelDto>> GetAllHotelsAsync()
         {
-            var hotels = await _unitOfWork.Hotels.GetAllAsync(include: q => q.Include(h => h.Rooms));
+            var hotels = await _unitOfWork.Hotels.GetAllAsync();
             return _mapper.Map<IEnumerable<HotelDto>>(hotels);
         }
 
         public async Task<Hotel?> GetHotelWithRoomsAsync(int hotelId)
         {
-            return await _unitOfWork.Hotels.GetAsync(h => h.HotelId == hotelId, include: q => q.Include(h => h.Rooms));
+            return await _unitOfWork.Hotels.GetByIdAsync(hotelId);
         }
 
         public async Task<Hotel?> GetHotelByIdAsync(int hotelId)
         {
-            return await _unitOfWork.Hotels.GetAsync(h => h.HotelId == hotelId);
+            return await _unitOfWork.Hotels.GetByIdAsync(hotelId);
         }
 
         public async Task<Hotel> CreateHotelAsync(Hotel hotel)
@@ -42,7 +42,7 @@ namespace ViagemImpacta.Services.Interfaces
 
         public async Task UpdateHotelAsync(Hotel hotel)
         {
-            var existingHotel = await _unitOfWork.Hotels.GetAsync(h => h.HotelId == hotel.HotelId, include: h => h.Include(r => r.Rooms));
+            var existingHotel = await _unitOfWork.Hotels.GetByIdAsync(hotel.HotelId);
             if (existingHotel == null) return;
 
             _mapper.Map(hotel, existingHotel);
@@ -63,24 +63,25 @@ namespace ViagemImpacta.Services.Interfaces
                 }
             }
 
-            _unitOfWork.Hotels.Update(existingHotel);
+            await _unitOfWork.Hotels.UpdateAsync(existingHotel);
             await _unitOfWork.CommitAsync();
         }
 
         public async Task DeleteHotelAsync(int hotelId)
         {
-            var hotel = await _unitOfWork.Hotels.GetAsync(h => h.HotelId == hotelId);
+            var hotel = await _unitOfWork.Hotels.GetByIdAsync(hotelId);
             if (hotel == null) return;
 
-            _unitOfWork.Hotels.Remove(hotel);
+            await _unitOfWork.Hotels.DeleteAsync(hotelId);
             await _unitOfWork.CommitAsync();
         }
 
         public async Task<IEnumerable<HotelDto>> GetHotelsWithFiltersAsync(string? hotelAddress, int? minStars, int? maxPrice, int? guestCount)
         {
-            var hotels = await _unitOfWork.Hotels.GetAllAsync(include: q => q.Include(h => h.Rooms));
+            IEnumerable<Hotel> hotels = await _unitOfWork.Hotels.GetAllAsync(); // Start with IEnumerable
+
             if (!string.IsNullOrEmpty(hotelAddress))
-                hotels = hotels.Where(h => h.HotelAddress != null && h.HotelAddress.Contains(hotelAddress, StringComparison.OrdinalIgnoreCase));
+                hotels = hotels.Where(h => h.City != null && h.City.Contains(hotelAddress, StringComparison.OrdinalIgnoreCase));
             if (minStars.HasValue)
                 hotels = hotels.Where(h => h.Stars >= minStars.Value);
 
