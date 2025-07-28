@@ -1,0 +1,174 @@
+.labelForms {
+   font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-weight: bold;
+    color: #2c5282; 
+    font-size: 1.0rem; 
+
+   
+}
+
+input[type="checkbox"],
+input[type="rage"], 
+.labelOption {
+    position: relative;
+   top: 20px;
+   color: #2c5282;
+}
+
+.labelForms {
+    font-family: "Open Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-weight: bold;
+    color: #2c5282;
+    font-size: 1.0rem;
+    /* Adicionado para espaçamento se houver outros elementos acima */
+    margin-bottom: 0.5rem;
+}
+
+input[type="checkbox"],
+input[type="range"], /* Corrigi "rage" para "range" */
+.labelOption {
+    position: relative;
+    /* top: 20px; Removido ou ajustado. Isso pode causar desalinhamento */
+    color: #2c5282;
+}
+
+/* Estilos gerais para labels e inputs (se você já tiver, pode manter) */
+/* Estilos gerais para labels e inputs */
+.labelForms {
+    font-family: "Open Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700; /* Bold para as labels */
+    font-style: normal;
+    color: #2c5282;
+    font-size: 1.0rem;
+    margin-bottom: 0.5rem; /* Espaçamento abaixo do título */
+    display: block; /* Para que a label ocupe sua própria linha */
+}
+
+/* Para que os inputs tenham a aparência esperada */
+input[type="text"],
+input[type="email"],
+input[type="date"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 0.75rem; /* py-3 px-3 */
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    border-radius: 0.5rem; /* rounded-lg */
+    background-color: #ffffff;
+    font-size: 1rem;
+    color: #374151; /* text-gray-700 */
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Estado de foco dos inputs */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus,
+select:focus {
+    outline: none;
+    border-color: #3b82f6; /* border-blue-500 */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); /* focus:ring-blue-500 */
+}
+
+/* Estilos para o checkbox dentro do item de comodidade */
+.comodidade-item input[type="checkbox"] {
+    margin-right: 0.5rem; /* Espaçamento entre o checkbox e o texto/estrela */
+    height: 1rem;
+    width: 1rem;
+    accent-color: #2b6cb0; /* Cor de destaque para o checkbox */
+    border-radius: 0.25rem;
+}
+
+/* Estilo para o ícone de estrela quando está junto à comodidade (Wi-Fi Grátis) */
+.star-icon-inline {
+    width: 1rem; /* Tamanho da estrela */
+    height: 1rem; /* Tamanho da estrela */
+    margin-right: 0.25rem; /* Pequeno espaçamento entre a estrela e o texto da comodidade */
+    color: #FFD700; /* Cor dourada para a estrela (Gold) */
+    vertical-align: middle; /* Alinha a estrela verticalmente com o texto */
+    display: inline-block; /* Garante que ela ocupe seu próprio espaço inline */
+}
+
+/* Estilos para a barra de range (mantidos) */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  outline: none;
+  height: 0.5rem;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #2b6cb0;
+  cursor: pointer;
+  margin-top: -0.25rem;
+  box-shadow: 0 0 0 3px #fff;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #2b6cb0;
+  cursor: pointer;
+  box-shadow: 0 0 0 3px #fff;
+}
+
+input[type="range"].range-blue::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, #2b6cb0 var(--range-progress), #e2e8f0 var(--range-progress));
+    border-radius: 9999px;
+    height: 0.5rem;
+}
+
+input[type="range"].range-blue::-moz-range-track {
+    background: linear-gradient(to right, #2b6cb0 var(--range-progress), #e2e8f0 var(--range-progress));
+    border-radius: 9999px;
+    height: 0.5rem;
+}
+
+
+/* Media queries para responsividade do grid de comodidades DENTRO do dropdown */
+@media (min-width: 640px) { /* sm breakpoint */
+    .comodidades-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 colunas */
+    }
+}
+
+@media (min-width: 768px) { /* md breakpoint */
+    .comodidades-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 colunas */
+    }
+}
+
+@media (min-width: 1024px) { /* lg breakpoint */
+    .comodidades-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 colunas em telas maiores */
+    }
+}
+
+@media (min-width: 1280px) { /* xl breakpoint - Adicionado para mais colunas em telas muito grandes */
+    .comodidades-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr)); /* 5 colunas */
+    }
+}
+
+/* Media queries para responsividade do grid */
+@media (min-width: 640px) { /* sm breakpoint */
+    .comodidades-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 colunas */
+    }
+}

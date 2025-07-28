@@ -483,3 +483,25 @@ a:hover {
     background-color: #f9f9f9;
   }
 }
+
+/* === CLASSES ADICIONAIS PARA TRAVEL SECTION === */
+
+/* Classe para títulos dos cards de viagem */
+.TittleCards {
+  font-family: 'Lexend Deca', sans-serif;
+  font-weight: 600;
+  font-size: 1.125rem; /* text-lg */
+  line-height: 1.25;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+/* Classe para sombra dos cards */
+.cardSombra {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Altura específica para as imagens dos cards de viagem */
+.h-92 {
+  height: 23rem; /* 368px */
+}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Input, Select, Textarea, Label, Modal, Alert } from '../../atoms';
+import { Button, Input, Select, Textarea, Modal, Alert, FormGroup } from '../../atoms';
 
 // 🎯 MOLECULAR COMPONENT - Event Reservation Form Atomic
 const EventReservationFormAtomic = ({ isOpen, onClose }) => {
@@ -84,8 +84,7 @@ const EventReservationFormAtomic = ({ isOpen, onClose }) => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Nome Completo */}
-                <div>
-                    <Label htmlFor="name">Nome Completo</Label>
+                <FormGroup label="Nome Completo">
                     <Input
                         type="text"
                         id="name"
@@ -95,11 +94,10 @@ const EventReservationFormAtomic = ({ isOpen, onClose }) => {
                         required
                         placeholder="Digite seu nome completo"
                     />
-                </div>
+                </FormGroup>
 
                 {/* E-mail */}
-                <div>
-                    <Label htmlFor="email">E-mail</Label>
+                <FormGroup label="E-mail">
                     <Input
                         type="email"
                         id="email"
@@ -109,11 +107,10 @@ const EventReservationFormAtomic = ({ isOpen, onClose }) => {
                         required
                         placeholder="seu@email.com"
                     />
-                </div>
+                </FormGroup>
 
                 {/* Telefone */}
-                <div>
-                    <Label htmlFor="phone">Telefone (com DDD)</Label>
+                <FormGroup label="Telefone (com DDD)">
                     <Input
                         type="tel"
                         id="phone"
@@ -123,11 +120,10 @@ const EventReservationFormAtomic = ({ isOpen, onClose }) => {
                         required
                         placeholder="(11) 99999-9999"
                     />
-                </div>
+                </FormGroup>
 
                 {/* Data de Interesse */}
-                <div>
-                    <Label htmlFor="preferredDate">Data de Interesse</Label>
+                <FormGroup label="Data de Interesse">
                     <Input
                         type="date"
                         id="preferredDate"
@@ -135,11 +131,10 @@ const EventReservationFormAtomic = ({ isOpen, onClose }) => {
                         value={formData.preferredDate}
                         onChange={handleChange}
                     />
-                </div>
+                </FormGroup>
 
                 {/* Tipo de Evento */}
-                <div>
-                    <Label htmlFor="eventType">Qual Evento te Interessou?</Label>
+                <FormGroup label="Qual Evento te Interessou?">
                     <Select
                         id="eventType"
                         name="eventType"
@@ -154,11 +149,10 @@ const EventReservationFormAtomic = ({ isOpen, onClose }) => {
                         <option value="Dia dos Namorados Romântico na Serra Gaúcha">Dia dos Namorados Romântico na Serra Gaúcha</option>
                         <option value="Outro">Outro (especifique na mensagem)</option>
                     </Select>
-                </div>
+                </FormGroup>
 
                 {/* Mensagem */}
-                <div>
-                    <Label htmlFor="message">Sua Mensagem / Detalhes Adicionais</Label>
+                <FormGroup label="Sua Mensagem / Detalhes Adicionais">
                     <Textarea
                         id="message"
                         name="message"
@@ -167,7 +161,7 @@ const EventReservationFormAtomic = ({ isOpen, onClose }) => {
                         onChange={handleChange}
                         placeholder="Conte-nos mais sobre suas preferências..."
                     />
-                </div>
+                </FormGroup>
 
                 {/* Submit Button */}
                 <Button

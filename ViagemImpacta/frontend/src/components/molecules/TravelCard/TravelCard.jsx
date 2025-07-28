@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Text, Image, Card } from '../../atoms';
+import { Button, Text, Image, Card, IconSVG, PriceDisplay } from '../../atoms';
 
 export const TravelCard = ({ 
     travel, 
@@ -51,15 +51,14 @@ export const TravelCard = ({
                         className="absolute top-2 right-2 p-2 rounded-full bg-black/50 hover:bg-black/70 transition z-10 text-white"
                         onClick={handleSaveClick}
                     >
-                        <svg className={`h-5 w-5 ${isSaved ? 'text-red-500' : 'text-white'}`} 
-                             fill={isSaved ? 'currentColor' : 'none'} 
-                             viewBox="0 0 24 24" 
-                             stroke="currentColor">
+                        <IconSVG className={`h-5 w-5 ${isSaved ? 'text-red-500' : 'text-white'}`}>
                             <path strokeLinecap="round" 
                                   strokeLinejoin="round" 
                                   strokeWidth="2" 
-                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                  fill={isSaved ? 'currentColor' : 'none'} 
+                                  stroke="currentColor" />
+                        </IconSVG>
                     </Button>
                 )}
             </div>
@@ -81,14 +80,13 @@ export const TravelCard = ({
                 
                 <div className="flex justify-between items-center">
                     <div className="flex flex-col">
-                        {hasDiscount && (
-                            <Text variant="small" className="text-gray-500 line-through">
-                                De R$ {travel.priceFrom?.toFixed(2)}
-                            </Text>
-                        )}
-                        <Text variant="price">
-                            R$ {travel.priceTo?.toFixed(2)}
-                        </Text>
+                        <PriceDisplay 
+                            price={travel.priceTo} 
+                            currency="R$" 
+                            size="md"
+                            originalPrice={hasDiscount ? travel.priceFrom : undefined}
+                            showDiscount={hasDiscount}
+                        />
                     </div>
                     
                     <div className="flex items-center space-x-2">

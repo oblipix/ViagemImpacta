@@ -247,6 +247,169 @@ export class HotelService {
             'Centro de negócios'
         ];
     };
+
+    /**
+     * 🔍 BUSCAR HOTÉIS COM QUARTOS DISPONÍVEIS
+     * 
+     * Integra busca de hotéis com verificação de disponibilidade real
+     * Combina todos os filtros de busca em uma única consulta otimizada
+     * 
+     * @param {object} searchParams - Parâmetros de busca
+     * @param {string} searchParams.destination - Cidade/destino (opcional)
+     * @param {string} searchParams.checkInDate - Data check-in (YYYY-MM-DD)
+     * @param {string} searchParams.checkOutDate - Data check-out (YYYY-MM-DD)
+     * @param {number} searchParams.guests - Número de hóspedes
+     * @param {number} searchParams.minRating - Classificação mínima (1-5)
+     * @param {boolean} searchParams.wifi - Filtrar por WiFi
+     * @param {boolean} searchParams.parking - Filtrar por estacionamento  
+     * @param {number} searchParams.minPrice - Preço mínimo da diária
+     * @param {number} searchParams.maxPrice - Preço máximo da diária
+     * @returns {Promise<Hotel[]>} Hotéis com quartos disponíveis
+     * 
+     * 🌐 ENDPOINT: GET /api/hotels/search-available
+     * 📊 RESPONSE: Array de hotéis com dados de quartos incluídos
+     * 
+     * 💡 EXEMPLO DE USO:
+     * const hotels = await hotelService.searchAvailableHotels({
+     *     destination: 'São Paulo',
+     *     checkInDate: '2025-02-01',
+     *     checkOutDate: '2025-02-05', 
+     *     guests: 2,
+     *     minRating: 4,
+     *     wifi: true,
+     *     minPrice: 100,
+     *     maxPrice: 300
+     * });
+     */
+    async searchAvailableHotels(searchParams) {
+        try {
+            // 🔧 CONSTRUIR QUERY PARAMETERS
+            const queryParams = {};
+            
+            // Parâmetros obrigatórios
+            if (searchParams.checkInDate) {
+                queryParams.checkIn = searchParams.checkInDate;
+            }
+            if (searchParams.checkOutDate) {
+                queryParams.checkOut = searchParams.checkOutDate;
+            }
+            if (searchParams.guests) {
+                queryParams.guests = searchParams.guests.toString();
+            }
+            
+            // Parâmetros opcionais - só incluir se especificados
+            if (searchParams.destination) {
+                queryParams.destination = searchParams.destination;
+            }
+            if (searchParams.minRating) {
+                queryParams.minStars = searchParams.minRating.toString();
+            }
+            if (searchParams.wifi === true) {
+                queryParams.wifi = 'true';
+            }
+            if (searchParams.parking === true) {
+                queryParams.parking = 'true';
+            }
+            if (searchParams.minPrice !== undefined && searchParams.minPrice !== null) {
+                queryParams.minPrice = searchParams.minPrice.toString();
+            }
+            if (searchParams.maxPrice !== undefined && searchParams.maxPrice !== null) {
+                queryParams.maxPrice = searchParams.maxPrice.toString();
+            }
+
+            // 🌐 REQUISIÇÃO PARA O BACKEND
+            const hotels = await apiService.get(
+                `${API_CONFIG.ENDPOINTS.HOTELS.BASE}/search-available`,
+                queryParams
+            );
+            
+            // 🔄 TRANSFORMAR DADOS PARA O FRONTEND
+            return hotels.map(this.transformHotelData);
+            
+        } catch (error) {
+            console.error('❌ Erro ao buscar hotéis disponíveis:', error);
+            
+            // 🎭 FALLBACK COM DADOS MOCKADOS (desenvolvimento)
+            console.warn('🎭 Usando dados mockados para busca de hotéis');
+            return this.getMockAvailableHotels(searchParams);
+        }
+    }
+
+    /**
+     * 🎭 DADOS MOCKADOS PARA DESENVOLVIMENTO
+     * 
+     * Simula resposta da API para desenvolvimento/testes
+     * Aplica filtros básicos nos dados mockados
+     */
+    getMockAvailableHotels(searchParams) {
+        // Dados mockados básicos
+        const mockHotels = [
+            {
+                id: 1,
+                title: 'Hotel Copacabana Palace',
+                location: 'Rio de Janeiro, RJ',
+                rating: 5,
+                description: 'Hotel de luxo na praia de Copacabana',
+                mainImageUrl: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400',
+                wifi: true,
+                parking: true,
+                gym: true,
+                rooms: [
+                    { id: 1, type: 'Standard', price: 350, capacity: 2, available: true },
+                    { id: 2, type: 'Deluxe', price: 450, capacity: 3, available: true }
+                ]
+            },
+            {
+                id: 2,
+                title: 'Grand Hyatt São Paulo',
+                location: 'São Paulo, SP',
+                rating: 4,
+                description: 'Hotel moderno no centro financeiro',
+                mainImageUrl: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400',
+                wifi: true,
+                parking: false,
+                gym: true,
+                rooms: [
+                    { id: 3, type: 'Executive', price: 280, capacity: 2, available: true }
+                ]
+            }
+        ];
+
+        // Aplicar filtros básicos aos dados mockados
+        return mockHotels.filter(hotel => {
+            // Filtro por destino
+            if (searchParams.destination && 
+                !hotel.location.toLowerCase().includes(searchParams.destination.toLowerCase())) {
+                return false;
+            }
+            
+            // Filtro por classificação
+            if (searchParams.minRating && hotel.rating < searchParams.minRating) {
+                return false;
+            }
+            
+            // Filtro por WiFi
+            if (searchParams.wifi === true && !hotel.wifi) {
+                return false;
+            }
+            
+            // Filtro por estacionamento
+            if (searchParams.parking === true && !hotel.parking) {
+                return false;
+            }
+            
+            // Filtro por capacidade e preço (verificar se tem quarto adequado)
+            const hasAvailableRoom = hotel.rooms?.some(room => {
+                if (!room.available) return false;
+                if (room.capacity < searchParams.guests) return false;
+                if (searchParams.minPrice && room.price < searchParams.minPrice) return false;
+                if (searchParams.maxPrice && room.price > searchParams.maxPrice) return false;
+                return true;
+            });
+            
+            return hasAvailableRoom;
+        });
+    }
 }
 
 // 🎯 INSTÂNCIA SINGLETON PARA USO GLOBAL

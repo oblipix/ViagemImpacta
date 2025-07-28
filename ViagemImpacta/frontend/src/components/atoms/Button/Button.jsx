@@ -22,6 +22,10 @@ export const Button = ({
                     return 'reset-btn-style'; // Apenas reset para deixar o CSS do buttonHeader funcionar
                 }
                 return `reset-btn-style ${baseClasses}`;
+            case 'secondary':
+                return `${baseClasses} bg-gray-500 hover:bg-gray-600`;
+            case 'outline':
+                return `${baseClasses} border border-gray-300 bg-white text-gray-700 hover:bg-gray-50`;
             case 'primary':
             default:
                 return baseClasses;

@@ -1,0 +1,41 @@
+/* src/components/InstitutionalPageAtomic.css */
+
+.institutional-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  /* Define um tamanho fixo para o card, para controlar a proporção da imagem */
+  width: 150px;
+  height: 200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.institutional-card img {
+  filter: grayscale(100%);
+  transition: filter 0.3s ease-in-out, transform 0.3s ease-in-out;
+
+  /* Garante que a imagem preencha a div do card */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Remove o filtro P&B ao passar o mouse */
+.institutional-card img:hover {
+  filter: grayscale(0%);
+  transform: scale(1.05);
+}
+
+.member-name{
+  font-size: 10px;
+}
+
+/* Ajustar o grid para melhor visualização dos tamanhos fixos */
+@media (min-width: 1024px) {
+  .grid-cols-lg-4-adjusted {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}

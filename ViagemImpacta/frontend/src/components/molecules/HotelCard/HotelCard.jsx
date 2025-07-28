@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Text, Image } from '../../atoms';
+import { Button, Text, Image, IconSVG, PriceDisplay, StarRating } from '../../atoms';
 
 export const HotelCard = ({ 
     hotel, 
@@ -29,15 +29,14 @@ export const HotelCard = ({
                             onSaveHotel(hotel);
                         }}
                     >
-                        <svg className={`h-5 w-5 ${isSaved ? 'text-red-500' : 'text-white'}`} 
-                             fill={isSaved ? 'currentColor' : 'none'} 
-                             viewBox="0 0 24 24" 
-                             stroke="currentColor">
+                        <IconSVG className={`h-5 w-5 ${isSaved ? 'text-red-500' : 'text-white'}`}>
                             <path strokeLinecap="round" 
                                   strokeLinejoin="round" 
                                   strokeWidth="2" 
-                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                  fill={isSaved ? 'currentColor' : 'none'}
+                                  stroke="currentColor" />
+                        </IconSVG>
                     </Button>
                 )}
             </div>
@@ -52,17 +51,18 @@ export const HotelCard = ({
                 </Text>
                 
                 <div className="flex justify-between items-center">
-                    <Text variant="price">
-                        R$ {hotel.price?.toFixed(2)}
-                    </Text>
+                    <PriceDisplay 
+                        price={hotel.price} 
+                        currency="R$" 
+                        size="md" 
+                    />
                     
                     {hotel.rating && (
-                        <div className="flex items-center">
-                            <span className="text-yellow-500">⭐</span>
-                            <Text variant="small" className="ml-1">
-                                {hotel.rating}
-                            </Text>
-                        </div>
+                        <StarRating 
+                            rating={hotel.rating} 
+                            maxStars={5} 
+                            size="sm" 
+                        />
                     )}
                 </div>
             </div>

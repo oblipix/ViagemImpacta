@@ -20,3 +20,4 @@ export { default as HotelLeisureFacilities } from './HotelLeisureFacilities';
 export { default as HotelRoomCard } from './HotelRoomCard';
 export { default as HotelRoomsSection } from './HotelRoomsSection';
 export { default as HotelDetailsPageAtomic } from './HotelDetailsPageAtomic';
+export { ImageModalAtomic } from './ImageModalAtomic';

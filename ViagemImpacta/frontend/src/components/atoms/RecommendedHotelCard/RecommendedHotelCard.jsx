@@ -1,6 +1,6 @@
 import React from 'react';
 import ActionButton from '../ActionButton/ActionButton';
-import RatingDisplay from '../RatingDisplay/RatingDisplay';
+import { StarRating, PriceDisplay } from '../index';
 import LocationTag from '../LocationTag/LocationTag';
 
 // 🎯 ATOMIC COMPONENT - RecommendedHotelCard
@@ -32,13 +32,23 @@ const RecommendedHotelCard = ({
                 
                 <LocationTag location={hotel.location} />
                 
-                <RatingDisplay
-                    rating={hotel.rating}
-                    reviewsCount={hotel.feedbacks?.length || 0}
+                <StarRating 
+                    rating={hotel.rating} 
+                    maxStars={5} 
+                    size="sm" 
                     className="mb-4"
                 />
                 
                 <p className="text-gray-700 text-base mb-4 line-clamp-3">{hotel.description}</p>
+                
+                {hotel.price && (
+                    <PriceDisplay 
+                        price={hotel.price} 
+                        currency="R$" 
+                        size="lg" 
+                        className="mb-4"
+                    />
+                )}
                 
                 <ActionButton
                     onClick={handleClick}

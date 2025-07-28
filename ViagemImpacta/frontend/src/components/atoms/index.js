@@ -14,6 +14,7 @@ export { Container } from './Container';
 export { Carousel } from './Carousel';
 export { HeroSlide } from './HeroSlide';
 export { FilterButton } from './FilterButton';
+export { default as NavigationButton } from './NavigationButton';
 export { default as OverlaySearchForm } from './OverlaySearchForm';
 export { default as InputWithIcon } from './InputWithIcon';
 export { default as SVGIcon } from './SVGIcon';
@@ -37,3 +38,13 @@ export { default as HotelTitle } from './HotelTitle';
 export { default as HotelDescription } from './HotelDescription';
 export { default as HotelAmenityItem } from './HotelAmenityItem';
 export { default as ReserveButton } from './ReserveButton';
+
+// 🎯 NOVOS ATOMS REUTILIZÁVEIS
+export { default as FormGroup } from './FormGroup/FormGroup';
+export { default as IconSVG } from './IconSVG/IconSVG';
+export { default as StarRating } from './StarRating/StarRating';
+export { default as OverlayContent } from './OverlayContent/OverlayContent';
+export { default as PriceDisplay } from './PriceDisplay/PriceDisplay';
+export { default as AmenityItem } from './AmenityItem/AmenityItem';
+export { default as ResultDisplay } from './ResultDisplay/ResultDisplay';
+export { default as AvatarUpload } from './AvatarUpload/AvatarUpload';
