@@ -31,10 +31,9 @@ public class StripeController : ControllerBase
         {
 
             var result = await _unitOfWork.Reservations.GetByIdAsync(id);
-            var res = _mapper.Map<ReservationResponseDto>(result);
             if (result == null) return BadRequest();
 
-           
+            var res = _mapper.Map<ReservationResponseDto>(result);
 
             StripeConfiguration.ApiKey = _model.SecretKey;
 
@@ -61,15 +60,14 @@ public class StripeController : ControllerBase
                             Currency = "BRL",
                             ProductData = new SessionLineItemPriceDataProductDataOptions
                             {
-                                Name = res.HotelName,
-                                //Alguns campos como "Descrição" e "Imagem" estão faltando pois não existe nas entidades
+                                Name = string.IsNullOrWhiteSpace(res.HotelName) ? "Reserva de Hotel" : res.HotelName,
                             }
                         },
-                        Quantity = 1,
+                        Quantity = 1
                     }
                 },
                 Mode = "payment",
-                PaymentMethodTypes = ["card", "boleto"],
+                PaymentMethodTypes = new List<string> { "card", "boleto" },
                 SuccessUrl = "https://localhost:7054/success",
                 ExpiresAt = DateTime.UtcNow + TimeSpan.FromMinutes(45),
             };
