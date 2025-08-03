@@ -5,19 +5,19 @@ using ViagemImpacta.Repositories.Interfaces;
 
 namespace ViagemImpacta.Repositories.Implementations
 {
-    public class RoomsPromotionRepository : Repository<RoomsPromotional>, IRoomsPromotional
+    public class RoomsPromotionalRepository : Repository<RoomsPromotional>, IRoomsPromotionalRepository
     {
         private readonly AgenciaDbContext _context;
 
-        public RoomsPromotionRepository(AgenciaDbContext context) : base(context)
+        public RoomsPromotionalRepository(AgenciaDbContext context) : base(context)
         {
             _context = context;
         }
 
-        public async Task<RoomsPromotional?> GetRoomPromotionalByIdAsync(int idRoomPromotional)
+        public async Task<RoomsPromotional?> GetRoomPromotionalByIdAsync(int idRoomsPromotional)
         {
             return await _context.RoomsPromotional
-                .FirstOrDefaultAsync(RP => RP.RoomPromotionalId == idRoomPromotional);
+                .FirstOrDefaultAsync(RP => RP.RoomsPromotionalId == idRoomsPromotional);
         }
 
         public async Task<bool> RoomsAvailableAsync(int PromotionId)

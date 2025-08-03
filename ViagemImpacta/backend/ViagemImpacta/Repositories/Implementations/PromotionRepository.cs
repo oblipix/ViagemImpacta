@@ -8,7 +8,7 @@ using ViagemImpacta.Repositories.Interfaces;
 
 namespace ViagemImpacta.Repositories.Implementations
 {
-    public class PromotionRepository : Repository<Promotion>, IPromotion
+    public class PromotionRepository : Repository<Promotion>, IPromotionRepository
     {
         private readonly AgenciaDbContext _context;
         public PromotionRepository(AgenciaDbContext context) : base(context)
