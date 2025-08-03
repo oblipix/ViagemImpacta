@@ -53,6 +53,14 @@ namespace ViagemImpacta.Repositories.Implementations
                 .Include(h => h.Rooms)
                 .ToListAsync();
         }
+
+        public async Task<Hotel> GetHotelByIdAsync(int id)
+        {
+            return await _context.Hotels
+                                .Include(h => h.Rooms)
+                .FirstOrDefaultAsync(h => h.HotelId == id) 
+                ?? throw new KeyNotFoundException($"Hotel with ID {id} not found.");
+        }
     }
 
    

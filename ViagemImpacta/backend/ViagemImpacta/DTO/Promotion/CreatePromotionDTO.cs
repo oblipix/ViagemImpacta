@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ViagemImpacta.Models;
+using ViagemImpacta.Models.Enums;
 
 namespace ViagemImpacta.DTO.Promotion
 {
@@ -27,7 +28,19 @@ namespace ViagemImpacta.DTO.Promotion
         [Required(ErrorMessage = "Hotel ID is required.")]
         public int HotelId { get; set; }
 
+        public RoomType RoomType { get; set; }
+        public RoomType RoomID { get; set; }
+
+        public int TotalRoomsAvailable { get; set; } // Total number of rooms available for the promotion
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public decimal FinalPrice { get; set; }
+        public decimal OriginalPrice { get; set; }
+        public decimal DiscountPercentage { get; set; } = 0.15m;
+
+        public bool isActive { get; set; } = true;
+
+        public RoomsPromotional roomsPromotional { get; set; } = new RoomsPromotional();
 
     }
 }

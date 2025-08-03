@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ViagemImpacta.Data;
+using ViagemImpacta.DTO.Promotion;
 using ViagemImpacta.Models;
 using ViagemImpacta.Repositories.Interfaces;
 
@@ -12,6 +13,21 @@ namespace ViagemImpacta.Repositories.Implementations
         public RoomsPromotionalRepository(AgenciaDbContext context) : base(context)
         {
             _context = context;
+        }
+
+        public async Task<RoomsPromotional> CreateRoomsPromotion(RoomsPromotional dto)
+        {
+            var roomsPromotion = await _context.RoomsPromotional.AddAsync(new RoomsPromotional
+            {
+                PromotionId = dto.PromotionId,
+                TotalRoomsAvailable = dto.TotalRoomsAvailable,
+                TotalRoomsReserved = dto.TotalRoomsAvailable,
+                active = true
+            });
+            await _context.SaveChangesAsync();
+            roomsPromotion.Entity.Hotel = await _context.Hotels.FindAsync(dto.HotelId);
+
+            return roomsPromotion.Entity;
         }
 
         public async Task<RoomsPromotional?> GetRoomPromotionalByIdAsync(int idRoomsPromotional)

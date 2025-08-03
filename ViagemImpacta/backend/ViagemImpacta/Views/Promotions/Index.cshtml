@@ -1,5 +1,4 @@
 ﻿@model IEnumerable<ViagemImpacta.Models.Promotion>
-
 @{
     ViewData["Title"] = "Index";
 }
@@ -49,7 +48,7 @@
                 @Html.DisplayNameFor(model => model.CreatedAt)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RoomsPromotionalId)
+                @Html.DisplayNameFor(model => model.RoomsPromotional)
             </th>
             <th></th>
         </tr>
@@ -94,7 +93,7 @@
                 @Html.DisplayFor(modelItem => item.CreatedAt)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.RoomsPromotionalId)
+                @Html.DisplayFor(modelItem => item.RoomsPromotional)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.PromotionId">Edit</a> |

@@ -1,5 +1,4 @@
-﻿@model ViagemImpacta.Models.Promotion
-
+﻿@model ViagemImpacta.DTO.Promotion.CreatePromotionDTO
 @{
     ViewData["Title"] = "Create";
 }
@@ -44,7 +43,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="HotelId" class="control-label"></label>
-                <select asp-for="HotelId" class ="form-control" asp-items="ViewBag.HotelId"></select>
+                <input asp-for="HotelId" class ="form-control" asp-items="ViewBag.HotelId"></input>
             </div>
             <div class="form-group">
                 <label asp-for="FinalPrice" class="control-label"></label>
@@ -63,7 +62,7 @@
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                    <input class="form-check-input" asp-for="isActive" /> @Html.DisplayNameFor(model => model.isActive)
                 </label>
             </div>
             <div class="form-group">
@@ -72,12 +71,22 @@
                 <span asp-validation-for="CreatedAt" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="RoomsPromotionalId" class="control-label"></label>
-                <input asp-for="RoomsPromotionalId" class="form-control" />
-                <span asp-validation-for="RoomsPromotionalId" class="text-danger"></span>
+                <label asp-for="TotalRoomsAvailable" class="control-label"></label>
+                <input asp-for="TotalRoomsAvailable" class="form-control" />
+                <span asp-validation-for="TotalRoomsAvailable" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="RoomType" class="control-label"></label>
+                <select asp-for="RoomType" class="form-control" asp-items="ViewBag.RoomTypes">
+                    <option value="Standard">Standard</option>
+                    <option value="Suite">Suíte</option>
+                    <option value="Luxo">Luxo</option>
+                </select>
+            <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+
+            
             </div>
         </form>
     </div>
