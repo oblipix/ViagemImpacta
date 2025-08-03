@@ -2,7 +2,7 @@
 
 namespace ViagemImpacta.Repositories.Interfaces
 {
-    public interface IPromotion : IRepository<Promotion>
+    public interface IPromotionRepository : IRepository<Promotion>
     {
         Task<Promotion?> GetPromotionByIdAsync(int idPromotion);
 

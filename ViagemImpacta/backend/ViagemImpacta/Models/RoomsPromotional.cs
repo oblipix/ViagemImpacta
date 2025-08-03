@@ -5,8 +5,8 @@ namespace ViagemImpacta.Models
 {
     public class RoomsPromotional
     {
-
-        public int RoomPromotionalId { get; set; }
+        [Key]
+        public int RoomsPromotionalId { get; set; }
 
         public int HotelId { get; set; }
         public Hotel? Hotel { get; set; }

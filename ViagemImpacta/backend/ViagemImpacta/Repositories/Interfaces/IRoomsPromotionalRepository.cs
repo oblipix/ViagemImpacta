@@ -2,7 +2,7 @@
 
 namespace ViagemImpacta.Repositories.Interfaces
 {
-    public interface IRoomsPromotional 
+    public interface IRoomsPromotionalRepository 
     {
         Task<bool> RoomsAvailableAsync(int PromotionId);
         Task<RoomsPromotional?> GetRoomPromotionalByIdAsync(int idRoomPromotional);
