@@ -32,6 +32,10 @@ namespace ViagemImpacta.Profiles
                 .ForMember(dest => dest.TotalDays, opt => opt.MapFrom(src => (src.CheckOut - src.CheckIn).Days))
                 .ForMember(dest => dest.Travellers, opt => opt.MapFrom(src => src.Travellers));
 
+            CreateMap<CreateReservationPromotionDto, Reservation>()
+                .ForMember(dest => dest.ReservationId, opt => opt.Ignore());
+                
+
             CreateMap<Reservation, UpdateReservationViewModel>();
             CreateMap<Reservation, UpdateReservationDto>();
 
