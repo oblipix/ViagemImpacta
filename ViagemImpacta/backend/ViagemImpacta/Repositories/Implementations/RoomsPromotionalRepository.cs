@@ -20,12 +20,16 @@ namespace ViagemImpacta.Repositories.Implementations
             var roomsPromotion = await _context.RoomsPromotional.AddAsync(new RoomsPromotional
             {
                 PromotionId = dto.PromotionId,
+                RoomsPromotionalId = dto.RoomsPromotionalId,
+                IdHotelPromotion = dto.IdHotelPromotion,
+                TypeName = dto.TypeName,
                 TotalRoomsAvailable = dto.TotalRoomsAvailable,
-                TotalRoomsReserved = dto.TotalRoomsAvailable,
+                TotalRoomsReserved = 0,
+                Capacity = dto.Capacity,
                 active = true
             });
             await _context.SaveChangesAsync();
-            roomsPromotion.Entity.Hotel = await _context.Hotels.FindAsync(dto.HotelId);
+            roomsPromotion.Entity.Hotel = await _context.Hotels.FindAsync(dto.IdHotelPromotion);
 
             return roomsPromotion.Entity;
         }

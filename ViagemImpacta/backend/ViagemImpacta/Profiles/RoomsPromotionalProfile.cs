@@ -1,15 +1,14 @@
 ﻿using AutoMapper;
 using ViagemImpacta.DTO.Promotion;
+using ViagemImpacta.Models;
 
 namespace ViagemImpacta.Profiles
 {
-    public class RoomsPromotional : Profile
+    public class RoomsPromotionalProfile : Profile
     {
-
-        public RoomsPromotional()
+        public RoomsPromotionalProfile()
         {
             CreateMap<CreateRoomsPromotionDTO, RoomsPromotional>();
         }
-        
     }
 }

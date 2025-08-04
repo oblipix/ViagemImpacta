@@ -46,16 +46,6 @@
                 <input asp-for="HotelId" class ="form-control" asp-items="ViewBag.HotelId"></input>
             </div>
             <div class="form-group">
-                <label asp-for="FinalPrice" class="control-label"></label>
-                <input asp-for="FinalPrice" class="form-control" />
-                <span asp-validation-for="FinalPrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="OriginalPrice" class="control-label"></label>
-                <input asp-for="OriginalPrice" class="form-control" />
-                <span asp-validation-for="OriginalPrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="DiscountPercentage" class="control-label"></label>
                 <input asp-for="DiscountPercentage" class="form-control" />
                 <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
@@ -64,11 +54,6 @@
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="isActive" /> @Html.DisplayNameFor(model => model.isActive)
                 </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control" />
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="TotalRoomsAvailable" class="control-label"></label>
@@ -85,7 +70,6 @@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
-
             
             </div>
         </form>

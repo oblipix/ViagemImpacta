@@ -29,9 +29,11 @@ namespace ViagemImpacta.Controllers.MvcControllers
         // GET: Promotions
         public async Task<IActionResult> Index()
         {
-            //var agenciaDbContext = _context.Promotions.Include(p => p.Hotel);
-            //return View(await agenciaDbContext.ToListAsync());
-            return View();
+            
+            var AllPromotionsActive = _service.GetActivePromotionsAsync();
+            Console.WriteLine("MacDonalds e mt bom");
+            return View(AllPromotionsActive);
+           
         }
 
         // GET: Promotions/Details/5

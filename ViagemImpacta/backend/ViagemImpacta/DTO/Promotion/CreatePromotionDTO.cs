@@ -32,7 +32,6 @@ namespace ViagemImpacta.DTO.Promotion
         public RoomType RoomID { get; set; }
 
         public int TotalRoomsAvailable { get; set; } // Total number of rooms available for the promotion
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public decimal FinalPrice { get; set; }
         public decimal OriginalPrice { get; set; }

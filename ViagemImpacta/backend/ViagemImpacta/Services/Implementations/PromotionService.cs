@@ -44,11 +44,14 @@ namespace ViagemImpacta.Services.Implementations
             var calcDiscaunt = originalPrice * (dto.DiscountPercentage / 100);
             var finalPrice = originalPrice - calcDiscaunt;
             dto.FinalPrice = finalPrice;
-            dto.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, BrazilTimeZone);
+            
             
             var promocao = _mapper.Map<Promotion>(dto);
             promocao.Hotel = await _unititOfWork.Hotels.GetHotelByIdAsync(dto.HotelId);
             promocao.OriginalPrice = originalPrice;
+            promocao.DiscountPercentage = dto.DiscountPercentage;
+            promocao.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, BrazilTimeZone);
+
 
             await _unititOfWork.Promotions.AddAsync(promocao);
             await _unititOfWork.CommitAsync();
@@ -56,22 +59,25 @@ namespace ViagemImpacta.Services.Implementations
 
             var quantidadeQuartosPromocao = new CreateRoomsPromotionDTO
             {
-                HotelId = dto.HotelId,
+                IdHotelPromotion = dto.HotelId,
                 TypeName = dto.RoomType,
                 TotalRoomsAvailable = dto.TotalRoomsAvailable,
+                TotalRoomsReserved = 0,
                 Capacity = 4,
-                idPromotion = promocao.PromotionId
+                PromotionId = promocao.PromotionId
             };
             var roomsPromotional = _mapper.Map<RoomsPromotional>(quantidadeQuartosPromocao);
 
             await _unititOfWork.RoomsPromotions.CreateRoomsPromotion(roomsPromotional);
-
             await _unititOfWork.CommitAsync();
 
 
             return promocao;
         }
 
-
+        public async Task<IEnumerable<Promotion>> GetActivePromotionsAsync()
+        {
+            return await _unititOfWork.Promotions.GetActivePromotionsAsync();
+        }
     }
 }

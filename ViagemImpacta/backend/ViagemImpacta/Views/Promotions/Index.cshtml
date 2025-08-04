@@ -12,6 +12,9 @@
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.PromotionId)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.TitlePromotion)
             </th>
             <th>
@@ -56,6 +59,9 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PromotionId)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.TitlePromotion)
             </td>

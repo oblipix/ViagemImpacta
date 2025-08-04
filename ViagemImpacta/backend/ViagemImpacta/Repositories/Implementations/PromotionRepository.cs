@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 using ViagemImpacta.Data;
@@ -19,8 +20,10 @@ namespace ViagemImpacta.Repositories.Implementations
         public async Task<IEnumerable<Promotion>> GetActivePromotionsAsync()
         {
             //asNoTracking
-            return await _context.Promotions
-                .Where(p => p.IsActive).ToListAsync();
+            var AllPromotionsActive = await _context.Promotions
+                .FromSqlRaw<Promotion>("SELECT * FROM Promotions WHERE active = 1").ToListAsync();
+            return AllPromotionsActive;
+            
         }
 
         public async Task<Promotion?> GetPromotionByIdAsync(int idPromotion)
