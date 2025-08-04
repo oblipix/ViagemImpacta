@@ -79,5 +79,11 @@ namespace ViagemImpacta.Services.Implementations
         {
             return await _unititOfWork.Promotions.GetActivePromotionsAsync();
         }
+
+        public async Task<Promotion> GetPromotionByIdAsync(int idPromotion)
+        {
+            return await _unititOfWork.Promotions.GetPromotionByIdAsync(idPromotion);
+        }
+
     }
 }

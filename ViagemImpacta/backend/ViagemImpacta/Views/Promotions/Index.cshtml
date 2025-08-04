@@ -69,9 +69,10 @@
                     </td>
                     <td>@item.EndDate.ToString("dd/MM/yyyy")</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.PromotionId" class="btn btn-sm btn-info">Detalhar</a>
-                        <a asp-action="Edit" asp-route-id="@item.PromotionId" class="btn btn-sm btn-warning">Editar</a>
-                        <a asp-action="Delete" asp-route-id="@item.PromotionId" class="btn btn-sm btn-danger">Deletar</a>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Details" asp-route-id="@item.PromotionId" class="btn btn-sm btn-info">Detalhar</a>
+                            <a asp-action="Delete" asp-route-id="@item.PromotionId" class="btn btn-sm btn-danger">Deletar</a>
+                        </div>
                     </td>
                 </tr>
             }

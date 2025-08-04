@@ -20,9 +20,9 @@ namespace ViagemImpacta.Repositories.Implementations
         public async Task<IEnumerable<Promotion>> GetActivePromotionsAsync()
         {
             var AllPromotionsActive = await _context.Promotions
-                .Include(p => p.Hotel) // Incluir dados do hotel
+                .Include(p => p.Hotel)
+                .Include(p => p.RoomsPromotional)// Incluir dados do hotel
                 .Where(p => p.IsActive)
-                .OrderByDescending(p => p.CreatedAt) // Ordenar por data de criação
                 .AsNoTracking()
                 .ToListAsync();
             
@@ -35,6 +35,7 @@ namespace ViagemImpacta.Repositories.Implementations
         {
             return await _context.Promotions
                 .Include(p => p.Hotel)
+                .Include(p => p.RoomsPromotional)
                 .FirstOrDefaultAsync(p => p.PromotionId == idPromotion);
         }
 

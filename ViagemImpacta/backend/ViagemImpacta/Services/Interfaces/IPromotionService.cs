@@ -7,6 +7,7 @@ namespace ViagemImpacta.Services.Interfaces
     {
         Task<Promotion?> CreatePromotionAsync(CreatePromotionDTO createpromotiondto);
         Task<IEnumerable<Promotion>> GetActivePromotionsAsync();
+        Task<Promotion?> GetPromotionByIdAsync(int idPromotion);
 
     }
 }

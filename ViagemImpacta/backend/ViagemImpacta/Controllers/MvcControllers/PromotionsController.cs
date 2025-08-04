@@ -34,20 +34,18 @@ namespace ViagemImpacta.Controllers.MvcControllers
         // GET: Promotions/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            var Idpromotion = (int)id.Value;
+            if (Idpromotion == null)
             {
                 return NotFound();
             }
+            var promotion = await _service.GetPromotionByIdAsync(Idpromotion);
+            if (promotion == null)
+            {
+                return NotFound();
+            }
+            return View(promotion);
 
-            // TODO: Implementar GetPromotionByIdAsync no service
-            // var promotion = await _service.GetPromotionByIdAsync(id.Value);
-            // if (promotion == null)
-            // {
-            //     return NotFound();
-            // }
-            // return View(promotion);
-
-            return View();
         }
 
         // GET: Promotions/Create
