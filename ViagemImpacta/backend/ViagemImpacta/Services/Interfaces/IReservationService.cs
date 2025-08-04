@@ -15,6 +15,8 @@ namespace ViagemImpacta.Services.Interfaces
         Task<IEnumerable<Reservation>> GetFilteredReservation(DateTime? checkin, DateTime? checkout, string search, string status);
         Task<Reservation> UpdateAsync(UpdateReservationDto dto);
 
-        Task<Reservation> CreateReservationByPromotion(int IdPromotion, CreateReservationPromotionDto Dto);
+        Task<Reservation> CreateReservationByPromotion( CreateReservationPromotionDto Dto);
+
+        Task<bool> RoomsAvailable(int idPromotion);
     }
 }

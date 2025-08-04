@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections;
 using System.Net;
@@ -21,9 +22,11 @@ namespace ViagemImpacta.Services.Implementations
 
         public ReservationService(IUnitOfWork unitOfWork, IMapper mapper, IOptions<SmtpOptions> smtpOptions)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-            _smtpOptions = smtpOptions.Value;
+            {
+                _unitOfWork = unitOfWork;
+                _mapper = mapper;
+                _smtpOptions = smtpOptions.Value;
+            }
         }
 
         public async Task<Reservation> CreateReservationAsync(CreateReservationDto createReservationDto)
@@ -66,7 +69,7 @@ namespace ViagemImpacta.Services.Implementations
                     room.TypeName,
                     createReservationDto.CheckIn,
                     createReservationDto.CheckOut);
-                
+
                 throw new InvalidOperationException(
                     $"Não há quartos do tipo {room.TypeName} disponíveis para o período solicitado. " +
                     $"Total de quartos ocupados: {occupiedRooms}/{room.TotalRooms}");
@@ -144,7 +147,7 @@ namespace ViagemImpacta.Services.Implementations
 
             reservation.IsConfirmed = true;
             reservation.UpdatedAt = DateTime.Now;
-            
+
             _unitOfWork.Reservations.Update(reservation);
             await _unitOfWork.CommitAsync();
             var user = await _unitOfWork.Users.GetByIdAsync(reservation.UserId);
@@ -260,50 +263,88 @@ namespace ViagemImpacta.Services.Implementations
             await _unitOfWork.CommitAsync();
             return reservation;
         }
-        
-        public async Task<Promotion> CreateReservationByPromotion(int IdPromotion, CreateReservationPromotionDto Dto)
+
+        public async Task<Reservation> CreateReservationByPromotion(CreateReservationPromotionDto Dto)
         {
-            var promotion = await _unitOfWork.Promotions.GetPromotionByIdAsync(IdPromotion);
+            var promotion = await _unitOfWork.Promotions.GetPromotionByIdAsync(Dto.idPromotion);
             if (promotion == null)
                 throw new ArgumentException("Promoção não encontrada");
 
             // Validações de negócio
-            var RoomsAvailable = await _unitOfWork.RoomsPromotions.RoomsAvailableAsync(IdPromotion);
+            var user = await _unitOfWork.Users.GetByIdAsync(Dto.UserId);
+            if (user == null)
+                throw new ArgumentException("Usuário não encontrado");
+                
+            var hotel = await _unitOfWork.Hotels.GetByIdAsync(promotion.HotelId);
+            if (hotel == null)
+                throw new ArgumentException("Hotel não encontrado");
+                
+            if (Dto.NumberOfGuests > promotion.RoomsPromotional.Capacity)
+                throw new ArgumentException($"Número de hóspedes ({Dto.NumberOfGuests}) excede a capacidade do quarto ({promotion.RoomsPromotional.Capacity})");
+
+            if (Dto.Travellers.Count != Dto.NumberOfGuests)
+                throw new ArgumentException("Número de viajantes deve ser igual ao número de hóspedes");
+
+            // Verificar se há quartos disponíveis na promoção
+            var roomsAvailable = await _unitOfWork.RoomsPromotions.RoomsAvailableAsync(Dto.idPromotion);
+            if (!roomsAvailable)
+                throw new InvalidOperationException("Não há quartos disponíveis para esta promoção");
+
+            var reservationFinal = new Reservation
+            {
+                UserId = Dto.UserId,
+                HotelId = promotion.HotelId,
+                CheckIn = promotion.CheckIn,
+                CheckOut = promotion.CheckOut,
+                TotalPrice = promotion.FinalPrice,
+                IsPromotion = true,
+                IdPromotion = Dto.idPromotion,
+                IdRoomPromotional = promotion.RoomsPromotional.RoomsPromotionalId,
+                RoomId = null, // Para reservas promocionais, RoomId não é usado
+                IsConfirmed = false,
+                CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, BrazilTimeZone),
+                UpdatedAt = DateTime.UtcNow,
+                Description = Dto.SpecialRequests,
+                
+
+            };
+
+            
+
+            // Criar viajantes
+            var travellers = _mapper.Map<List<Travellers>>(Dto.Travellers);
+
+            // Adicionar reserva
+            await _unitOfWork.Reservations.AddAsync(reservationFinal);
+            await _unitOfWork.CommitAsync();
+
+            // Associar viajantes à reserva
+            foreach (var traveller in travellers)
+            {
+                traveller.ReservationId = reservationFinal.ReservationId;
+                await _unitOfWork.Travellers.AddAsync(traveller);
+            }
+
+            await _unitOfWork.CommitAsync();
+
+            // Buscar reserva com detalhes para retorno
+            var createdReservation = await _unitOfWork.Reservations.GetReservationWithDetailsAsync(reservationFinal.ReservationId);
+            return createdReservation;
+        }
+        
+        public async Task<bool> RoomsAvailable(int idPromotion)
+        {
+            var RoomsAvailable = await _unitOfWork.RoomsPromotions.RoomsAvailableAsync(idPromotion);
             if (RoomsAvailable)
             {
-                try
-                {
-                    var user = await _unitOfWork.Users.GetByIdAsync(Dto.UserId);
-                    if (user == null)
-                        throw new ArgumentException("Usuário não encontrado");
-                    var hotel = await _unitOfWork.Hotels.GetByIdAsync(Dto.HotelId);
-                    if (Dto.NumberOfGuests > promotion.RoomsPromotional.Capacity)
-                        throw new ArgumentException($"Número de hóspedes ({Dto.NumberOfGuests}) excede a capacidade do quarto ({promotion.RoomsPromotional.Capacity})");
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
-                    if (Dto.Travellers.Count != Dto.NumberOfGuests)
-                        throw new ArgumentException("Número de viajantes deve ser igual ao número de hóspedes");
+    }
+}
 
-                    var reservationFinal = _mapper.Map<Reservation>(Dto);
-                    reservationFinal.IsPromotion = true;
-                    reservationFinal.IdPromotion = IdPromotion;
-                    reservationFinal.TotalPrice = promotion.FinalPrice;
-                    reservationFinal.Hotel = hotel;
-                    reservationFinal.IdRoomPromotional = promotion.RoomsPromotional.RoomsPromotionalId;
-                    reservationFinal.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, BrazilTimeZone);
-                    reservationFinal.CheckIn = promotion.CheckIn;
-                    reservationFinal.CheckOut = promotion.CheckOut;
-                    reservationFinal.TotalPrice = promotion.FinalPrice;
-
-
-                    var travellers = _mapper.Map<List<Travellers>>(Dto.Travellers);
-                    foreach (var traveller in travellers)
-                    {
-                        traveller.ReservationId = reservation.ReservationId;
-                        await _unitOfWork.Travellers.AddAsync(traveller);
-                    }
-
-                    await _unitOfWork.CommitAsync();
-
-                }
-
-                }

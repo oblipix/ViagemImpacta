@@ -12,6 +12,7 @@ namespace ViagemImpacta.Controllers.ApiControllers
     public class ReservationsController : ControllerBase
     {
         private readonly IReservationService _reservationService;
+        private readonly IPromotionService _promotionService;
         private readonly IMapper _mapper;
 
         public ReservationsController(IReservationService reservationService, IMapper mapper)
@@ -48,7 +49,39 @@ namespace ViagemImpacta.Controllers.ApiControllers
             {
                 return BadRequest(ex.Message);
             }
-            
+
+        }
+
+        [HttpPost("promotionReservation")]
+        //[Authorize]
+        public async Task<ActionResult<ReservationDto>> CreateReservationByPromotion([FromBody] CreateReservationPromotionDto dto)
+        {
+            var roomsAvailable = await _reservationService.RoomsAvailable(dto.idPromotion);
+            if (roomsAvailable)
+            {
+                try
+                {
+                    if (!ModelState.IsValid)
+                    {
+                        return BadRequest(ModelState);
+                    }
+                    if (dto == null)
+                    {
+                        return BadRequest("Dados da reserva não podem ser nulos");
+                    }
+
+                    var reservation = await _reservationService.CreateReservationByPromotion(dto);
+                    var reservationDto = _mapper.Map<ReservationDto>(reservation);
+                    return Ok(CreatedAtAction(nameof(GetReservation), new { id = reservation.ReservationId }, reservationDto));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.StackTrace);
+                    return BadRequest(ex.Message);
+                }
+            }
+
+            return BadRequest("retorno final");
         }
 
         /// <summary>

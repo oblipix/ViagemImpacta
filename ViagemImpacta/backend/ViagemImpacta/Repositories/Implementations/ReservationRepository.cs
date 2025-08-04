@@ -122,5 +122,14 @@ namespace ViagemImpacta.Repositories.Implementations
         {
             return await GetReservationWithUserRoomAndHotel().ToListAsync();
         }
+
+        public Task<bool> RoomsAvailable(int idPromotion)
+        {
+            var roomsAvailable = _context.RoomsPromotional
+                .Where(rp => rp.PromotionId == idPromotion && rp.TotalRoomsAvailable > rp.TotalRoomsReserved)
+                .AnyAsync();
+
+            return roomsAvailable;
+        }
     }
 }

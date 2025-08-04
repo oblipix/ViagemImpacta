@@ -8,21 +8,10 @@ namespace ViagemImpacta.DTO.ReservationDTO
             [Required(ErrorMessage = "ID do usuário é obrigatório")]
             public int UserId { get; set; }
 
-            [Required(ErrorMessage = "ID do quarto é obrigatório")]
-            public int RoomPromotionalId { get; set; }
+        [Required(ErrorMessage = "ID da Promoção é obrigatório")]
+        public int idPromotion { get; set; }
 
-            [Required(ErrorMessage = "ID do hotel é obrigatório")]
-            public int HotelId { get; set; }
-
-            [Required(ErrorMessage = "Data de check-in é obrigatória")]
-            [DataType(DataType.Date)]
-            public DateTime CheckIn { get; set; }
-
-            [Required(ErrorMessage = "Data de check-out é obrigatória")]
-            [DataType(DataType.Date)]
-            public DateTime CheckOut { get; set; }
-
-            [Range(1, 4, ErrorMessage = "Número de hóspedes deve ser entre 1 e 4")]
+        [Range(1, 4, ErrorMessage = "Número de hóspedes deve ser entre 1 e 4")]
             public int NumberOfGuests { get; set; }
 
             [StringLength(500, ErrorMessage = "Solicitações especiais devem ter no máximo 500 caracteres")]
@@ -32,11 +21,6 @@ namespace ViagemImpacta.DTO.ReservationDTO
             [MinLength(1, ErrorMessage = "Deve haver pelo menos um viajante")]
             public List<CreateTravellerDto> Travellers { get; set; } = new();
 
-            // Validação customizada
-            public bool IsValidDateRange()
-            {
-                return CheckOut > CheckIn && CheckIn >= DateTime.Today;
-            }
         }
     }
 
