@@ -19,11 +19,16 @@ namespace ViagemImpacta.Repositories.Implementations
 
         public async Task<IEnumerable<Promotion>> GetActivePromotionsAsync()
         {
-            //asNoTracking
             var AllPromotionsActive = await _context.Promotions
-                .FromSqlRaw<Promotion>("SELECT * FROM Promotions WHERE active = 1").ToListAsync();
-            return AllPromotionsActive;
+                .Include(p => p.Hotel) // Incluir dados do hotel
+                .Where(p => p.IsActive)
+                .OrderByDescending(p => p.CreatedAt) // Ordenar por data de criação
+                .AsNoTracking()
+                .ToListAsync();
             
+            Console.WriteLine($"Total de promoções ativas encontradas: {AllPromotionsActive.Count()}");
+            
+            return AllPromotionsActive;
         }
 
         public async Task<Promotion?> GetPromotionByIdAsync(int idPromotion)
