@@ -46,7 +46,7 @@ namespace ViagemImpacta.Repositories.Implementations
                 .Where(RP => RP.active)
                 .FirstOrDefaultAsync(RP => RP.PromotionId == PromotionId);
 
-            if(roomsAvailable.TotalRoomsReserved < roomsAvailable.TotalRoomsAvailable)
+            if (roomsAvailable.TotalRoomsReserved < roomsAvailable.TotalRoomsAvailable)
             {
                 return true;
             }

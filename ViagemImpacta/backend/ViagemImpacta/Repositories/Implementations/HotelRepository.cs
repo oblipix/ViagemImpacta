@@ -30,6 +30,14 @@ namespace ViagemImpacta.Repositories.Implementations
             .ToListAsync();
         }
 
+        public async Task<Hotel> GetHotelByIdAsync(int id)
+        {
+            return await _context.Hotels
+                                .Include(h => h.Rooms)
+                .FirstOrDefaultAsync(h => h.HotelId == id)
+                ?? throw new KeyNotFoundException($"Hotel with ID {id} not found.");
+        }
+
 
         public async Task<IEnumerable<Hotel>> GetHotelsWithAmenitiesAsync(bool wifi, bool parking, bool gym)
         {
@@ -58,13 +66,6 @@ namespace ViagemImpacta.Repositories.Implementations
                 .ToListAsync();
         }
 
-        public async Task<Hotel> GetHotelByIdAsync(int id)
-        {
-            return await _context.Hotels
-                                .Include(h => h.Rooms)
-                .FirstOrDefaultAsync(h => h.HotelId == id) 
-                ?? throw new KeyNotFoundException($"Hotel with ID {id} not found.");
-        }
 
         public async Task<IEnumerable<Hotel>> SearchHotelsAsync(
             string? destination,
@@ -351,11 +352,12 @@ namespace ViagemImpacta.Repositories.Implementations
                 var allRoomIds = hotels.SelectMany(h => h.Rooms).Select(r => r.RoomId).ToList();
 
                 var conflictingReservations = await _context.Reservations
-                    .Where(r => allRoomIds.Contains(r.RoomId) &&
+                    .Where(r => r.RoomId.HasValue && 
+                               allRoomIds.Contains(r.RoomId.Value) &&
                                r.IsConfirmed &&
                                r.CheckIn < checkOutDate &&
                                r.CheckOut > checkInDate)
-                    .GroupBy(r => r.RoomId)
+                    .GroupBy(r => r.RoomId.Value)
                     .Select(g => new { RoomId = g.Key, Count = g.Count() })
                     .ToDictionaryAsync(x => x.RoomId, x => x.Count);
 

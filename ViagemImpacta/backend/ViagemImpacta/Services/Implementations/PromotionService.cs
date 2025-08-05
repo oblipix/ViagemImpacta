@@ -23,7 +23,7 @@ namespace ViagemImpacta.Services.Implementations
 
         public async Task<Promotion?> CreatePromotionAsync(CreatePromotionDTO dto)
         {
-            
+
 
 
             if (dto.RoomType.Equals("Standard"))
@@ -44,8 +44,8 @@ namespace ViagemImpacta.Services.Implementations
             var calcDiscaunt = originalPrice * (dto.DiscountPercentage / 100);
             var finalPrice = originalPrice - calcDiscaunt;
             dto.FinalPrice = finalPrice;
-            
-            
+
+
             var promocao = _mapper.Map<Promotion>(dto);
             promocao.Hotel = await _unititOfWork.Hotels.GetHotelByIdAsync(dto.HotelId);
             promocao.OriginalPrice = originalPrice;

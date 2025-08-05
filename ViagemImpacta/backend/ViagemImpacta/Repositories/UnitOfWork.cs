@@ -1,7 +1,6 @@
 using ViagemImpacta.Data;
 using ViagemImpacta.Repositories.Interfaces;
 using ViagemImpacta.Repositories.Implementations;
-using Microsoft.Extensions.Logging;
 
 namespace ViagemImpacta.Repositories
 {
@@ -28,7 +27,7 @@ namespace ViagemImpacta.Repositories
             Travellers = new TravellerRepository(_context);
             PasswordResetTokens = new PasswordResetTokenRepository(_context);
             Promotions = new PromotionRepository(_context);
-            RoomsPromotions = new RoomsPromotionRepository(_context);
+            RoomsPromotions = new RoomsPromotionalRepository(_context);
         }
 
         public async Task<bool> CommitAsync()
