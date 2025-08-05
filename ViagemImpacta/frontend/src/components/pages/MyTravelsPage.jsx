@@ -823,10 +823,6 @@ function MyTravelsPage() {
               <span>R$ ${totalPrice}</span>
             </div>
             <div class="price-detail">
-              <span>Taxa de serviço</span>
-              <span>Incluso</span>
-            </div>
-            <div class="price-detail">
               <span>Impostos</span>
               <span>Incluso</span>
             </div>
