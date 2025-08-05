@@ -15,20 +15,17 @@
 }
 
 <link rel="stylesheet" href="~/css/dashboard.css"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
 <div class="container-fluid px-4">
-    <!-- Header Avançado -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 class="text-primary mb-1">📊 Dashboard Administrativo Avançado</h1>
-                    <p class="text-muted mb-0">Olá, @name - Análise completa de performance</p>
+                    <h1 class="text-primary mb-1">Dashboard Administrativo Avançado</h1>
                 </div>
                 <div class="d-flex gap-2">
-                    <a asp-controller="Admins" asp-action="Dashboard" class="btn btn-outline-secondary">
-                        <i class="material-icons">arrow_back</i> Voltar
+                    <a asp-controller="Admins" asp-action="Dashboard" class="btn btn-outline-secondary d-flex align-items-center">
+                        <i class="material-icons me-2">arrow_back</i> Voltar
                     </a>
                     @if (ViewBag.Role == "Attendant")
                     {
@@ -38,64 +35,66 @@
             </div>
         </div>
     </div>
+        <div class="row g-5 mb-4">
+            <div class="col-lg-2 col-md-4">
+                <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #007bff, #0056b3); min-height: 120px;">
+                    <div class="card-body text-white text-center py-3">
+                        <div class="d-flex align-items-center justify-content-center mb-2">
+                            <i class="material-icons" style="font-size: 2.5rem;">hotel</i>
+                        </div>
+                        <h3 class="mb-1">@(dashboardStats?.TotalHotels ?? 0)</h3>
+                        <p class="mb-0 opacity-75 small">Total Hotéis</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #28a745, #1e7e34); min-height: 120px;">
+                    <div class="card-body text-white text-center py-3">
+                        <div class="d-flex align-items-center justify-content-center mb-2">
+                            <i class="material-icons" style="font-size: 2.5rem;">event</i>
+                        </div>
+                        <h3 class="mb-1">@(dashboardStats?.TotalReservations ?? 0)</h3>
+                        <p class="mb-0 opacity-75 small">Total Reservas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #17a2b8, #117a8b); min-height: 120px;">
+                    <div class="card-body text-white text-center py-3">
+                        <div class="d-flex align-items-center justify-content-center mb-2">
+                            <i class="material-icons" style="font-size: 2.5rem;">group</i>
+                        </div>
+                        <h3 class="mb-1">@(dashboardStats?.TotalUsers ?? 0)</h3>
+                        <p class="mb-0 opacity-75 small">Total Clientes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #6c757d, #5a6268); min-height: 100px;">
+                    <div class="card-body text-white text-center py-2">
+                        <div class="d-flex align-items-center justify-content-center mb-2">
+                            <span class="material-symbols-outlined" style="font-size: 2.5rem;">bed</span>
+                        </div>
+                        <h4 class="mb-1">@(dashboardStats?.ReservationsThisMonth ?? 0)</h4>
+                        <p class="mb-0 opacity-75 small">Reservas Este Mês</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #dc3545, #c82333); min-height: 100px;">
+                    <div class="card-body text-white text-center py-2">
+                        <div class="d-flex align-items-center justify-content-center mb-2">
+                            <span class="material-symbols-outlined" style="font-size: 2.5rem;">trending_up</span>
+                        </div>
+                        <h4 class="mb-1">@((dashboardStats?.OccupancyRate ?? 0).ToString("F1"))%</h4>
+                        <p class="mb-0 opacity-75 small">Taxa Ocupação</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <!-- KPIs Principais Coloridos - Ajustados para ficar menores -->
     <div class="row g-3 mb-4">
-        <div class="col-lg-4 col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #007bff, #0056b3); min-height: 120px;">
-                <div class="card-body text-white text-center py-3">
-                    <div class="d-flex align-items-center justify-content-center mb-2">
-                        <i class="material-icons" style="font-size: 2.5rem;">hotel</i>
-                    </div>
-                    <h3 class="mb-1">@(dashboardStats?.TotalHotels ?? 0)</h3>
-                    <p class="mb-0 opacity-75 small">Total Hotéis</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #28a745, #1e7e34); min-height: 120px;">
-                <div class="card-body text-white text-center py-3">
-                    <div class="d-flex align-items-center justify-content-center mb-2">
-                        <i class="material-icons" style="font-size: 2.5rem;">event</i>
-                    </div>
-                    <h3 class="mb-1">@(dashboardStats?.TotalReservations ?? 0)</h3>
-                    <p class="mb-0 opacity-75 small">Total Reservas</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #17a2b8, #117a8b); min-height: 120px;">
-                <div class="card-body text-white text-center py-3">
-                    <div class="d-flex align-items-center justify-content-center mb-2">
-                        <i class="material-icons" style="font-size: 2.5rem;">group</i>
-                    </div>
-                    <h3 class="mb-1">@(dashboardStats?.TotalUsers ?? 0)</h3>
-                    <p class="mb-0 opacity-75 small">Total Clientes</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Segunda linha de KPIs - Menores -->
-    <div class="row g-3 mb-4">
-        <div class="col-lg-2 col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #6c757d, #5a6268); min-height: 100px;">
-                <div class="card-body text-white text-center py-2">
-                    <h4 class="mb-1">@(dashboardStats?.ReservationsThisMonth ?? 0)</h4>
-                    <p class="mb-0 opacity-75 small">Reservas Este Mês</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #dc3545, #c82333); min-height: 100px;">
-                <div class="card-body text-white text-center py-2">
-                    <h4 class="mb-1">@((dashboardStats?.OccupancyRate ?? 0).ToString("F1"))%</h4>
-                    <p class="mb-0 opacity-75 small">Taxa Ocupação</p>
-                </div>
-            </div>
-        </div>
         <div class="col-lg-8">
-            <!-- Resumo Financeiro -->
             @if (financialSummary != null)
             {
                 <div class="row g-2">
@@ -138,13 +137,11 @@
         </div>
     </div>
 
-    <!-- Gráficos Principais -->
     <div class="row g-4 mb-4">
-        <!-- Top 10 Hotéis - Faturamento -->
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white border-0">
-                    <h5 class="mb-0 text-primary">📊 Top 10 Hotéis - Faturamento</h5>
+                    <h5 class="mb-0 text-primary">Top 10 Hotéis - Faturamento</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="hotelRevenueChart" style="height: 350px;"></canvas>
@@ -152,11 +149,10 @@
             </div>
         </div>
 
-        <!-- Status das Reservas -->
         <div class="col-lg-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white border-0">
-                    <h5 class="mb-0 text-success">🎯 Status das Reservas</h5>
+                    <h5 class="mb-0 text-success">Status das Reservas</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="reservationStatusChart" style="height: 350px;"></canvas>
@@ -164,11 +160,10 @@
             </div>
         </div>
 
-        <!-- Evolução Mensal -->
         <div class="col-lg-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white border-0">
-                    <h5 class="mb-0 text-info">📈 Evolução Mensal do Faturamento</h5>
+                    <h5 class="mb-0 text-info">Evolução Mensal do Faturamento</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="monthlyRevenueChart" style="height: 350px;"></canvas>
@@ -177,13 +172,11 @@
         </div>
     </div>
 
-    <!-- Segunda linha de gráficos -->
     <div class="row g-4 mb-4">
-        <!-- Quartos Mais Reservados -->
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white border-0">
-                    <h5 class="mb-0 text-warning">🛏️ Quartos Mais Reservados</h5>
+                    <h5 class="mb-0 text-warning">Quartos Mais Reservados</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="roomTypesChart" style="height: 300px;"></canvas>
@@ -191,11 +184,10 @@
             </div>
         </div>
 
-        <!-- Performance por Cidade -->
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white border-0">
-                    <h5 class="mb-0 text-purple">🏙️ Performance por Cidade</h5>
+                    <h5 class="mb-0 text-purple">Performance por Cidade</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="cityPerformanceChart" style="height: 300px;"></canvas>
@@ -204,7 +196,6 @@
         </div>
     </div>
 
-    <!-- Tabela dos Top 10 Hotéis que Mais Vendem -->
     <div class="row g-4 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
@@ -265,12 +256,11 @@
         </div>
     </div>
 
-    <!-- Performance Detalhada dos Hotéis -->
     <div class="row g-4 mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">📈 Performance Detalhada dos Hotéis</h5>
+                    <h5 class="mb-0">Performance Detalhada dos Hotéis</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -342,7 +332,6 @@
         </div>
     </div>
 
-    <!-- Botões de Ação -->
     <div class="text-center mb-4">
         <div class="btn-group" role="group">
             <a asp-controller="Hotels" asp-action="Index" class="btn btn-primary btn-lg">
@@ -359,16 +348,13 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Dados do servidor
         const hotelRevenueData = @Html.Raw(hotelRevenueData != null ? Newtonsoft.Json.JsonConvert.SerializeObject(hotelRevenueData) : "[]");
         const monthlyRevenueData = @Html.Raw(monthlyRevenueData != null ? Newtonsoft.Json.JsonConvert.SerializeObject(monthlyRevenueData) : "[]");
         const reservationStatusData = @Html.Raw(reservationStatusData != null ? Newtonsoft.Json.JsonConvert.SerializeObject(reservationStatusData) : "[]");
         const mostReservedRooms = @Html.Raw(mostReservedRooms != null ? Newtonsoft.Json.JsonConvert.SerializeObject(mostReservedRooms) : "[]");
         const cityPerformanceData = @Html.Raw(cityPerformance != null ? Newtonsoft.Json.JsonConvert.SerializeObject(cityPerformance) : "[]");
 
-        // Paleta de cores vibrantes como nas imagens
         const colors = {
             blue: '#007bff',
             green: '#28a745',
@@ -380,7 +366,6 @@
             pink: '#e83e8c'
         };
 
-        // 1. Gráfico de Top Hotéis (Barras Azuis)
         if (hotelRevenueData && hotelRevenueData.length > 0) {
             new Chart(document.getElementById('hotelRevenueChart'), {
                 type: 'bar',
@@ -414,7 +399,6 @@
             });
         }
 
-        // 2. Status das Reservas (Doughnut Verde)
         if (reservationStatusData && reservationStatusData.length > 0) {
             new Chart(document.getElementById('reservationStatusChart'), {
                 type: 'doughnut',
@@ -440,7 +424,6 @@
             });
         }
 
-        // 3. Evolução Mensal (Linha)
         if (monthlyRevenueData && monthlyRevenueData.length > 0) {
             new Chart(document.getElementById('monthlyRevenueChart'), {
                 type: 'line',
@@ -467,7 +450,6 @@
             });
         }
 
-        // 4. Quartos Mais Reservados (Pizza)
         if (mostReservedRooms && mostReservedRooms.length > 0) {
             new Chart(document.getElementById('roomTypesChart'), {
                 type: 'pie',
@@ -491,7 +473,6 @@
             });
         }
 
-        // 5. Performance por Cidade (Barras Horizontais)
         if (cityPerformanceData && cityPerformanceData.length > 0) {
             new Chart(document.getElementById('cityPerformanceChart'), {
                 type: 'bar',
