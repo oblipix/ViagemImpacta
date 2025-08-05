@@ -24,10 +24,12 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build "ViagemImpacta/backend/ViagemImpacta/ViagemImpacta.csproj" --configuration Release
+        working-directory: 'ViagemImpacta/backend/ViagemImpacta'
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish "ViagemImpacta/backend/ViagemImpacta/ViagemImpacta.csproj" -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        working-directory: 'ViagemImpacta/backend/ViagemImpacta'
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
