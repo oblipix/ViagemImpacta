@@ -56,7 +56,9 @@ namespace ViagemImpacta.Services.Implementations
                             {
                                 Name = result.Hotel?.Name,
                                 Description = result.Hotel?.Description,
-                                Images = [ result.Hotel.ImageUrls[0] ]
+                                Images = result.Hotel?.ImageUrls != null && result.Hotel.ImageUrls.Count > 0
+                                ? new List<string> { result.Hotel.ImageUrls[0] }
+                                : new List<string>()
                             }
                         },
                         Quantity = 1,
