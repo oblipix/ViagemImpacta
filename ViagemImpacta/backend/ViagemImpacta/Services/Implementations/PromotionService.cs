@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ViagemImpacta.DTO.Promotion;
 using ViagemImpacta.Models;

@@ -13,22 +13,16 @@
         public Room? RoomPromotional { get; set; }
         public int? RoomId { get; set; }
         public Room? Room { get; set; }
-        
         public DateTime CheckIn { get; set; }
         public DateTime CheckOut { get; set; }
-        public decimal TotalPrice { get; set; }
-        public bool IsConfirmed { get; set; }
-       
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-       
-        
+        public decimal TotalPrice { get; set; }
         public string? Description { get; set; }
+        public string? PaymentIntentId { get; set; }
+        public bool IsConfirmed { get; set; }
+        public bool IsCanceled { get; set; } = false;
 
         public ICollection<Travellers>? Travellers { get; set; }
     }
 }
-
-
-
-// public bool IsConfirmed { get; set; } analisar se vai ser utilizado :)

@@ -16,7 +16,16 @@ namespace ViagemImpacta.Repositories.Interfaces
 
 
         Task<IEnumerable<Hotel>> GetAllHotelsWithRoomsAsync();
-
-        Task<Hotel> GetHotelByIdAsync(int id);
+        Task<IEnumerable<Hotel>> SearchHotelsAsync(
+            string? destination,
+            decimal? minPrice,
+            decimal? maxPrice,
+            int? stars,
+            string? roomType,
+            string? amenities,
+            int? guests,
+            string? checkIn,
+            string? checkOut
+        );
     }
 }

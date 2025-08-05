@@ -1,8 +1,8 @@
 using AutoMapper;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client;
-using Microsoft.IdentityModel.Tokens;
-using System.Collections;
+using Stripe;
+using Stripe.Checkout;
 using System.Net;
 using System.Net.Mail;
 using ViagemImpacta.DTO.ReservationDTO;
@@ -19,43 +19,46 @@ namespace ViagemImpacta.Services.Implementations
         private readonly IMapper _mapper;
         private readonly SmtpOptions _smtpOptions;
         private readonly TimeZoneInfo BrazilTimeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+        private readonly StripeModel _model;
+        private readonly StripeService _stripeService;
 
-        public ReservationService(IUnitOfWork unitOfWork, IMapper mapper, IOptions<SmtpOptions> smtpOptions)
+        public ReservationService(IUnitOfWork unitOfWork, IMapper mapper, IOptions<SmtpOptions> smtpOptions,
+            IOptions<StripeModel> model, StripeService stripeService)
         {
-            {
-                _unitOfWork = unitOfWork;
-                _mapper = mapper;
-                _smtpOptions = smtpOptions.Value;
-            }
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+            _smtpOptions = smtpOptions.Value;
+            _model = model.Value;
+            _stripeService = stripeService;
         }
 
         public async Task<Reservation> CreateReservationAsync(CreateReservationDto createReservationDto)
         {
-            // Validações de negócio
+            // Validaï¿½ï¿½es de negï¿½cio
             await ValidateReservationAsync(createReservationDto);
 
             // Buscar entidades relacionadas
             var user = await _unitOfWork.Users.GetByIdAsync(createReservationDto.UserId);
             if (user == null)
-                throw new ArgumentException("Usuário não encontrado");
+                throw new ArgumentException("Usuï¿½rio nï¿½o encontrado");
 
             var room = await _unitOfWork.Rooms.GetByIdAsync(createReservationDto.RoomId);
             if (room == null)
-                throw new ArgumentException("Quarto não encontrado");
+                throw new ArgumentException("Quarto nï¿½o encontrado");
 
             var hotel = await _unitOfWork.Hotels.GetByIdAsync(createReservationDto.HotelId);
             if (hotel == null)
-                throw new ArgumentException("Hotel não encontrado");
+                throw new ArgumentException("Hotel nï¿½o encontrado");
 
             // Validar capacidade do quarto
             if (createReservationDto.NumberOfGuests > room.Capacity)
-                throw new ArgumentException($"Número de hóspedes ({createReservationDto.NumberOfGuests}) excede a capacidade do quarto ({room.Capacity})");
+                throw new ArgumentException($"Nï¿½mero de hï¿½spedes ({createReservationDto.NumberOfGuests}) excede a capacidade do quarto ({room.Capacity})");
 
-            // Validar número de viajantes
+            // Validar nï¿½mero de viajantes
             if (createReservationDto.Travellers.Count != createReservationDto.NumberOfGuests)
-                throw new ArgumentException("Número de viajantes deve ser igual ao número de hóspedes");
+                throw new ArgumentException("Nï¿½mero de viajantes deve ser igual ao nï¿½mero de hï¿½spedes");
 
-            // NOVA VALIDAÇÃO: Verificar disponibilidade por tipo de quarto
+            // NOVA VALIDAï¿½ï¿½O: Verificar disponibilidade por tipo de quarto
             var isRoomTypeAvailable = await _unitOfWork.Reservations.IsRoomTypeAvailableAsync(
                 createReservationDto.HotelId,
                 room.TypeName,
@@ -71,12 +74,12 @@ namespace ViagemImpacta.Services.Implementations
                     createReservationDto.CheckOut);
 
                 throw new InvalidOperationException(
-                    $"Não há quartos do tipo {room.TypeName} disponíveis para o período solicitado. " +
+                    $"Nï¿½o hï¿½ quartos do tipo {room.TypeName} disponï¿½veis para o perï¿½odo solicitado. " +
                     $"Total de quartos ocupados: {occupiedRooms}/{room.TotalRooms}");
             }
 
 
-            // Calcular preço total
+            // Calcular preï¿½o total
             var totalDays = (createReservationDto.CheckOut - createReservationDto.CheckIn).Days;
             var totalPrice = room.AverageDailyPrice * totalDays;
 
@@ -93,7 +96,7 @@ namespace ViagemImpacta.Services.Implementations
             await _unitOfWork.Reservations.AddAsync(reservation);
             await _unitOfWork.CommitAsync();
 
-            // Associar viajantes à reserva e adicionar
+            // Associar viajantes ï¿½ reserva e adicionar
             foreach (var traveller in travellers)
             {
                 traveller.ReservationId = reservation.ReservationId;
@@ -125,35 +128,47 @@ namespace ViagemImpacta.Services.Implementations
             return reservations;
         }
 
-        public async Task<bool> CancelReservationAsync(int reservationId, int userId)
+        public async Task<bool> CancelReservationAsync(int reservationId)
         {
-            var reservation = await _unitOfWork.Reservations.GetByIdAsync(reservationId);
-            if (reservation == null || reservation.UserId != userId)
-                return false;
+            var reservation = await _unitOfWork.Reservations.GetReservationById(reservationId);
+            if (reservation == null) return false;
 
-            // Verificar se pode cancelar (ex: não pode cancelar no mesmo dia do check-in)
-            if (reservation.CheckIn <= DateTime.Today)
-                throw new InvalidOperationException("Não é possível cancelar reservas no dia do check-in ou após");
+            if (reservation.IsConfirmed && !string.IsNullOrEmpty(reservation.PaymentIntentId))
+            {
+                GiveRefund(reservation.PaymentIntentId);
+            }
 
-            _unitOfWork.Reservations.Remove(reservation);
-            return await _unitOfWork.CommitAsync();
+            reservation.IsCanceled = true;
+            reservation.UpdatedAt = DateTime.UtcNow;
+            Console.WriteLine(reservation);
+            await _unitOfWork.CommitAsync();
+            return true;
         }
 
-        public async Task<bool> ConfirmReservationAsync(int reservationId)
+        public async Task<bool> ConfirmReservationAsync(string sessionId)
         {
-            var reservation = await _unitOfWork.Reservations.GetByIdAsync(reservationId);
-            if (reservation == null)
+            StripeConfiguration.ApiKey = _model.SecretKey;
+            var service = new SessionService();
+            var session = await service.GetAsync(sessionId);
+            var reservationId = session.Metadata["reservationId"];
+            if (!int.TryParse(reservationId, out int Id))
+            {
                 return false;
+            }
+
+            var reservation = await _unitOfWork.Reservations.GetReservationById(Id);
+            if (reservation == null)
+                return false;   
 
             reservation.IsConfirmed = true;
             reservation.UpdatedAt = DateTime.Now;
+            reservation.PaymentIntentId = session.PaymentIntentId;
 
             _unitOfWork.Reservations.Update(reservation);
             await _unitOfWork.CommitAsync();
-            var user = await _unitOfWork.Users.GetByIdAsync(reservation.UserId);
-            await SendEmailAsync(user);
+            await SendEmailAsync(reservation);
+            
             return true;
-
         }
 
         public async Task<bool> IsRoomAvailableAsync(int roomId, DateTime checkIn, DateTime checkOut)
@@ -167,27 +182,27 @@ namespace ViagemImpacta.Services.Implementations
             if (!dto.IsValidDateRange())
                 throw new ArgumentException("Data de check-out deve ser posterior ao check-in e check-in deve ser hoje ou no futuro");
 
-            // Validar se há pelo menos um viajante
+            // Validar se hï¿½ pelo menos um viajante
             if (dto.Travellers == null || !dto.Travellers.Any())
                 throw new ArgumentException("Deve haver pelo menos um viajante");
 
-            // Validar CPFs únicos
+            // Validar CPFs ï¿½nicos
             var cpfs = dto.Travellers.Select(t => t.Cpf).ToList();
             if (cpfs.Count != cpfs.Distinct().Count())
-                throw new ArgumentException("CPFs dos viajantes devem ser únicos");
+                throw new ArgumentException("CPFs dos viajantes devem ser ï¿½nicos");
 
             // Validar se entidades existem
             var userExists = await _unitOfWork.Users.GetByIdAsync(dto.UserId) != null;
             if (!userExists)
-                throw new ArgumentException("Usuário não encontrado");
+                throw new ArgumentException("Usuï¿½rio nï¿½o encontrado");
 
             var roomExists = await _unitOfWork.Rooms.GetByIdAsync(dto.RoomId) != null;
             if (!roomExists)
-                throw new ArgumentException("Quarto não encontrado");
+                throw new ArgumentException("Quarto nï¿½o encontrado");
 
             var hotelExists = await _unitOfWork.Hotels.GetByIdAsync(dto.HotelId) != null;
             if (!hotelExists)
-                throw new ArgumentException("Hotel não encontrado");
+                throw new ArgumentException("Hotel nï¿½o encontrado");
         }
 
         public async Task<IEnumerable<Reservation>> GetFilteredReservation(DateTime? checkin, DateTime? checkout, string search, string status)
@@ -217,15 +232,17 @@ namespace ViagemImpacta.Services.Implementations
             if (!string.IsNullOrWhiteSpace(status))
             {
                 if (status == "confirmadas")
-                    reservations = reservations.Where(r => r.IsConfirmed);
-                else if (status == "nao-confirmadas")
-                    reservations = reservations.Where(r => !r.IsConfirmed);
+                    reservations = reservations.Where(r => r.IsConfirmed && !r.IsCanceled);
+                else if (status == "pendentes")
+                    reservations = reservations.Where(r => !r.IsConfirmed && !r.IsCanceled);
+                else if (status == "canceladas")
+                    reservations = reservations.Where(r => r.IsCanceled);
             }
 
             return reservations;
         }
 
-        private async Task SendEmailAsync(User user)
+        private async Task SendEmailAsync(Reservation reservation)
         {
             var smtpClient = new SmtpClient(_smtpOptions.Host)
             {
@@ -235,22 +252,47 @@ namespace ViagemImpacta.Services.Implementations
 
             };
 
+            // Caminho absoluto ou relativo da imagem
+            var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "banner-tripz.png");
+
             var emailBody = $@"
-                <h1>Parabéns, {user.FirstName}!</h1>
-                <p>Sua reserva foi confirmada com sucesso!</p>
-                <p>Agora você pode acessar nossa plataforma e aproveitar todos os benefícios.</p>
-                <p>Você pode acessar sua conta usando o email: {user.Email}</p>
-                <p>Atenciosamente,<br>Equipe Tripz</p>";
+                <img src=""cid:logoTripz"" alt=""Logo Tripz"" style=""width:600px; height:auto; display:block; margin-bottom: 20px;"" />
+                <h1>Parabï¿½ns, {reservation.User.FirstName}! </h1>
+                <p>Estamos muito felizes em confirmar que sua reserva foi realizada com sucesso!</p>
+                <p>A partir de agora, vocï¿½ jï¿½ pode acessar a nossa plataforma e comeï¿½ar a planejar a sua experiï¿½ncia com a gente.</p>
+                <p><strong>Detalhes da sua reserva:</strong></p>
+                <ul>
+                    <li><strong>Hotel:</strong> {reservation.Hotel?.Name}</li>
+                    <li><strong>Chekin:</strong> {reservation.CheckIn.ToString("dd/MM/yyyy")}</li>
+                    <li><strong>Checkout:</strong> {reservation.CheckOut.ToString("dd/MM/yyyy")}</li>
+                    <li><strong>Valor total:</strong> {reservation.TotalPrice.ToString("N2")}</li>
+                </ul>
+                <p>Use este e-mail para fazer login: <strong>{reservation.User.Email}</strong></p>
+                <p>Se tiver qualquer dï¿½vida, nossa equipe estï¿½ pronta para te ajudar.</p>
+                <p>Vocï¿½ pode acessar nosso site a qualquer momento em: <a href=""https://tripz.com"">tripz.com</a></p>
+                <p>Aproveite sua estadia ao mï¿½ximo!</p>
+                <p><strong>Equipe Tripz</strong></p>";
 
             var mensagem = new MailMessage
             {
                 From = new MailAddress(_smtpOptions.From),
-                Subject = "Confirmação de Cadastro",
+                Subject = "Confirmaï¿½ï¿½o de Reserva",
                 Body = emailBody,
                 IsBodyHtml = true
             };
 
-            mensagem.To.Add(user.Email);
+            mensagem.To.Add(reservation.User.Email);
+
+            // Cria o LinkedResource para a imagem
+            var logo = new LinkedResource(imagePath)
+            {
+                ContentId = "logoTripz"
+            };
+
+            // Cria o AlternateView e adiciona o LinkedResource
+            var htmlView = AlternateView.CreateAlternateViewFromString(emailBody, null, "text/html");
+            htmlView.LinkedResources.Add(logo);
+            mensagem.AlternateViews.Add(htmlView);
 
             await smtpClient.SendMailAsync(mensagem);
         }
@@ -259,36 +301,87 @@ namespace ViagemImpacta.Services.Implementations
         {
             var reservation = await _unitOfWork.Reservations.GetByIdAsync(dto.ReservationId);
 
+            _mapper.Map(dto, reservation);
+
             await _unitOfWork.Reservations.UpdateAsync(reservation);
             await _unitOfWork.CommitAsync();
             return reservation;
+        }
+
+        private async void GiveRefund(string paymentId)
+        {
+            StripeConfiguration.ApiKey = _model.SecretKey;
+            var refund = new RefundService();
+            var service = await refund.CreateAsync(new RefundCreateOptions
+            {
+                PaymentIntent = paymentId,
+            });
+        }
+
+        public async Task SendPaymentLinkToUserEmail(Reservation reservation)
+        {
+            var smtpClient = new SmtpClient(_smtpOptions.Host)
+            {
+                Port = _smtpOptions.Port,
+                Credentials = new NetworkCredential(_smtpOptions.User, _smtpOptions.Pass),
+                EnableSsl = true
+            };
+
+            var url = await _stripeService.CreateCheckout(reservation);
+
+            var emailBody = $@"
+                <h1Olï¿½, {reservation.User?.FirstName}!</h1>
+                <p>Aqui estï¿½ o link de pagamento da sua nova reserva</p>
+                <p>Link de pagamento: <a href=""{url}"">Clique Aqui</a>.</p>
+                <p>Vocï¿½ terï¿½ 45 minutos para efetuar o pagamento</p>
+                <p>Atenciosamente,<br>Equipe Tripz</p>";
+
+            var mensagem = new MailMessage
+            {
+                From = new MailAddress(_smtpOptions.From),
+                Subject = "Link de Pagamento da Reserva - Tripz",
+                Body = emailBody,
+                IsBodyHtml = true
+            };
+
+            mensagem.To.Add(reservation.User.Email);
+
+            try
+            {
+                await smtpClient.SendMailAsync(mensagem);
+            }
+            catch (SmtpException ex)
+            {
+                Console.WriteLine($"Erro ao enviar e-mail: {ex.Message}");
+                throw;
+            }
         }
 
         public async Task<Reservation> CreateReservationByPromotion(CreateReservationPromotionDto Dto)
         {
             var promotion = await _unitOfWork.Promotions.GetPromotionByIdAsync(Dto.idPromotion);
             if (promotion == null)
-                throw new ArgumentException("Promoção não encontrada");
+                throw new ArgumentException("Promoï¿½ï¿½o nï¿½o encontrada");
 
-            // Validações de negócio
+            // Validaï¿½ï¿½es de negï¿½cio
             var user = await _unitOfWork.Users.GetByIdAsync(Dto.UserId);
             if (user == null)
-                throw new ArgumentException("Usuário não encontrado");
+                throw new ArgumentException("Usuï¿½rio nï¿½o encontrado");
                 
             var hotel = await _unitOfWork.Hotels.GetByIdAsync(promotion.HotelId);
             if (hotel == null)
-                throw new ArgumentException("Hotel não encontrado");
+                throw new ArgumentException("Hotel nï¿½o encontrado");
                 
             if (Dto.NumberOfGuests > promotion.RoomsPromotional.Capacity)
-                throw new ArgumentException($"Número de hóspedes ({Dto.NumberOfGuests}) excede a capacidade do quarto ({promotion.RoomsPromotional.Capacity})");
+                throw new ArgumentException($"Nï¿½mero de hï¿½spedes ({Dto.NumberOfGuests}) excede a capacidade do quarto ({promotion.RoomsPromotional.Capacity})");
 
             if (Dto.Travellers.Count != Dto.NumberOfGuests)
-                throw new ArgumentException("Número de viajantes deve ser igual ao número de hóspedes");
+                throw new ArgumentException("Nï¿½mero de viajantes deve ser igual ao nï¿½mero de hï¿½spedes");
 
-            // Verificar se há quartos disponíveis na promoção
+            // Verificar se hï¿½ quartos disponï¿½veis na promoï¿½ï¿½o
             var roomsAvailable = await _unitOfWork.RoomsPromotions.RoomsAvailableAsync(Dto.idPromotion);
             if (!roomsAvailable)
-                throw new InvalidOperationException("Não há quartos disponíveis para esta promoção");
+                throw new InvalidOperationException("Nï¿½o hï¿½ quartos disponï¿½veis para esta promoï¿½ï¿½o");
 
             var reservationFinal = new Reservation
             {
@@ -300,7 +393,7 @@ namespace ViagemImpacta.Services.Implementations
                 IsPromotion = true,
                 IdPromotion = Dto.idPromotion,
                 IdRoomPromotional = promotion.RoomsPromotional.RoomsPromotionalId,
-                RoomId = null, // Para reservas promocionais, RoomId não é usado
+                RoomId = null, // Para reservas promocionais, RoomId nï¿½o ï¿½ usado
                 IsConfirmed = false,
                 CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, BrazilTimeZone),
                 UpdatedAt = DateTime.UtcNow,
@@ -318,7 +411,7 @@ namespace ViagemImpacta.Services.Implementations
             await _unitOfWork.Reservations.AddAsync(reservationFinal);
             await _unitOfWork.CommitAsync();
 
-            // Associar viajantes à reserva
+            // Associar viajantes ï¿½ reserva
             foreach (var traveller in travellers)
             {
                 traveller.ReservationId = reservationFinal.ReservationId;

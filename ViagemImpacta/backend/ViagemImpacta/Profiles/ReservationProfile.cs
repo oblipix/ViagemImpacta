@@ -37,7 +37,17 @@ namespace ViagemImpacta.Profiles
                 
 
             CreateMap<Reservation, UpdateReservationViewModel>();
+
             CreateMap<Reservation, UpdateReservationDto>();
+
+            CreateMap<UpdateReservationViewModel, CreateReservationDto>();
+
+            CreateMap<UpdateReservationViewModel, UpdateReservationDto>();
+
+            CreateMap<CreateReservationDto, Reservation>();
+
+            CreateMap<UpdateReservationDto, Reservation>()
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
 
             // Traveller mappings
             CreateMap<CreateTravellerDto, Travellers>()
@@ -46,6 +56,8 @@ namespace ViagemImpacta.Profiles
                 .ForMember(dest => dest.Reservation, opt => opt.Ignore());
 
             CreateMap<Travellers, TravellerDto>();
+
+            CreateMap<Travellers, CreateTravellerDto>();
         }
     }
 }

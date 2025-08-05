@@ -1,4 +1,4 @@
-﻿using ViagemImpacta.DTO.Promotion;
+using ViagemImpacta.DTO.Promotion;
 using ViagemImpacta.Models;
 
 namespace ViagemImpacta.Repositories.Interfaces

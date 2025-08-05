@@ -21,5 +21,6 @@ namespace ViagemImpacta.Repositories.Interfaces
         Task<IEnumerable<Reservation>> GetAllReservationsAsync();
 
         Task<bool> RoomsAvailable(int idPromotion);
+        Task<Reservation?> GetReservationById(int id);
     }
 }
