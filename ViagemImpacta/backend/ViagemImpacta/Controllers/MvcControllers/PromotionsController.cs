@@ -53,11 +53,11 @@ namespace ViagemImpacta.Controllers.MvcControllers
         {
             // Buscar todos os hotéis para o dropdown
             var hotels = await _hotelService.GetAllHotelsAsync();
-            ViewBag.Hotels = new SelectList(hotels.Select(h => new { 
-                HotelId = h.HotelId, 
-                DisplayName = $"{h.Name} - {h.City}" 
+            ViewBag.Hotels = new SelectList(hotels.Select(h => new {
+                HotelId = h.HotelId,
+                DisplayName = $"{h.Name} - {h.City}"
             }), "HotelId", "DisplayName");
-            
+
             return View();
         }
 
@@ -99,11 +99,11 @@ namespace ViagemImpacta.Controllers.MvcControllers
             {
                 // Recarregar dados para dropdown em caso de erro
                 var hotels = await _hotelService.GetAllHotelsAsync();
-                ViewBag.Hotels = new SelectList(hotels.Select(h => new { 
-                    HotelId = h.HotelId, 
-                    DisplayName = $"{h.Name} - {h.City}" 
+                ViewBag.Hotels = new SelectList(hotels.Select(h => new {
+                    HotelId = h.HotelId,
+                    DisplayName = $"{h.Name} - {h.City}"
                 }), "HotelId", "DisplayName");
-                
+
                 return View(dto);
             }
 
@@ -115,16 +115,44 @@ namespace ViagemImpacta.Controllers.MvcControllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("", $"Erro ao criar promoção: {ex.Message}");
-                
+
                 // Recarregar dados para dropdown em caso de erro
                 var hotels = await _hotelService.GetAllHotelsAsync();
-                ViewBag.Hotels = new SelectList(hotels.Select(h => new { 
-                    HotelId = h.HotelId, 
-                    DisplayName = $"{h.Name} - {h.City}" 
+                ViewBag.Hotels = new SelectList(hotels.Select(h => new {
+                    HotelId = h.HotelId,
+                    DisplayName = $"{h.Name} - {h.City}"
                 }), "HotelId", "DisplayName");
-                
+
                 return View(dto);
             }
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id == null)
+            {
+                 return BadRequest();
+            }
+            var promotion = await _service.GetPromotionByIdAsync(id);
+            if (promotion == null) return NotFound();
+
+            return View(promotion);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var promotion = await _service.GetPromotionByIdAsync(id);
+            if (promotion == null)
+                return NotFound();
+
+            var result = await _service.SoftDeletePromotion(id);
+            return View(promotion);
         }
     }
 }

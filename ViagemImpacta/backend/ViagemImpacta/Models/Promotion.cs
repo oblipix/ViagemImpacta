@@ -1,4 +1,6 @@
-﻿namespace ViagemImpacta.Models
+﻿using Microsoft.EntityFrameworkCore.Update.Internal;
+
+namespace ViagemImpacta.Models
 {
     public class Promotion
     {
@@ -21,6 +23,7 @@
         public decimal DiscountPercentage { get; set; } = 0.15m;
 
         public bool IsActive { get; set; } = true;
+        public DateTime UpdatedAt { get; set; } 
 
         public DateTime CreatedAt { get; set; }
 

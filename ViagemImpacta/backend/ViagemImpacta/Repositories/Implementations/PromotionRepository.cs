@@ -17,6 +17,8 @@ namespace ViagemImpacta.Repositories.Implementations
             _context = context;
         }
 
+       
+
         public async Task<IEnumerable<Promotion>> GetActivePromotionsAsync()
         {
             var AllPromotionsActive = await _context.Promotions
@@ -44,6 +46,6 @@ namespace ViagemImpacta.Repositories.Implementations
             return await _context.Promotions
                 .Where(p => p.HotelId == hotelId)
                 .ToListAsync();
-        }
+        } 
     }
 }

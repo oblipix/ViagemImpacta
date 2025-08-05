@@ -85,5 +85,27 @@ namespace ViagemImpacta.Services.Implementations
             return await _unititOfWork.Promotions.GetPromotionByIdAsync(idPromotion);
         }
 
+        public async Task<bool> SoftDeletePromotion(int idPromotion)
+        {
+            if (idPromotion <= 0)
+                return false;
+
+            var promotion = await _unititOfWork.Promotions.GetPromotionByIdAsync(idPromotion);
+            if (promotion == null)
+                return false;
+
+            promotion.IsActive = false;
+            promotion.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, BrazilTimeZone);
+
+            await _unititOfWork.Promotions.UpdateAsync(promotion);
+            var roomsPromotional = await _unititOfWork.RoomsPromotions.GetRoomPromotionalByIdAsync(promotion.PromotionId);
+            if (roomsPromotional != null)
+            {
+                roomsPromotional.active = false;
+                await _unititOfWork.RoomsPromotions.UpdateAsync(roomsPromotional);
+            }
+            await _unititOfWork.CommitAsync();
+            return true;
+        }
     }
 }

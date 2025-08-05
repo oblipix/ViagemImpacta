@@ -9,8 +9,5 @@ namespace ViagemImpacta.Repositories.Interfaces
         Task<IEnumerable<Promotion>> GetActivePromotionsAsync();
 
         Task<IEnumerable<Promotion>> GetPromotionsByHotelIdAsync(int hotelId);
-
-
-
     }
 }
