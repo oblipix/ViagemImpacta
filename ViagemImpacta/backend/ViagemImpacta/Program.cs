@@ -21,6 +21,7 @@ var key = Encoding.ASCII.GetBytes(Settings.Secret);
 
 // Adiciona o Application Insights
 builder.Services.AddApplicationInsightsTelemetry();
+Console.WriteLine("asd");
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
