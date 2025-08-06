@@ -8,7 +8,7 @@ import { paymentService } from '../../services/paymentService.js';
 import { Icons } from '../layout/Icons.jsx';
 import DateErrorModal from './DateErrorModal.jsx'; // Importa o modal de erro de data
 
-const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
+const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess, isPromotion = false, promotionDates = null }) => {
   const { currentUser, isLoggedIn, addReservationToHistory } = useAuth();
   
   // Função para obter a data mínima permitida (amanhã)
@@ -25,8 +25,8 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
   };
 
   const [formData, setFormData] = useState({
-    checkIn: '',
-    checkOut: '',
+    checkIn: isPromotion && promotionDates ? promotionDates.checkIn : '',
+    checkOut: isPromotion && promotionDates ? promotionDates.checkOut : '',
     numberOfGuests: 1,
     specialRequests: '',
     travellers: [
@@ -37,6 +37,23 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
       }
     ]
   });
+
+  // Debug log para verificar as datas da promoção
+  React.useEffect(() => {
+    console.log('ReservationModal - isPromotion:', isPromotion);
+    console.log('ReservationModal - promotionDates:', promotionDates);
+    console.log('ReservationModal - formData.checkIn:', formData.checkIn);
+    console.log('ReservationModal - formData.checkOut:', formData.checkOut);
+    
+    // Para promoções, define o total fixo imediatamente
+    if (isPromotion && room?.price) {
+      setCalculatedTotal({
+        nights: 1, // Não importa o número real de noites para promoções
+        basePrice: room.price,
+        total: room.price
+      });
+    }
+  }, [isPromotion, promotionDates, formData.checkIn, formData.checkOut, room?.price]);
   
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -56,6 +73,11 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Se for promoção, não permitir alteração das datas
+    if (isPromotion && (name === 'checkIn' || name === 'checkOut')) {
+      return; // Não faz nada, mantém as datas bloqueadas
+    }
     
     // Validação para campos de data
     if (name === 'checkIn' || name === 'checkOut') {
@@ -119,13 +141,20 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
       }));
     }
 
-    // Recalcula o total quando as datas mudam
+    // Recalcula o total quando as datas mudam (apenas para reservas normais, não promoções)
     const checkIn = name === 'checkIn' ? value : formData.checkIn;
     const checkOut = name === 'checkOut' ? value : formData.checkOut;
     
-    if (checkIn && checkOut && checkOut > checkIn) {
+    if (!isPromotion && checkIn && checkOut && checkOut > checkIn) {
       const total = reservationService.calculateReservationTotal(room.price, checkIn, checkOut);
       setCalculatedTotal(total);
+    } else if (isPromotion) {
+      // Para promoções, usa o preço fixo do room sem cálculos
+      setCalculatedTotal({
+        nights: 1, // Não importa o número real de noites para promoções
+        basePrice: room.price,
+        total: room.price
+      });
     }
   };
 
@@ -284,7 +313,7 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Check-in
+                  Check-in {isPromotion && <span className="text-red-600 text-xs">(Data da Promoção - Não Alterável)</span>}
                 </label>
                 <input
                   type="date"
@@ -292,6 +321,7 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
                   value={formData.checkIn}
                   min={getMinDate()}
                   onChange={handleInputChange}
+                  readOnly={isPromotion}
                   onBlur={(e) => {
                     const { value } = e.target;
                     const today = getTodayDate();
@@ -306,13 +336,15 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
                   onInvalid={(e) => {
                     e.target.setCustomValidity('Só é permitido agendar em datas posteriores ao dia de hoje!');
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    isPromotion ? 'bg-gray-100 cursor-not-allowed' : ''
+                  }`}
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Check-out
+                  Check-out {isPromotion && <span className="text-red-600 text-xs">(Data da Promoção - Não Alterável)</span>}
                 </label>
                 <input
                   type="date"
@@ -320,6 +352,7 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
                   value={formData.checkOut}
                   min={formData.checkIn || getMinDate()}
                   onChange={handleInputChange}
+                  readOnly={isPromotion}
                   onBlur={(e) => {
                     const { value } = e.target;
                     const today = getTodayDate();
@@ -342,7 +375,9 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
                       e.target.setCustomValidity('Só é permitido agendar em datas posteriores ao dia de hoje!');
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    isPromotion ? 'bg-gray-100 cursor-not-allowed' : ''
+                  }`}
                   required
                 />
               </div>
@@ -443,12 +478,21 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
             {/* Resumo do valor */}
             {calculatedTotal && (
               <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-semibold text-gray-800 mb-2">Resumo da Reserva</h4>
+                <h4 className="font-semibold text-gray-800 mb-2">
+                  {isPromotion ? 'Resumo da Promoção' : 'Resumo da Reserva'}
+                </h4>
                 <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span>{calculatedTotal.days} {calculatedTotal.days === 1 ? 'noite' : 'noites'} × R$ {calculatedTotal.dailyPrice.toFixed(2).replace('.', ',')}</span>
-                    <span>R$ {calculatedTotal.subtotal.toFixed(2).replace('.', ',')}</span>
-                  </div>
+                  {isPromotion ? (
+                    <div className="flex justify-between">
+                      <span>Valor da Promoção (Datas Fixas)</span>
+                      <span>R$ {calculatedTotal.total.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between">
+                      <span>{calculatedTotal.days} {calculatedTotal.days === 1 ? 'noite' : 'noites'} × R$ {calculatedTotal.dailyPrice.toFixed(2).replace('.', ',')}</span>
+                      <span>R$ {calculatedTotal.subtotal.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                  )}
                   {/* TAXAS REMOVIDAS - NÃO MOSTRAR MAIS
                   <div className="flex justify-between">
                     <span>Taxas e impostos</span>
@@ -459,6 +503,11 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
                     <span>Total</span>
                     <span>R$ {calculatedTotal.total.toFixed(2).replace('.', ',')}</span>
                   </div>
+                  {isPromotion && (
+                    <div className="text-xs text-red-600 mt-2 font-medium">
+                      🔥 Valor promocional fixo - Datas não alteráveis
+                    </div>
+                  )}
                 </div>
               </div>
             )}

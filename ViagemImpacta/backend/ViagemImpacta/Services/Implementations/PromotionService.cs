@@ -51,6 +51,7 @@ namespace ViagemImpacta.Services.Implementations
             promocao.OriginalPrice = originalPrice;
             promocao.DiscountPercentage = dto.DiscountPercentage;
             promocao.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, BrazilTimeZone);
+            promocao.BannerPromotion = dto.BannerPromotion;
 
 
             await _unititOfWork.Promotions.AddAsync(promocao);

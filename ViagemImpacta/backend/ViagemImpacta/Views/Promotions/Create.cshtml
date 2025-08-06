@@ -106,11 +106,13 @@
                 </div>
             </div>
 
-            <div class="form-check mb-4">
-                <input asp-for="isActive" class="form-check-input" type="checkbox" />
-                <label asp-for="isActive" class="form-check-label">
-                    Promoção Ativa
-                </label>
+            <div id="imageUrlsContainer">
+                <div class="image-url-entry mb-3">
+                    <label class="form-label">Imagem Principal *</label>
+                    <div class="input-group">
+                        <input type="url" name="BannerPromotion" class="form-control" placeholder="https://exemplo.com/imagem.jpg" />
+                    </div>
+                </div>
             </div>
 
             <div class="d-flex gap-2">

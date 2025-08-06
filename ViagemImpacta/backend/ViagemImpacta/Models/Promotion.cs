@@ -26,7 +26,7 @@ namespace ViagemImpacta.Models
         public DateTime UpdatedAt { get; set; } 
 
         public DateTime CreatedAt { get; set; }
-
+        public string BannerPromotion { get; set; } 
         public RoomsPromotional RoomsPromotional { get; set; }
         
     }

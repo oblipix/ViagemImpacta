@@ -47,6 +47,9 @@ namespace ViagemImpacta.DTO.Promotion
         [Range(0.01, 100, ErrorMessage = "Desconto deve ser entre 0,01% e 100%.")]
         public decimal DiscountPercentage { get; set; } = 15.0m;
 
+        [Required(ErrorMessage = "A imagem do Banner é obrigatória")]
+        public string BannerPromotion { get; set; }
+
         public bool isActive { get; set; } = true;
     }
 }

@@ -46,11 +46,6 @@ class PromotionService {
             });
 
             if (!response.ok) {
-                // Se a API não existir ainda, retorna dados de exemplo
-                if (response.status === 404) {
-                    console.warn('API de promoções não encontrada, usando dados de exemplo');
-                    return this.getMockPromotions();
-                }
                 throw new Error(`Erro ao buscar promoções ativas: ${response.status} ${response.statusText}`);
             }
 
@@ -58,67 +53,8 @@ class PromotionService {
             return promotions;
         } catch (error) {
             console.error('Erro ao buscar promoções ativas:', error);
-            // Em caso de erro, retorna dados de exemplo para desenvolvimento
-            console.warn('Usando dados de exemplo para promoções');
-            return this.getMockPromotions();
+            throw new Error('Não foi possível carregar as promoções. Tente novamente mais tarde.');
         }
-    }
-
-    /**
-     * Retorna dados de exemplo para desenvolvimento
-     * @returns {Array} Lista de promoções de exemplo
-     */
-    getMockPromotions() {
-        return [
-            {
-                id: 1,
-                title: "Pacote Praia de Verão",
-                description: "3 dias de paraíso com desconto especial!",
-                mainImageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
-                hotelName: "Resort Paradise Beach",
-                checkIn: "2025-08-15",
-                checkOut: "2025-08-18",
-                originalPrice: 1200.00,
-                finalPrice: 900.00,
-                discountPercent: 25,
-                isActive: true,
-                endDate: "2025-08-10",
-                roomsQuantityTotal: 50,
-                roomsQuantityUsed: 15
-            },
-            {
-                id: 2,
-                title: "Escapada Romântica",
-                description: "Final de semana perfeito para casais!",
-                mainImageUrl: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800",
-                hotelName: "Hotel Romantic Sunset",
-                checkIn: "2025-08-20",
-                checkOut: "2025-08-22",
-                originalPrice: 800.00,
-                finalPrice: 640.00,
-                discountPercent: 20,
-                isActive: true,
-                endDate: "2025-08-15",
-                roomsQuantityTotal: 20,
-                roomsQuantityUsed: 8
-            },
-            {
-                id: 3,
-                title: "Aventura na Montanha",
-                description: "5 dias de trilhas e paisagens incríveis!",
-                mainImageUrl: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
-                hotelName: "Mountain Lodge Adventure",
-                checkIn: "2025-09-01",
-                checkOut: "2025-09-06",
-                originalPrice: 1500.00,
-                finalPrice: 1050.00,
-                discountPercent: 30,
-                isActive: true,
-                endDate: "2025-08-25",
-                roomsQuantityTotal: 30,
-                roomsQuantityUsed: 12
-            }
-        ];
     }
 
     /**
@@ -153,15 +89,17 @@ class PromotionService {
      * @returns {Object} Dados formatados
      */
     formatPromotionData(promotion) {
+        // Para dados da API (estrutura completa)
         const roomsTotal = promotion.roomsPromotional?.totalRoomsAvailable || 0;
         const roomsReserved = promotion.roomsPromotional?.totalRoomsReserved || 0;
 
         return {
             id: promotion.id || promotion.promotionId,
-            title: promotion.title,
+            title: promotion.title || promotion.titlePromotion,
             description: promotion.description,
             mainImageUrl: promotion.mainImageUrl || promotion.imageUrl || '/default-promotion.jpg',
-            hotelName: promotion.hotel.name,
+            bannerPromotion: promotion.bannerPromotion || promotion.BannerPromotion || promotion.banner_promotion || promotion.mainImageUrl || promotion.imageUrl,
+            hotelName: promotion.hotel?.name || promotion.hotelName || 'Hotel não informado',
             checkIn: new Date(promotion.checkIn).toLocaleDateString('pt-BR'),
             checkOut: new Date(promotion.checkOut).toLocaleDateString('pt-BR'),
             originalPrice: promotion.originalPrice,
@@ -181,11 +119,8 @@ class PromotionService {
      * @param {number} finalPrice - Preço final
      * @returns {number} Porcentagem de desconto
      */
-    calculateDiscountPercent(originalPrice, finalPrice) {
-        if (!originalPrice || originalPrice <= 0) return 0;
-        return Math.round(((originalPrice - finalPrice) / originalPrice) * 100);
-    }
 }
+
 
 // Exporta uma instância única do serviço
 export const promotionService = new PromotionService();

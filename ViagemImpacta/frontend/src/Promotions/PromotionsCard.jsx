@@ -2,13 +2,13 @@ import { Link } from 'react-router-dom';
 
 function PromotionsCard({ promotion }) {
     return (
-        <Link to={`/promotions/${promotion.id}`}
+        <Link to={`/promocao/${promotion.id}`}
             className="block hotel-card-modern bg-white rounded-xl shadow-md border-0 overflow-hidden
                          h-full flex flex-col transition-all duration-300 hover:shadow-xl
                          w-full max-w-sm mx-auto sm:max-w-none min-h-[420px] sm:min-h-[450px]">
             <div className="relative w-full h-48 sm:h-56 overflow-hidden">
                 <img
-                    src={promotion.mainImageUrl}
+                    src={promotion.bannerPromotion || promotion.mainImageUrl || promotion.imageUrl || '/default-promotion.jpg'}
                     alt={promotion.title}
                     className="w-full h-full object-cover"
                 />

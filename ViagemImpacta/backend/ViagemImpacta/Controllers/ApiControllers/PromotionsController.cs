@@ -23,5 +23,13 @@ namespace ViagemImpacta.Controllers.ApiControllers
             var promotions = await _promotionService.GetActivePromotionsAsync();
             return Ok(promotions);
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Promotion>> GetPromotionsById(int id)
+        {
+            var promotions = await _promotionService.GetPromotionByIdAsync(id);
+            return Ok(promotions);
+        }
+
     }
 }
