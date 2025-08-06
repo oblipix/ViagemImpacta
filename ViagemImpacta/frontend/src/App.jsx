@@ -11,7 +11,10 @@ import Footer from './components/layout/Footer.jsx';
 // Lazy loading do componente BackToTop otimizado
 const LazyBackToTop = lazy(() => import('./components/common/OptimizedBackToTop.jsx'));
 
-const MAPS_API_KEY = import.meta.env.VITE_Maps_API_KEY;
+const MAPS_API_KEY = import.meta.env.VITE_Maps_API_KEY_PRODUCTION || import.meta.env.VITE_Maps_API_KEY;
+
+console.log('🗺️ Using Google Maps API Key:', MAPS_API_KEY ? 'Key loaded' : 'No key found');
+console.log('🗺️ Environment:', import.meta.env.PROD ? 'Production' : 'Development');
 
 // <<<<<<<<<<<< SOLUÇÃO: MOVER A ARRAY 'LIBRARIES' PARA FORA DO COMPONENTE >>>>>>>>>>>>
 const libraries = ["places"]; // Definida uma única vez, fora da função do componente
