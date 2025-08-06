@@ -91,4 +91,4 @@ const NewsletterSection = () => {
   );
 };
 
-export default NewsletterSection;
+export default NewsLetterSection;
