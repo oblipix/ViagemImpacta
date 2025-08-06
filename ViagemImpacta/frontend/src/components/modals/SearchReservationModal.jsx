@@ -196,7 +196,7 @@ const SearchReservationModal = ({ isOpen, onClose, hotel, room, onSuccess, initi
       }
 
       console.log('=== ENVIANDO PARA API ===');
-      console.log('URL da API: https://localhost:7010/api/reservations');
+      console.log('URL da API: https://tripzback.azurewebsites.net/api/reservations');
       console.log('Auth Token:', localStorage.getItem('authToken') ? 'Presente' : 'Ausente');
 
       // Processa a reserva e redireciona para o pagamento

@@ -15,7 +15,7 @@ function ForgotPasswordPage() {
 
     
     try {
-      const response = await fetch('https://localhost:7010/api/auth/forgot-password', {
+      const response = await fetch('https://tripzback.azurewebsites.net/api/auth/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

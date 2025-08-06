@@ -85,7 +85,7 @@ function ResetPasswordPage(){
         }   
 
         try{
-            const response = await fetch('https://localhost:7010/api/Auth/reset-password',{
+            const response = await fetch('https://tripzback.azurewebsites.net/api/Auth/reset-password',{
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json'},
                 body: JSON.stringify({ token, newPassword}),

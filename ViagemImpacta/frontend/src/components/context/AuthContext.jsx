@@ -9,7 +9,7 @@ import reservationService from '../../services/reservationService';
 const AuthContext = createContext(null);
  
 // APIs de hotéis para uso no contexto de autenticação
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7010/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tripzback.azurewebsites.net/api';
 const HOTELS_API = {
     SAVED: `${API_BASE_URL}/Hotels/saved`,
     VISITED: `${API_BASE_URL}/Hotels/visited`,
@@ -384,7 +384,7 @@ export const AuthProvider = ({ children }) => {
         }
  
         try {
-            const response = await fetch('https://localhost:7010/api/Auth/login', {
+            const response = await fetch('https://tripzback.azurewebsites.net/api/Auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -592,7 +592,7 @@ export const AuthProvider = ({ children }) => {
                 }
             }
 
-            const response = await fetch(`https://localhost:7010/api/Users/${userId}`, {
+            const response = await fetch(`https://tripzback.azurewebsites.net/api/Users/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -915,12 +915,12 @@ export const AuthProvider = ({ children }) => {
                 password: password
             };
             const attemptConfigs = [
-                { url: 'https://localhost:7010/api/Users/createUser', data: dataToSend },
-                { url: 'https://localhost:7010/api/Users/createUser', data: alternativeData },
-                { url: 'https://localhost:7010/api/Users', data: dataToSend },
-                { url: 'https://localhost:7010/api/Users', data: alternativeData },
-                { url: 'https://localhost:7010/api/Auth/register', data: dataToSend },
-                { url: 'https://localhost:7010/api/Auth/register', data: alternativeData }
+                { url: 'https://tripzback.azurewebsites.net/api/Users/createUser', data: dataToSend },
+                { url: 'https://tripzback.azurewebsites.net/api/Users/createUser', data: alternativeData },
+                { url: 'https://tripzback.azurewebsites.net/api/Users', data: dataToSend },
+                { url: 'https://tripzback.azurewebsites.net/api/Users', data: alternativeData },
+                { url: 'https://tripzback.azurewebsites.net/api/Auth/register', data: dataToSend },
+                { url: 'https://tripzback.azurewebsites.net/api/Auth/register', data: alternativeData }
             ];
             
             let lastError = null;
@@ -1007,7 +1007,7 @@ export const AuthProvider = ({ children }) => {
  
             // Verifica se é um erro de rede (fetch falhou)
             if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                throw new Error('Não foi possível conectar com o servidor. Verifique se o backend está rodando em https://localhost:7010');
+                throw new Error('Não foi possível conectar com o servidor. Verifique se o backend está rodando em https://tripzback.azurewebsites.net');
             }
  
             // Re-lança o erro para que o componente possa exibir a mensagem
