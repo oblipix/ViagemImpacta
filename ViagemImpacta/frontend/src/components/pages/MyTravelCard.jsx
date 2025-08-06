@@ -38,7 +38,7 @@ function MyTravelCard({ travel, onCardClick }) {
       // Mostra modal de aviso se não estiver logado
       showModal({
         title: 'Login Necessário',
-        message: 'É necessário estar logado para favoritar destinos. Faça login para salvar seus hotéis favoritos!',
+        message: 'É necessário estar logado para esta ação. Faça login para continuar!',
         actionText: 'Fazer Login',
         showHeader: true,
         onConfirm: () => {

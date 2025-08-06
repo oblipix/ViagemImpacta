@@ -48,7 +48,6 @@ const RecommendedHotelCard = ({ hotel, onCardClick, onSaveTravel, isHotelSaved }
         <button
           onClick={handleSaveClick}
           className={`favorite-button ${isSaved ? 'favorited' : ''}`}
-          title={isSaved ? "Remover dos favoritos" : "Salvar nos favoritos"}
         >
           <svg className={`h-6 w-6 transition-colors ${isSaved ? 'text-red-500' : 'text-gray-500'}`}
             fill={isSaved ? 'currentColor' : 'none'}

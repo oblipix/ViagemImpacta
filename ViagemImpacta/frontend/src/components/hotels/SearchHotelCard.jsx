@@ -145,7 +145,7 @@ function SearchHotelCard({ hotel, searchDates }) {
         if (!isLoggedIn) {
             showModal({
                 title: 'Login Necessário',
-                message: 'É necessário estar logado para favoritar hotéis. Faça login para salvar seus hotéis favoritos!',
+                message: 'É necessário estar logado para esta ação. Faça login para continuar!',
                 actionText: 'Fazer Login',
                 showHeader: true,
                 onConfirm: () => {
@@ -268,7 +268,6 @@ function SearchHotelCard({ hotel, searchDates }) {
                                         ref={buttonRef}
                                         className="bg-white px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 flex items-center space-x-1 border border-gray-200"
                                         onClick={handleSaveClick}
-                                        aria-label={isSaved ? "Remover dos favoritos" : "Salvar nos favoritos"}
                                     >
                                         <svg className={`h-3 w-3 sm:h-4 sm:w-4 transition-colors favorite-icon ${isSaved ? 'text-red-500' : 'text-gray-500'}`}
                                             fill={isSaved ? 'currentColor' : 'none'}
@@ -276,7 +275,6 @@ function SearchHotelCard({ hotel, searchDates }) {
                                         >
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.5l1.318-1.182a4.5 4.5 0 116.364 6.364L12 18.75l-7.682-7.682a4.5 4.5 0 010-6.364z" />
                                         </svg>
-                                        <span className="text-xs font-medium hidden sm:inline">{isSaved ? 'Salvo' : 'Salvar'}</span>
                                     </button>
                                     <div ref={confettiRef} className="confetti-container"></div>
                                 </div>
