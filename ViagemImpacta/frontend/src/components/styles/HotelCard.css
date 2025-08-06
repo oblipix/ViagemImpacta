@@ -191,12 +191,13 @@ section[id*="promocoes"] .swiper-slide {
         padding-bottom: 32px !important; /* Espaço extra para o botão */
         box-sizing: border-box !important;
     }
-    section[id*="promocoes"] .swiper-slide .hotel-card-modern {
+section[id*="promocoes"] .swiper-slide .hotel-card-modern {
         margin: 4px auto 0 auto !important;
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1) !important;
         border-radius: 12px !important;
-        max-width: 350px !important;
-        width: 100% !important;
+        max-width: 80vw !important;
+        width: 80vw !important;
+        min-width: 260px !important;
         display: block !important;
     }
     
