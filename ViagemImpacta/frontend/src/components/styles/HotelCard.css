@@ -178,12 +178,21 @@
     }
     
     /* Promotions section mobile improvements */
-    section[id*="promocoes"] .swiper {
-        padding: 12px 8px 20px 8px !important;
+section[id*="promocoes"] .swiper {
+        padding: 12px 8px 48px 8px !important; /* Mais espaço embaixo para mostrar o card e botão */
+        overflow: visible !important;
     }
     
+section[id*="promocoes"] .swiper-slide {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: flex-start !important;
+        width: 100% !important;
+        padding-bottom: 32px !important; /* Espaço extra para o botão */
+        box-sizing: border-box !important;
+    }
     section[id*="promocoes"] .swiper-slide .hotel-card-modern {
-        margin: 4px auto 8px auto !important;
+        margin: 4px auto 0 auto !important;
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1) !important;
         border-radius: 12px !important;
         max-width: 350px !important;
