@@ -7,6 +7,10 @@
 
 /* Mobile-specific improvements */
 @media (max-width: 640px) {
+    /* Remove Swiper pagination bubble for promo section */
+    section[id*="promocoes"] .swiper-pagination {
+        display: none !important;
+    }
     .hotel-card-modern {
         margin: 8px auto 20px auto; /* Margens menores no mobile */
         max-width: none; /* Remove limitação de largura */
