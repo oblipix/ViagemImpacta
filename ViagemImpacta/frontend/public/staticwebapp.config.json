@@ -1,0 +1,35 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/images/*.{png,jpg,gif,svg}", "/css/*", "/js/*", "*.{css,js,png,jpg,gif,svg,ico,woff,woff2,ttf,eot}"]
+  },
+  "mimeTypes": {
+    ".json": "application/json"
+  },
+  "routes": [
+    {
+      "route": "/payment-success*",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/confirm-reservation*",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/hoteis/*",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/minhas-viagens",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/login",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/register",
+      "rewrite": "/index.html"
+    }
+  ]
+}

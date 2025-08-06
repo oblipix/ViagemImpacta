@@ -58,7 +58,9 @@ namespace ViagemImpacta.Services.Implementations
                             {
                                 Name = result.Hotel?.Name,
                                 Description = result.Hotel?.Description,
-                                Images = [ result.Hotel.ImageUrls[0] ]
+                                Images = result.Hotel?.ImageUrls?.Any() == true 
+                                    ? [result.Hotel.ImageUrls[0]] 
+                                    : ["https://picsum.photos/800/600?random=1"]
                             }
                         },
                         Quantity = 1,

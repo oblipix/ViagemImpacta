@@ -26,6 +26,10 @@ const createMarkerIcon = (color) => {
 function HotelsMapSection({ isLoaded }) {
   const navigate = useNavigate();
   const { hotels, loading, error } = useHotels();
+
+  // Debug do Google Maps
+  console.log('🗺️ HotelsMapSection - isLoaded:', isLoaded);
+  console.log('🗺️ HotelsMapSection - hotels count:', hotels.length);
  
   // Estado para controlar o centro do mapa e o zoom
   const [mapCenter, setMapCenter] = useState(defaultCenter);
@@ -103,6 +107,14 @@ function HotelsMapSection({ isLoaded }) {
  
             {/* Coluna da Direita: Mapa */}
             <div className="w-full md:w-2/3 rounded-lg overflow-hidden shadow-xl">
+              {!isLoaded && (
+                <div className="bg-gray-100 w-full h-[450px] flex items-center justify-center text-gray-600">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p>Carregando mapa...</p>
+                  </div>
+                </div>
+              )}
               {isLoaded ? (
                 <GoogleMap
                   mapContainerStyle={mapContainerStyle}
