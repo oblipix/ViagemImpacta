@@ -113,6 +113,7 @@ builder.Services.AddScoped<IHotelMappingService, HotelMappingService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<StripeService>();
+builder.Services.AddScoped<PromotionService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddAutoMapper(typeof(HotelProfile).Assembly, typeof(UserProfile).Assembly, typeof(ReservationProfile).Assembly);
