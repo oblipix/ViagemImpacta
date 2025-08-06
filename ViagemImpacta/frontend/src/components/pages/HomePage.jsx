@@ -78,7 +78,7 @@ function HomePage() {
       
       {/* Newsletter surge de baixo */}
       <ScrollReveal animation="fadeUp" delay={400}>
-        <NewsletterSection />
+        <NewsLetterSection />
       </ScrollReveal>
     </>
   );
