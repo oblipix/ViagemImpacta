@@ -186,6 +186,9 @@
         margin: 4px auto 8px auto !important;
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1) !important;
         border-radius: 12px !important;
+        max-width: 350px !important;
+        width: 100% !important;
+        display: block !important;
     }
     
     /* Blog Cards Mobile Improvements */
