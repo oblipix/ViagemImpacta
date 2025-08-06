@@ -129,6 +129,7 @@ namespace ViagemImpacta.Controllers.MvcControllers
 
         public async Task<IActionResult> Delete(int id)
         {
+
             if (id == null)
             {
                  return BadRequest();
@@ -146,13 +147,19 @@ namespace ViagemImpacta.Controllers.MvcControllers
             if (id == null)
             {
                 return BadRequest();
-            }
+            } 
             var promotion = await _service.GetPromotionByIdAsync(id);
             if (promotion == null)
-                return NotFound();
-
-            var result = await _service.SoftDeletePromotion(id);
-            return View(promotion);
+            return NotFound();
+            try
+            {
+                var result = await _service.SoftDeletePromotion(id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception e)
+            {
+                return View(promotion);
+            }       
         }
     }
 }
