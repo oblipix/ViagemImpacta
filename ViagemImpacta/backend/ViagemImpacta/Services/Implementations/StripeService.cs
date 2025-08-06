@@ -70,7 +70,7 @@ namespace ViagemImpacta.Services.Implementations
                 },
                 Mode = "payment",
                 PaymentMethodTypes = ["card", "boleto"],
-                SuccessUrl = $"{_frontendSettings.BaseUrl}/confirm-reservation?session_id={{CHECKOUT_SESSION_ID}}",
+                SuccessUrl = $"{_frontendSettings.BaseUrl}/payment-success?session_id={{CHECKOUT_SESSION_ID}}",
                 CancelUrl = $"{_frontendSettings.BaseUrl}/hoteis",
                 ExpiresAt = DateTime.UtcNow + TimeSpan.FromMinutes(45),
             };

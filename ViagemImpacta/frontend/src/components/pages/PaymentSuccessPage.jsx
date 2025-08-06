@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import API_CONFIG from '../../config/apiConfig.js';
 
 const PaymentSuccessPage = () => {
   const navigate = useNavigate();
@@ -9,6 +10,8 @@ const PaymentSuccessPage = () => {
   const { isLoggedIn, currentUser } = useAuth();
   const [countdown, setCountdown] = useState(30); // Aumentado para 30 segundos
   const [confetti, setConfetti] = useState([]);
+  const [reservationConfirmed, setReservationConfirmed] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState("Confirmando sua reserva...");
   const confettiContainerRef = useRef(null);
 
   // Verificar autenticação, mas permitir que a página seja carregada mesmo sem autenticação
@@ -22,6 +25,23 @@ const PaymentSuccessPage = () => {
       return;
     }
   }, [isLoggedIn, navigate, searchParams]);
+
+  // Confirmar reserva quando houver sessionId
+  useEffect(() => {
+    const sessionId = searchParams.get('session_id');
+    if (sessionId) {
+      fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.STRIPE}/confirm-reservation?sessionId=${sessionId}`)
+        .then(response => response.text())
+        .then(text => {
+          setConfirmationMessage(text);
+          setReservationConfirmed(true);
+        })
+        .catch(error => {
+          console.error("Erro ao confirmar a reserva:", error);
+          setConfirmationMessage("Erro ao confirmar a reserva. Tente novamente mais tarde.");
+        });
+    }
+  }, [searchParams]);
 
   // Removido o redirecionamento automático para a página de profile
   // Mantendo o contador apenas como efeito visual
@@ -201,6 +221,26 @@ const PaymentSuccessPage = () => {
         <h1 className="text-4xl font-extrabold text-blue-800 mb-4 animate-bounce-slow">
           Uhuuul! Tudo Pronto Para Sua Viagem!
         </h1>
+
+        {/* Reservation Confirmation Status */}
+        {searchParams.get('session_id') && (
+          <div className={`mb-6 p-4 rounded-lg border ${
+            reservationConfirmed 
+              ? 'bg-green-50 border-green-200 text-green-800' 
+              : 'bg-blue-50 border-blue-200 text-blue-800'
+          }`}>
+            <div className="flex items-center justify-center">
+              {reservationConfirmed ? (
+                <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <div className="w-6 h-6 mr-2 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              )}
+              <span className="font-medium">{confirmationMessage}</span>
+            </div>
+          </div>
+        )}
         
         <p className="text-xl text-gray-700 mb-6">
           Olá, <span className="font-bold text-blue-600">{currentUser?.FirstName || currentUser?.firstName || 'Viajante Especial'}</span>! 
