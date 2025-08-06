@@ -179,17 +179,21 @@
     
     /* Promotions section mobile improvements */
 section[id*="promocoes"] .swiper {
-        padding: 12px 8px 48px 8px !important; /* Mais espaço embaixo para mostrar o card e botão */
+        padding: 12px 8px 64px 8px !important; /* Espaço extra para não ser "comido" pela próxima seção */
         overflow: visible !important;
+        min-height: 480px !important;
     }
     
 section[id*="promocoes"] .swiper-slide {
         display: flex !important;
         justify-content: center !important;
         align-items: flex-start !important;
-        width: 100% !important;
-        padding-bottom: 32px !important; /* Espaço extra para o botão */
+        width: 100vw !important;
+        min-width: 100vw !important;
+        max-width: 100vw !important;
+        padding-bottom: 40px !important; /* Espaço extra para o botão */
         box-sizing: border-box !important;
+        overflow: visible !important;
     }
 section[id*="promocoes"] .swiper-slide .hotel-card-modern {
         margin: 4px auto 0 auto !important;
@@ -199,6 +203,7 @@ section[id*="promocoes"] .swiper-slide .hotel-card-modern {
         width: 80vw !important;
         min-width: 260px !important;
         display: block !important;
+        align-self: center !important;
     }
     
     /* Blog Cards Mobile Improvements */
