@@ -16,6 +16,7 @@ namespace ViagemImpacta.Repositories
         public IPasswordResetTokenRepository PasswordResetTokens { get; set; }
         public IPromotionRepository Promotions { get; private set; }
         public IRoomsPromotionalRepository RoomsPromotions { get; private set; }
+        public IReviewRepository Reviews { get; private set; }
         public UnitOfWork(AgenciaDbContext context, ILoggerFactory loggerFactory)
         {
             _context = context;
@@ -28,6 +29,7 @@ namespace ViagemImpacta.Repositories
             PasswordResetTokens = new PasswordResetTokenRepository(_context);
             Promotions = new PromotionRepository(_context);
             RoomsPromotions = new RoomsPromotionalRepository(_context);
+            Reviews = new ReviewRepository(_context);
         }
 
         public async Task<bool> CommitAsync()

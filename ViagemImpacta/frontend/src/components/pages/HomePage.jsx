@@ -10,7 +10,7 @@ import HomeMenu from '../layout/HomeMenu.jsx';
 import SearchHotelsBar from '../common/SearchHotelsBar.jsx';
 import BlogSection from '../blog/BlogSection.jsx';
 import HotelsMapSection from '../hotels/HotelsMapSection.jsx';
-import NewsletterSection from '../pages/NewsletterSection.jsx';
+import NewsletterSection from './NewsletterSection.jsx';
 import PromocoesDestaque from '../hotels/PromocoesDestaque.jsx';
 import RecommendedHotelsSection from '../hotels/RecommendedHotelsSection.jsx';
 
