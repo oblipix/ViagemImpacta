@@ -1,6 +1,6 @@
 // src/services/paymentService.js
 
-const API_BASE_URL = 'https://tripzback.azurewebsites.net';
+import API_CONFIG from '../config/apiConfig.js';
 
 /**
  * Serviço para gerenciar operações relacionadas a pagamentos
@@ -19,7 +19,7 @@ class PaymentService {
       const token = localStorage.getItem('authToken');
       console.log('Auth token exists:', !!token);
       
-      const response = await fetch(`https://tripzback.azurewebsites.net/api/Stripe/checkout?id=${reservationId}`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.STRIPE}/checkout?id=${reservationId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ class PaymentService {
   async processReservationAndPayment(reservationData) {
     try {
       // Primeiro, criar a reserva
-      const reservationResponse = await fetch(`${API_BASE_URL}/reservations`, {
+      const reservationResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.RESERVATIONS}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

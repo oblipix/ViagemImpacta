@@ -1,5 +1,6 @@
 import { useState, useEffect} from 'react';
 import PaymentSuccessPage from './PaymentSuccessPage.jsx'; // Importando a página de sucesso de pagamento
+import API_CONFIG from '../../config/apiConfig.js';
 
 function ConfirmReservation() {
     const [statusMessage, setStatusMessage] = useState("Confirmando sua Reserva");
@@ -11,7 +12,7 @@ function ConfirmReservation() {
             return;
         }
 
-        fetch(`https://tripzback.azurewebsites.net/api/stripe/confirm-reservation?sessionId=${sessionId}`)
+        fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.STRIPE}/confirm-reservation?sessionId=${sessionId}`)
             .then(response => response.text())
             .then(text => {setStatusMessage(text); })
             .catch(error => {

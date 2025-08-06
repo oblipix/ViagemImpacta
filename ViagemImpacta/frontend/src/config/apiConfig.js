@@ -19,7 +19,7 @@ export const API_CONFIG = {
     AUTH: '/auth',
     USERS: '/users',
     REVIEWS: '/reviews',
-    STRIPE: '/stripe'
+    STRIPE: '/Stripe'
   },
   HEADERS: {
     'Content-Type': 'application/json',
