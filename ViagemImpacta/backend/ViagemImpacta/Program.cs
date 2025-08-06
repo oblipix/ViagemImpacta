@@ -103,6 +103,7 @@ builder.Services.AddDbContext<AgenciaDbContext>(options =>
 
 builder.Services.Configure<StripeModel>(builder.Configuration.GetSection("StripeSettings"));
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
+builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("FrontendSettings"));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IHotelService, HotelService>();

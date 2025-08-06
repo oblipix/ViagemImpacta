@@ -11,11 +11,13 @@ namespace ViagemImpacta.Services.Implementations
     public class StripeService
     {
         public readonly StripeModel _model;
+        private readonly FrontendSettings _frontendSettings;
         private readonly IUnitOfWork _unitOfWork;
 
-        public StripeService(IOptions<StripeModel> model, IUnitOfWork unitOfWork)
+        public StripeService(IOptions<StripeModel> model, IOptions<FrontendSettings> frontendSettings, IUnitOfWork unitOfWork)
         {
             _model = model.Value;
+            _frontendSettings = frontendSettings.Value;
             _unitOfWork = unitOfWork;
         }
 
@@ -68,8 +70,8 @@ namespace ViagemImpacta.Services.Implementations
                 },
                 Mode = "payment",
                 PaymentMethodTypes = ["card", "boleto"],
-                SuccessUrl = "http://localhost:5173/confirm-reservation?session_id={CHECKOUT_SESSION_ID}",
-                CancelUrl = "http://localhost:5173/hoteis",
+                SuccessUrl = $"{_frontendSettings.BaseUrl}/confirm-reservation?session_id={{CHECKOUT_SESSION_ID}}",
+                CancelUrl = $"{_frontendSettings.BaseUrl}/hoteis",
                 ExpiresAt = DateTime.UtcNow + TimeSpan.FromMinutes(45),
             };
 
