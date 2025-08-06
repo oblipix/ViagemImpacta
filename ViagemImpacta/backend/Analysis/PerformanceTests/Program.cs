@@ -1,21 +1,33 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Net;
 
 namespace PerformanceTests;
 
 public class Program
 {
-    private static readonly HttpClient _httpClient = new();
+    private static readonly HttpClient _httpClient = new HttpClient()
+    {
+        Timeout = TimeSpan.FromSeconds(30) // Timeout para evitar travamentos
+    };
     private static ILogger<Program>? _logger;
-    private static readonly string _baseUrl = "http://localhost:5155";
+    private static IConfiguration? _config;
+    private static string _baseUrl = "http://localhost:5155";
+    private static int _concurrentUsers = 500;
+    private static int _testDurationMinutes = 1;
 
     public static async Task Main(string[] args)
     {
-        // Configurar logging
+        // Configurar logging e configurações
         using var host = Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            })
             .ConfigureServices(services =>
             {
                 services.AddLogging(builder =>
@@ -27,12 +39,18 @@ public class Program
             .Build();
 
         _logger = host.Services.GetRequiredService<ILogger<Program>>();
+        _config = host.Services.GetRequiredService<IConfiguration>();
+
+        // Carregar configurações
+        _baseUrl = _config["PerformanceTest:BaseUrl"] ?? _baseUrl;
+        _concurrentUsers = _config.GetValue<int>("PerformanceTest:ConcurrentUsers", 500);
+        _testDurationMinutes = _config.GetValue<int>("PerformanceTest:TestDurationMinutes", 1);
 
         Console.WriteLine("🚀 VIAGEM IMPACTA - TESTE DE PERFORMANCE SISTEMA DE BUSCA");
         Console.WriteLine("================================================================");
         Console.WriteLine($"🎯 Target: {_baseUrl}");
-        Console.WriteLine($"👥 Simulating: 50 concurrent users");
-        Console.WriteLine($"⏱️  Duration: 2 minutes");
+        Console.WriteLine($"👥 Simulating: {_concurrentUsers} concurrent users");
+        Console.WriteLine($"⏱️  Duration: {_testDurationMinutes} minute(s)");
         Console.WriteLine("================================================================\n");
 
         // Verificar se a API está rodando
@@ -46,7 +64,7 @@ public class Program
         Console.WriteLine("🔥 FASE 1: Teste de Aquecimento (Warm-up)");
         await WarmUpTest();
 
-        Console.WriteLine("\n💥 FASE 2: Teste de Carga (50 usuários simultâneos)");
+        Console.WriteLine("\n💥 FASE 2: Teste de Carga ({0} usuários simultâneos)", _concurrentUsers);
         await LoadTest();
 
         Console.WriteLine("\n🚨 FASE 3: Teste de Sobrecarga (Overload)");
@@ -97,14 +115,14 @@ public class Program
         var results = new List<TestResult>();
         var stopwatch = Stopwatch.StartNew();
 
-        _logger?.LogInformation("💥 Iniciando teste de carga: 50 usuários simultâneos por 2 minutos...");
+        _logger?.LogInformation("💥 Iniciando teste de carga: {Users} usuários simultâneos por {Minutes} minuto(s)...", _concurrentUsers, _testDurationMinutes);
 
-        // Executa por 2 minutos
-        var endTime = DateTime.Now.AddMinutes(2);
+        // Executa por tempo configurado
+        var endTime = DateTime.Now.AddMinutes(_testDurationMinutes);
         var tasks = new List<Task>();
 
-        // Cria 50 "usuários" simultâneos
-        for (int userId = 1; userId <= 50; userId++)
+        // Cria usuários simultâneos configurados
+        for (int userId = 1; userId <= _concurrentUsers; userId++)
         {
             var userTask = SimulateUser(userId, endpoints, endTime, results);
             tasks.Add(userTask);
@@ -122,12 +140,13 @@ public class Program
         var endpoints = GetTestEndpoints();
         var results = new List<TestResult>();
 
-        _logger?.LogInformation("🚨 Iniciando teste de sobrecarga: 100 requests simultâneos...");
+        var overloadRequests = _config?.GetValue<int>("PerformanceTest:OverloadRequests", 200) ?? 200;
+        _logger?.LogInformation("🚨 Iniciando teste de sobrecarga: {Requests} requests simultâneos...", overloadRequests);
 
         var tasks = new List<Task<TestResult>>();
 
-        // 100 requests simultâneos para causar overload
-        for (int i = 1; i <= 100; i++)
+        // Requests simultâneos para causar overload
+        for (int i = 1; i <= overloadRequests; i++)
         {
             var endpoint = endpoints[Random.Shared.Next(endpoints.Length)];
             var requestId = i; // Captura o valor atual
@@ -160,8 +179,10 @@ public class Program
                     userResults.Add(result);
                 }
 
-                // Simula comportamento humano - pausa entre requests
-                var delay = Random.Shared.Next(500, 2000); // 0.5 a 2 segundos
+                // Simula comportamento humano - pausa entre requests (mais agressivo para 500 usuários)
+                var minDelay = _config?.GetValue<int>("PerformanceTest:UserDelayMinMs", 200) ?? 200;
+                var maxDelay = _config?.GetValue<int>("PerformanceTest:UserDelayMaxMs", 1000) ?? 1000;
+                var delay = Random.Shared.Next(minDelay, maxDelay);
                 await Task.Delay(delay);
             }
             catch (Exception ex)

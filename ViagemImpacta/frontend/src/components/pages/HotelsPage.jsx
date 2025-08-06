@@ -11,7 +11,7 @@ import HeroSwiper from '../layout/HeroSwiper.jsx';
 import HomeMenu from '../layout/HomeMenu.jsx';
  
 import SearchHotelsBar from '../common/SearchHotelsBar.jsx';
-import HotelCard from '../hotels/HotelCard.jsx';
+import SearchHotelCard from '../hotels/SearchHotelCard.jsx'; // Card especializado para busca
 import HotelCardSkeleton from '../common/HotelCardSkeleton.jsx';
 import { useHotels } from '../hooks/useHotels.js';
 import hotelService from '../../services/hotelService';
@@ -204,7 +204,7 @@ function HotelsPage() {
               {currentHotelsPaginated.map((hotel, index) => (
                 <AnimatedHotelCard key={hotel.id} index={index}>
                   <div className="card-spacing">
-                    <HotelCard hotel={hotel} />
+                    <SearchHotelCard hotel={hotel} />
                   </div>
                 </AnimatedHotelCard>
               ))}

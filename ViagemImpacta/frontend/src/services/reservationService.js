@@ -289,8 +289,8 @@ class ReservationService {
       const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
       const subtotal = dailyPrice * daysDiff;
-      const taxes = subtotal * 0.1; // 10% de taxas
-      const total = subtotal + taxes;
+      const taxes = 0; // Taxa removida conforme solicitado
+      const total = subtotal; // Total sem taxa adicional
 
       return {
         days: daysDiff,
