@@ -1,7 +1,7 @@
 // src/services/reviewService.js
 
 // URL base da sua API .NET - usando a mesma URL que funciona no reservationService
-const API_URL = 'https://localhost:7010/api';
+const API_URL = 'https://tripzback.azurewebsites.net';
 
 // Função para obter o token do localStorage
 const getAuthToken = () => {

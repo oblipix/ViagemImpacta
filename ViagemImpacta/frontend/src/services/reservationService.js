@@ -1,6 +1,7 @@
+/* eslint-disable no-dupe-class-members */
 // src/services/reservationService.js
 
-const API_BASE_URL = 'https://localhost:7010/api';
+const API_BASE_URL = 'https://tripzback.azurewebsites.net';
 
 /**
  * Serviço para gerenciar operações relacionadas a reservas

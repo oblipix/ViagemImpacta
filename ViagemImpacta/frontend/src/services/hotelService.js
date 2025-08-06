@@ -1,6 +1,6 @@
 // src/services/hotelService.js
  
-const API_BASE_URL = 'https://localhost:7010/api';
+const API_BASE_URL = 'https://tripzback.azurewebsites.net';
 import axios from 'axios';
  
 /**
