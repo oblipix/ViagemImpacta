@@ -246,7 +246,7 @@ class HotelService {
     return {
       id: backendHotel.hotelId || backendHotel.HotelId,
       title: backendHotel.name || backendHotel.Name,
-      description: backendHotel.description || backendHotel.Description,
+      description: backendHotel.description || backendHotel.Description || this.generateDescription(backendHotel),
       location: `${backendHotel.city || backendHotel.City}, Brasil`,
       price: this.generatePrice(backendHotel),
       rating: this.generateRating(backendHotel),
@@ -392,14 +392,14 @@ class HotelService {
   generateImageUrl(hotel) {
     // Primeira tentativa: mainImageUrl
     if (hotel.mainImageUrl && hotel.mainImageUrl.trim() !== '') {
-      return hotel.mainImageUrl;
+      return this.convertPostImgUrl(hotel.mainImageUrl);
     }
     
     // Segunda tentativa: imageUrls (minúsculo)
     if (hotel.imageUrls && Array.isArray(hotel.imageUrls) && hotel.imageUrls.length > 0) {
       const firstImage = hotel.imageUrls.find(url => url && url.trim() !== '');
       if (firstImage) {
-        return firstImage;
+        return this.convertPostImgUrl(firstImage);
       }
     }
     
@@ -407,12 +407,27 @@ class HotelService {
     if (hotel.ImageUrls && Array.isArray(hotel.ImageUrls) && hotel.ImageUrls.length > 0) {
       const firstImage = hotel.ImageUrls.find(url => url && url.trim() !== '');
       if (firstImage) {
-        return firstImage;
+        return this.convertPostImgUrl(firstImage);
       }
     }
     
-    // Fallback simples
-    return '/images/hotel-placeholder.jpg';
+    // Fallback: imagem padrão local ou Unsplash
+    return `https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop&crop=center&q=80`;
+  }
+
+  /**
+   * Converte URLs do PostImg para URLs diretas de imagem
+   */
+  convertPostImgUrl(url) {
+    if (url.includes('postimg.cc')) {
+      // Extrai o ID da imagem do PostImg
+      const match = url.match(/postimg\.cc\/([a-zA-Z0-9]+)/);
+      if (match && match[1]) {
+        // Converte para URL direta da imagem
+        return `https://i.postimg.cc/${match[1]}/image.jpg`;
+      }
+    }
+    return url;
   }
  
   /**
@@ -436,7 +451,7 @@ class HotelService {
         if (url && url.trim() !== '') {
           images.push({
             id: `hotel-${hotel.hotelId || hotel.HotelId}-img-${index}`,
-            url: url,
+            url: this.convertPostImgUrl(url),
             alt: `${hotel.name || hotel.Name} - Imagem ${index + 1}`
           });
         }
