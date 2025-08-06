@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useHotels } from '../hooks/useHotels.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { reviewService } from '../../services/reviewService';
 import ImageModal from '../common/ImageModal.jsx';
 import ReservationModal from '../modals/ReservationModal.jsx';
-import { Icons } from '../layout/Icons.jsx'; // Importando os ícones centralizados
-import '../styles/HotelDetailsPage.css'; // Importando o CSS específico para esta página
- 
+import { Icons } from '../layout/Icons.jsx';
+import '../styles/HotelDetailsPage.css';
+
 // Importa o carrossel e seus estilos
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
- 
- 
+
+
 // Componente para renderizar estrelas de avaliação
 const RatingDisplay = ({ rating }) => {
     const fullStars = Math.floor(rating);
@@ -24,7 +25,7 @@ const RatingDisplay = ({ rating }) => {
         </div>
     );
 };
- 
+
 // Componente personalizado para ícone de xícara (café/restaurante)
 const CoffeeIcon = () => (
     <svg className="h-5 w-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -65,7 +66,6 @@ const PetIcon = () => (
 
 // Mapeamento de nomes de comodidades para componentes de ícone
 const leisureIconMap = {
-    // Amenidades de lazer
     'Piscina': Icons.Pool,
     'Academia': Icons.Gym,
     'Spa': Icons.Spa,
@@ -90,19 +90,17 @@ const leisureIconMap = {
     'Sala de Reuniões': Icons.Lounge,
     'Business Center': Icons.Lounge,
     'Salão de Festas': Icons.Lounge,
-    
-    // Serviços
     'Wi-Fi Grátis': Icons.Wifi,
     'Wi-Fi': Icons.Wifi,
     'Internet': Icons.Wifi,
-    'Estacionamento': Icons.TotalRooms, // Usando TotalRooms como ícone para estacionamento (parece com vagas de estacionamento)
+    'Estacionamento': Icons.TotalRooms,
     'Estacionamento Grátis': Icons.TotalRooms,
     'Serviço de Quarto': BroomIcon, 
     'Acessibilidade': Icons.User,
     'Pet Friendly': PetIcon,
     'Aceita Animais': PetIcon,
     'Aceita Pets': PetIcon,
-    'Café da Manhã Incluso': CoffeeIcon, // Usando ícone de xícara para café da manhã
+    'Café da Manhã Incluso': CoffeeIcon,
     'Café da Manhã': CoffeeIcon,
     'Recepção 24h': Icons.User,
     'Recepção': Icons.User,
@@ -116,8 +114,6 @@ const leisureIconMap = {
     'Vista para o Mar': Icons.Location,
     'Serviço de Concierge': Icons.User,
     'Concierge': Icons.User,
-    
-    // Variações comuns
     'estacionamento': Icons.TotalRooms,
     'restaurante': CoffeeIcon,
     'quarto': Icons.RoomType,
@@ -131,13 +127,13 @@ const leisureIconMap = {
     'pet': PetIcon,
     'animais': PetIcon
 };
- 
+
 function HotelDetailsPage() {
     const { hotelId } = useParams();
     const navigate = useNavigate();
     const { getHotelById } = useHotels();
     const { isLoggedIn, currentUser } = useAuth();
-   
+    
     const [hotel, setHotel] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -145,10 +141,13 @@ function HotelDetailsPage() {
     const [modalImages, setModalImages] = useState([]);
     const [initialImageId, setInitialImageId] = useState(null);
     
-    // Estados para o modal de reserva
+    const [reviews, setReviews] = useState([]);
+    const [reviewsLoading, setReviewsLoading] = useState(false);
+    const [reviewsError, setReviewsError] = useState(null);
+    
     const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
- 
+
     useEffect(() => {
         const loadHotel = async () => {
             try {
@@ -161,12 +160,39 @@ function HotelDetailsPage() {
                 setLoading(false);
             }
         };
- 
+
         if (hotelId) {
             loadHotel();
         }
     }, [hotelId, getHotelById]);
- 
+
+    const loadReviews = async () => {
+        if (!hotelId || !isLoggedIn) return;
+        
+        try {
+            setReviewsLoading(true);
+            setReviewsError(null);
+            const reviewData = await reviewService.getHotelReviews(parseInt(hotelId));
+            
+            const reviewsArray = reviewData.reviews || [];
+
+            
+            setReviews(reviewsArray);
+        } catch (error) {
+            console.error('Erro ao carregar reviews:', error);
+            setReviewsError('Erro ao carregar avaliações');
+            setReviews([]);
+        } finally {
+            setReviewsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (hotel && isLoggedIn) {
+            loadReviews();
+        }
+    }, [hotel, isLoggedIn, hotelId]);
+
     if (loading) {
         return (
             <div className="container mx-auto py-8 px-6 text-center">
@@ -175,7 +201,7 @@ function HotelDetailsPage() {
             </div>
         );
     }
- 
+
     if (error || !hotel) {
         return (
             <div className="container mx-auto py-8 px-6 text-center">
@@ -187,29 +213,23 @@ function HotelDetailsPage() {
             </div>
         );
     }
- 
+
     const handleImageClick = (imagesArray, clickedImageId) => {
         setModalImages(imagesArray);
         setInitialImageId(clickedImageId);
         setIsModalOpen(true);
     };
- 
+
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
 
-    // Funções para o modal de reserva
     const handleReserveRoom = (room) => {
-        // Verifica se o usuário está logado
         if (!isLoggedIn) {
             alert('Você precisa estar logado para fazer uma reserva. Redirecionando para o login...');
             navigate('/login');
             return;
         }
-
-        console.log('Selected room data:', room);
-        console.log('Hotel data:', hotel);
-        console.log('Current user:', currentUser);
         setSelectedRoom(room);
         setIsReservationModalOpen(true);
     };
@@ -221,54 +241,53 @@ function HotelDetailsPage() {
 
     const handleReservationSuccess = (reservation) => {
         alert(`Reserva criada com sucesso! ID: ${reservation.id}`);
-        // Aqui você pode redirecionar para uma página de confirmação ou atualizar a UI
         console.log('Reserva criada:', reservation);
     };
- 
-    // Configurações do Carrossel de Feedbacks
+
+    // CORREÇÃO: Lógica do carrossel refeita para ser dinâmica e robusta.
+    const numReviews = reviews.length;
+    const slidesToShowDesktop = Math.min(numReviews, 2);
+    const slidesToShowTablet = Math.min(numReviews, 2);
+    const slidesToShowMobile = 1;
+
     const sliderSettings = {
         dots: true,
-        infinite: true,
         speed: 500,
-        slidesToShow: 1,
+        infinite: numReviews > slidesToShowMobile,
+        arrows: numReviews > slidesToShowMobile,
+        slidesToShow: slidesToShowMobile,
         slidesToScroll: 1,
-        autoplay: true,
+        autoplay: numReviews > 1,
         autoplaySpeed: 5000,
-        arrows: true,
         responsive: [
             {
                 breakpoint: 1024,
                 settings: {
-                    slidesToShow: 2,
+                    slidesToShow: slidesToShowDesktop,
                     slidesToScroll: 1,
+                    infinite: numReviews > slidesToShowDesktop,
+                    arrows: numReviews > slidesToShowDesktop,
                 }
             },
             {
                 breakpoint: 768,
                 settings: {
-                    slidesToShow: 1,
+                    slidesToShow: slidesToShowTablet,
                     slidesToScroll: 1,
-                }
-            },
-            {
-                breakpoint: 640,
-                settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1
+                    infinite: numReviews > slidesToShowTablet,
+                    arrows: numReviews > slidesToShowTablet,
                 }
             }
         ]
     };
- 
+
     return (
         <div className="container mx-auto py-4 sm:py-8 px-4 sm:px-6">
             <button onClick={() => navigate(-1)} className="main-action-button bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-3 sm:px-4 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center mb-6 sm:mb-8 text-sm sm:text-base">
-                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 Voltar
             </button>
- 
+
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div className="relative">
                     <img
@@ -293,13 +312,11 @@ function HotelDetailsPage() {
                         <h3 className="text-blue-800 font-semibold mb-2 text-sm sm:text-base">Sobre o hotel</h3>
                         <p className="text-sm sm:text-base">{hotel.description}</p>
                     </div>
- 
+
                     {hotel.galleryImages && hotel.galleryImages.length > 0 && (
                         <div className="mb-6 sm:mb-8">
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
+                                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 Galeria de Fotos
                             </h2>
                             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
@@ -316,38 +333,15 @@ function HotelDetailsPage() {
                             </div>
                         </div>
                     )}
- 
-                    {/* Seção "O que o hotel oferece" com design melhorado */}
+
                     <div className="my-6 sm:my-8 py-4 sm:py-6 border-t border-b border-gray-200">
                         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
-                            <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
+                            <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                             O que o hotel oferece
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-gray-700">
                             {hotel.leisureFacilities.map((facility, index) => {
-                                // Logs para debug - ver no console quais facilidades estão sendo recebidas
-                                console.log(`Facility: "${facility}"`, leisureIconMap[facility] ? "has icon" : "no icon");
-                                
-                                // Tenta encontrar o ícone pelo nome exato ou por uma variação comum
-                                let IconComponent = leisureIconMap[facility];
-                                
-                                // Se não encontrar o ícone, escolhe um adequado baseado em palavras-chave
-                                if (!IconComponent) {
-                                    const facilityLower = facility.toLowerCase();
-                                    if (facilityLower.includes('estacionamento')) IconComponent = Icons.TotalRooms;
-                                    else if (facilityLower.includes('restaurante') || facilityLower.includes('refeição')) IconComponent = CoffeeIcon;
-                                    else if (facilityLower.includes('café') || facilityLower.includes('cafe')) IconComponent = CoffeeIcon;
-                                    else if (facilityLower.includes('serviço de quarto') || facilityLower.includes('limpeza')) IconComponent = BroomIcon;
-                                    else if (facilityLower.includes('jardim') || facilityLower.includes('flor')) IconComponent = FlowerIcon;
-                                    else if (facilityLower.includes('pet') || facilityLower.includes('animal') || facilityLower.includes('cachorro') || facilityLower.includes('gato')) IconComponent = PetIcon;
-                                    else if (facilityLower.includes('quarto')) IconComponent = Icons.RoomType;
-                                    else if (facilityLower.includes('piscina')) IconComponent = Icons.Pool;
-                                    else if (facilityLower.includes('wi-fi') || facilityLower.includes('wifi') || facilityLower.includes('internet')) IconComponent = Icons.Wifi;
-                                    else IconComponent = Icons.User; // Fallback padrão
-                                }
-                                
+                                let IconComponent = leisureIconMap[facility.toLowerCase()] || leisureIconMap[facility] || Icons.User;
                                 return (
                                     <div key={index} className="flex items-center bg-gray-100 border border-gray-200 p-3 sm:p-4 rounded-lg sm:rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:border-blue-300">
                                         <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 text-blue-600 flex-shrink-0" />
@@ -357,13 +351,11 @@ function HotelDetailsPage() {
                             })}
                         </div>
                     </div>
- 
+
                     {hotel.roomOptions?.length > 0 && (
                         <div className="mb-6 sm:mb-8">
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
-                                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                                </svg>
+                                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                                 Opções de Quartos
                             </h2>
                             <div className="space-y-4 sm:space-y-6">
@@ -373,32 +365,15 @@ function HotelDetailsPage() {
                                             <h3 className="text-lg sm:text-xl font-semibold text-gray-800 group-hover:text-blue-700 transition-colors duration-300">{room.type}</h3>
                                             <p className="text-gray-600 text-sm mt-2">{room.description}</p>
                                             <div className="mt-3 flex flex-wrap gap-2">
-                                                <span className="inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                                                    </svg>
-                                                    Café da manhã
-                                                </span>
-                                                <span className="inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                                                    </svg>
-                                                    Wi-Fi grátis
-                                                </span>
+                                                <span className="inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"><svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>Café da manhã</span>
+                                                <span className="inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"><svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>Wi-Fi grátis</span>
                                             </div>
                                         </div>
                                         <div className="w-full lg:w-auto lg:ml-6 flex flex-col lg:flex-col items-center lg:items-end">
                                             <div className="bg-blue-600 text-white font-bold text-lg sm:text-xl lg:text-2xl px-3 py-2 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl mb-3 shadow-md">
                                                 R$ {room.price.toFixed(2).replace('.', ',')}
                                             </div>
-                                            <button
-                                                onClick={() => handleReserveRoom(room)}
-                                                className={`reservation-button font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg sm:rounded-xl transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 text-sm sm:text-base w-full lg:w-auto ${
-                                                    isLoggedIn 
-                                                        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                                                        : 'bg-gray-400 hover:bg-gray-500 text-white'
-                                                }`}
-                                            >
+                                            <button onClick={() => handleReserveRoom(room)} className={`reservation-button font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg sm:rounded-xl transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 text-sm sm:text-base w-full lg:w-auto ${isLoggedIn ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-400 hover:bg-gray-500 text-white'}`}>
                                                 {isLoggedIn ? 'Reservar' : 'Fazer Login para Reservar'}
                                             </button>
                                         </div>
@@ -407,41 +382,67 @@ function HotelDetailsPage() {
                             </div>
                         </div>
                     )}
- 
-                    {/* Seção de Avaliações (Feedbacks) - Carrossel abaixo de Opções de Quartos */}
-                    {hotel.feedbacks && hotel.feedbacks.length > 0 && (
+
+                    {isLoggedIn && (
                         <div className="mb-6 sm:mb-8">
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
-                                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-                                </svg>
-                                O que os hóspedes dizem
+                                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                                Avaliações dos Hóspedes
+                                {reviews.length > 0 && (
+                                    <span className="ml-2 text-sm text-gray-500">({reviews.length} {reviews.length === 1 ? 'avaliação' : 'avaliações'})</span>
+                                )}
                             </h2>
-                            <div className="bg-gray-50 rounded-lg sm:rounded-2xl overflow-visible p-4 sm:p-6 md:p-8">
-                                <Slider {...sliderSettings}>
-                                    {hotel.feedbacks.map(feedback => (
-                                        <div key={feedback.id} className="p-2 sm:p-4">
-                                            <div className="feedback-bubble">
-                                                <div>
-                                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-                                                        <RatingDisplay rating={feedback.rating} />
-                                                        <span className="text-xs sm:text-sm font-semibold text-gray-700 bg-blue-50 py-1 px-2 sm:px-3 rounded-full self-start sm:self-auto">{feedback.guestName}</span>
+
+                            {reviewsLoading ? (
+                                <div className="bg-gray-50 rounded-lg p-8 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div><p className="text-gray-600">Carregando avaliações...</p></div>
+                            ) : reviewsError ? (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-4"><p className="text-red-600">{reviewsError}</p></div>
+                            ) : reviews.length > 0 ? (
+                                <div className="bg-gray-50 rounded-lg sm:rounded-2xl overflow-visible p-4 sm:p-6 md:p-8">
+                                    <Slider {...sliderSettings}>
+                                        {reviews.map(review => (
+                                            <div key={review.reviewID} className="p-2 sm:p-4">
+                                                <div className="feedback-bubble">
+                                                    <div>
+                                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+                                                            <RatingDisplay rating={review.rating} />
+                                                            <span className="text-xs sm:text-sm font-semibold text-gray-700 bg-blue-50 py-1 px-2 sm:px-3 rounded-full self-start sm:self-auto">Hóspede Verificado</span>
+                                                        </div>
+                                                        <p className="text-gray-600 italic text-sm sm:text-base leading-relaxed">"{review.comment}"</p>
                                                     </div>
-                                                    <p className="text-gray-600 italic text-sm sm:text-base leading-relaxed">"{feedback.comment}"</p>
-                                                </div>
-                                                <div className="text-right mt-3 sm:mt-4">
-                                                    <span className="text-xs text-gray-400">Data da estadia: Julho 2025</span>
+                                                    <div className="text-right mt-3 sm:mt-4">
+                                                        <span className="text-xs text-gray-400">
+                                                            {review.createdAt ? new Date(review.createdAt).toLocaleDateString('pt-BR') : 'Data não disponível'}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
-                                </Slider>
+                                        ))}
+                                    </Slider>
+                                </div>
+                            ) : (
+                                <div className="bg-gray-50 rounded-lg p-8 text-center"><svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg><p className="text-gray-600">Este hotel ainda não possui avaliações.</p><p className="text-gray-500 text-sm mt-2">Seja o primeiro a avaliar!</p></div>
+                            )}
+                        </div>
+                    )}
+
+                    {!isLoggedIn && (
+                        <div className="mb-6 sm:mb-8">
+                            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                                Avaliações dos Hóspedes
+                            </h2>
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                                <svg className="w-12 h-12 text-blue-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                <p className="text-blue-800 font-medium mb-2">Faça login para ver as avaliações</p>
+                                <p className="text-blue-600 text-sm">As avaliações reais dos hóspedes estão disponíveis apenas para usuários logados.</p>
+                                <button onClick={() => navigate('/login')} className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">Fazer Login</button>
                             </div>
                         </div>
                     )}
                 </div>
             </div>
- 
+
             {isModalOpen && (
                 <ImageModal
                     images={modalImages}
@@ -462,5 +463,5 @@ function HotelDetailsPage() {
         </div>
     );
 }
- 
+
 export default HotelDetailsPage;
