@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { EnvelopeIcon } from '@heroicons/react/24/outline';
-import '../styles/NewsletterSection.css'; // Mantenha a importação para outros estilos
+import '../styles/NewsLetterSection.css'; // Mantenha a importação para outros estilos
 
 const NewsletterSection = () => {
   const [email, setEmail] = useState('');
