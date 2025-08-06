@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { EnvelopeIcon } from '@heroicons/react/24/outline';
 import '../styles/NewsLetterSection.css'; // Mantenha a importação para outros estilos
 
-const NewsletterSection = () => {
+const NewsLetterSection = () => {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState('');
