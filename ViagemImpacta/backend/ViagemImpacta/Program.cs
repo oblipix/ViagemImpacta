@@ -130,7 +130,8 @@ builder.Services.AddCors(options =>
                 "http://localhost:5174",
                 "https://localhost:5174",
                 "http://localhost:4173",
-                "https://localhost:4173"
+                "https://localhost:4173",
+                "https://mango-mud-0485cd210.1.azurestaticapps.net"
               )
               .AllowAnyHeader()
               .AllowAnyMethod()
