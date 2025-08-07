@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Stripe;
-using Stripe.Checkout;
 using ViagemImpacta.Repositories;
 using ViagemImpacta.Services.Implementations;
 using ViagemImpacta.Services.Interfaces;
@@ -37,7 +35,7 @@ public class StripeController : ControllerBase
             var result = await _unitOfWork.Reservations.GetReservationById(id);
             if (result == null) return BadRequest($"Reserva com ID {id} não encontrada");
 
-            var url = _stripeService.CreateCheckout(result);
+            var url = await _stripeService.CreateCheckout(result);
             return Ok(new { url });
         }
         catch (Exception ex)
