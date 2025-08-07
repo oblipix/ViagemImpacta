@@ -7,13 +7,13 @@ import ImageModal from '../common/ImageModal.jsx';
 import ReservationModal from '../modals/ReservationModal.jsx';
 import { Icons } from '../layout/Icons.jsx';
 import '../styles/HotelDetailsPage.css';
- 
+
 // Importa o carrossel e seus estilos
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
- 
- 
+
+
 // Componente para renderizar estrelas de avaliação
 const RatingDisplay = ({ rating }) => {
     const fullStars = Math.floor(rating);
@@ -25,7 +25,7 @@ const RatingDisplay = ({ rating }) => {
         </div>
     );
 };
- 
+
 // Componente personalizado para ícone de xícara (café/restaurante)
 const CoffeeIcon = () => (
     <svg className="h-5 w-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -34,7 +34,7 @@ const CoffeeIcon = () => (
         <path d="M6 1v3M10 1v3M14 1v3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
 );
- 
+
 // Componente personalizado para ícone de vassoura (serviço de quarto/limpeza)
 const BroomIcon = () => (
     <svg className="h-5 w-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -42,7 +42,7 @@ const BroomIcon = () => (
         <path d="M8 13h8v5a2 2 0 01-2 2h-4a2 2 0 01-2-2v-5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
 );
- 
+
 // Componente personalizado para ícone de flor (jardim)
 const FlowerIcon = () => (
     <svg className="h-5 w-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -53,7 +53,7 @@ const FlowerIcon = () => (
         <path d="M12 4V23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
 );
- 
+
 // Componente personalizado para ícone de pet (pet friendly)
 const PetIcon = () => (
     <svg className="h-5 w-5 text-gray-500 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -63,7 +63,7 @@ const PetIcon = () => (
         <path d="M17 19.5C18.1 19.5 19 18.6 19 17.5C19 16.4 18.1 15.5 17 15.5C15.9 15.5 15 16.4 15 17.5C15 18.6 15.9 19.5 17 19.5Z" stroke="currentColor" strokeWidth="2" />
     </svg>
 );
- 
+
 // Mapeamento de nomes de comodidades para componentes de ícone
 const leisureIconMap = {
     'Piscina': Icons.Pool,
@@ -127,27 +127,27 @@ const leisureIconMap = {
     'pet': PetIcon,
     'animais': PetIcon
 };
- 
+
 function HotelDetailsPage() {
     const { hotelId } = useParams();
     const navigate = useNavigate();
     const { getHotelById } = useHotels();
     const { isLoggedIn, currentUser } = useAuth();
-   
+
     const [hotel, setHotel] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalImages, setModalImages] = useState([]);
     const [initialImageId, setInitialImageId] = useState(null);
-   
+
     const [reviews, setReviews] = useState([]);
     const [reviewsLoading, setReviewsLoading] = useState(false);
     const [reviewsError, setReviewsError] = useState(null);
-   
+
     const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
- 
+
     useEffect(() => {
         const loadHotel = async () => {
             try {
@@ -160,23 +160,23 @@ function HotelDetailsPage() {
                 setLoading(false);
             }
         };
- 
+
         if (hotelId) {
             loadHotel();
         }
     }, [hotelId, getHotelById]);
- 
+
     const loadReviews = async () => {
         if (!hotelId || !isLoggedIn) return;
-       
+
         try {
             setReviewsLoading(true);
             setReviewsError(null);
             const reviewData = await reviewService.getHotelReviews(parseInt(hotelId));
-           
+
             const reviewsArray = reviewData.reviews || [];
- 
-           
+
+
             setReviews(reviewsArray);
         } catch (error) {
             console.error('Erro ao carregar reviews:', error);
@@ -186,13 +186,13 @@ function HotelDetailsPage() {
             setReviewsLoading(false);
         }
     };
- 
+
     useEffect(() => {
         if (hotel && isLoggedIn) {
             loadReviews();
         }
     }, [hotel, isLoggedIn, hotelId]);
- 
+
     if (loading) {
         return (
             <div className="container mx-auto py-8 px-6 text-center">
@@ -201,7 +201,7 @@ function HotelDetailsPage() {
             </div>
         );
     }
- 
+
     if (error || !hotel) {
         return (
             <div className="container mx-auto py-8 px-6 text-center">
@@ -213,17 +213,17 @@ function HotelDetailsPage() {
             </div>
         );
     }
- 
+
     const handleImageClick = (imagesArray, clickedImageId) => {
         setModalImages(imagesArray);
         setInitialImageId(clickedImageId);
         setIsModalOpen(true);
     };
- 
+
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
- 
+
     const handleReserveRoom = (room) => {
         if (!isLoggedIn) {
             alert('Você precisa estar logado para fazer uma reserva. Redirecionando para o login...');
@@ -233,23 +233,23 @@ function HotelDetailsPage() {
         setSelectedRoom(room);
         setIsReservationModalOpen(true);
     };
- 
+
     const handleCloseReservationModal = () => {
         setIsReservationModalOpen(false);
         setSelectedRoom(null);
     };
- 
+
     const handleReservationSuccess = (reservation) => {
         alert(`Reserva criada com sucesso! ID: ${reservation.id}`);
         console.log('Reserva criada:', reservation);
     };
- 
+
     // CORREÇÃO: Lógica do carrossel refeita para ser dinâmica e robusta.
     const numReviews = reviews.length;
     const slidesToShowDesktop = Math.min(numReviews, 2);
     const slidesToShowTablet = Math.min(numReviews, 2);
     const slidesToShowMobile = 1;
- 
+
     const sliderSettings = {
         dots: true,
         speed: 500,
@@ -280,14 +280,14 @@ function HotelDetailsPage() {
             }
         ]
     };
- 
+
     return (
         <div className="container mx-auto py-4 sm:py-8 px-4 sm:px-6">
             <button onClick={() => navigate(-1)} className="main-action-button bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-3 sm:px-4 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center mb-6 sm:mb-8 text-sm sm:text-base">
                 <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 Voltar
             </button>
- 
+
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div className="relative">
                     <img
@@ -306,13 +306,13 @@ function HotelDetailsPage() {
                         </p>
                     </div>
                 </div>
-               
+
                 <div className="p-4 sm:p-6 md:p-8">
                     <div className="bg-blue-50 border-l-4 border-blue-600 text-gray-800 leading-relaxed p-4 sm:p-6 rounded-r-lg mb-6 sm:mb-8 shadow-sm">
                         <h3 className="text-blue-800 font-semibold mb-2 text-sm sm:text-base">Sobre o hotel</h3>
                         <p className="text-sm sm:text-base">{hotel.description}</p>
                     </div>
- 
+
                     {hotel.galleryImages && hotel.galleryImages.length > 0 && (
                         <div className="mb-6 sm:mb-8">
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 flex items-center">
@@ -333,7 +333,7 @@ function HotelDetailsPage() {
                             </div>
                         </div>
                     )}
- 
+
                     <div className="my-6 sm:my-8 py-4 sm:py-6 border-t border-b border-gray-200">
                         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
                             <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
@@ -351,7 +351,7 @@ function HotelDetailsPage() {
                             })}
                         </div>
                     </div>
- 
+
                     {hotel.roomOptions?.length > 0 && (
                         <div className="mb-6 sm:mb-8">
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
@@ -382,7 +382,7 @@ function HotelDetailsPage() {
                             </div>
                         </div>
                     )}
- 
+
                     {isLoggedIn && (
                         <div className="mb-6 sm:mb-8">
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
@@ -392,7 +392,7 @@ function HotelDetailsPage() {
                                     <span className="ml-2 text-sm text-gray-500">({reviews.length} {reviews.length === 1 ? 'avaliação' : 'avaliações'})</span>
                                 )}
                             </h2>
- 
+
                             {reviewsLoading ? (
                                 <div className="bg-gray-50 rounded-lg p-8 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div><p className="text-gray-600">Carregando avaliações...</p></div>
                             ) : reviewsError ? (
@@ -425,7 +425,7 @@ function HotelDetailsPage() {
                             )}
                         </div>
                     )}
- 
+
                     {!isLoggedIn && (
                         <div className="mb-6 sm:mb-8">
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
@@ -442,7 +442,7 @@ function HotelDetailsPage() {
                     )}
                 </div>
             </div>
- 
+
             {isModalOpen && (
                 <ImageModal
                     images={modalImages}
@@ -450,7 +450,7 @@ function HotelDetailsPage() {
                     onClose={handleCloseModal}
                 />
             )}
- 
+
             {isReservationModalOpen && selectedRoom && (
                 <ReservationModal
                     isOpen={isReservationModalOpen}
@@ -463,6 +463,5 @@ function HotelDetailsPage() {
         </div>
     );
 }
- 
+
 export default HotelDetailsPage;
- 

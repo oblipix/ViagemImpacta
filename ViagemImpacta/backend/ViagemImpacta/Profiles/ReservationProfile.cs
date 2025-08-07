@@ -44,8 +44,6 @@ namespace ViagemImpacta.Profiles
 
             CreateMap<UpdateReservationViewModel, UpdateReservationDto>();
 
-            CreateMap<CreateReservationDto, Reservation>();
-
             CreateMap<UpdateReservationDto, Reservation>()
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
 

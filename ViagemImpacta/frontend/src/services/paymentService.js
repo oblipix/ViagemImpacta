@@ -18,7 +18,7 @@ class PaymentService {
       console.log('Creating checkout session for reservation ID:', reservationId);
       const token = localStorage.getItem('authToken');
       console.log('Auth token exists:', !!token);
-      
+
       const response = await fetch(`https://localhost:7010/api/Stripe/checkout?id=${reservationId}`, {
         method: 'POST',
         headers: {
@@ -71,8 +71,11 @@ class PaymentService {
    */
   async processReservationAndPayment(reservationData) {
     try {
+
+      const regex = "[0-9]+"
+      const endpoint = window.location.href.match(`https://localhost:5173/hoteis/${regex}`) ? "reservation" : "promotionReservation";
       // Primeiro, criar a reserva
-      const reservationResponse = await fetch(`${API_BASE_URL}/reservations`, {
+      const reservationResponse = await fetch(`${API_BASE_URL}/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

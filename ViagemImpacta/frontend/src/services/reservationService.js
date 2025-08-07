@@ -91,6 +91,7 @@ class ReservationService {
   /**
    * Cria uma nova reserva
    * @param {Object} reservationData - Dados da reserva
+   * @param {number} reservationData.idPromotion - ID da promoção (opcional)
    * @param {number} reservationData.userId - ID do usuário
    * @param {number} reservationData.roomId - ID do quarto
    * @param {number} reservationData.hotelId - ID do hotel
@@ -102,13 +103,17 @@ class ReservationService {
    */
   async createReservation(reservationData) {
     try {
-      const response = await fetch(`${API_BASE_URL}/reservations`, {
+      const regex = new RegExp("[0-9]+");
+      const endpoint = window.location.href.match(`https://localhost:5173/hoteis/${regex}`) ? "reservation" : "reservations/promotionReservation";
+      console.log(`${API_BASE_URL}/${endpoint}` + "  ijdkj");
+      const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         },
         body: JSON.stringify({
+          idPromotion: reservationData.idPromotion || null,
           UserId: reservationData.userId,
           RoomId: reservationData.roomId,
           HotelId: reservationData.hotelId,
