@@ -1,29 +1,42 @@
 ﻿@model IEnumerable<ViagemImpacta.Models.Reservation>
-
 @{
-    ViewData["Title"] = "Reservas do Usuário";
+    ViewData["Title"] = $"Reservas do Usuário";
+    var getName = Model?.FirstOrDefault();
 }
 
-<h1>Reservas do Usuário</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="d-flex align-items-center gap-2 mb-4">
+        <span class="material-symbols-outlined" style="font-size: 2.5rem">receipt</span>
+        Reservas do Usuário: @getName.User.FirstName @getName.User.LastName
+    </h1>
+    <a class="btn btn-secondary" asp-action="Index" asp-controller="Users">Voltar</a>
+</div>
 
 @if (Model != null && Model.Any())
 {
-    foreach (var reservation in Model)
-    {
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Reserva #@reservation.ReservationId</h5>
-                <p class="card-text">
-                    <strong>Hotel:</strong> @reservation.Hotel?.Name<br />
-                    <strong>Quarto:</strong> @reservation.Room?.TypeName<br />
-                    <strong>Check-In:</strong> @reservation.CheckIn.ToString("dd/MM/yyyy")<br />
-                    <strong>Check-Out:</strong> @reservation.CheckOut.ToString("dd/MM/yyyy")<br />
-                    <strong>Status:</strong> @(reservation.IsCanceled ? "Cancelada" : reservation.IsConfirmed ? "Confirmada" : "Pendente")<br />
-                </p>
-                <a asp-action="Details" asp-route-id="@reservation.ReservationId" class="btn btn-primary">Detalhes</a>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var reservation in Model)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Reserva #@reservation.ReservationId</h5>
+                        <p class="card-text">
+                            <strong>Hotel:</strong> @reservation.Hotel?.Name<br />
+                            <strong>Quarto:</strong> @reservation.Room?.TypeName<br />
+                            <strong>Check-In:</strong> @reservation.CheckIn.ToString("dd/MM/yyyy")<br />
+                            <strong>Check-Out:</strong> @reservation.CheckOut.ToString("dd/MM/yyyy")<br />
+                            <strong>Status:</strong> 
+                            <span class="badge @(reservation.IsCanceled ? "bg-danger" : reservation.IsConfirmed ? "bg-success" : "bg-warning text-dark")">
+                                @(reservation.IsCanceled ? "Cancelada" : reservation.IsConfirmed ? "Confirmada" : "Pendente")
+                            </span><br />
+                        </p>
+                        <a asp-action="Details" asp-route-id="@reservation.ReservationId" class="btn btn-primary">Detalhes</a>
+                    </div>
+                </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 }
 else
 {

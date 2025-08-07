@@ -62,7 +62,7 @@
     </div>
 
     <div class="row mb-3">
-        <div class="col-md-6">
+        <div class="col-md-6" hidden>
             <label class="form-label">Preço Original</label>
             <input class="form-control" id="totalPriceOriginal" value="@Model.TotalPrice.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))" readonly />
         </div>
@@ -116,8 +116,8 @@
 
     <hr />
     <div class="d-flex gap-2">
-        <a asp-action="Index" class="btn btn-secondary">Voltar</a>
-        <button type="submit" class="btn btn-primary">Gerar Nova Reserva</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
+        <button type="submit" class="btn btn-success">Confirmar</button>
         <a asp-action="Cancel" asp-route-id="@Model.ReservationId" class="btn btn-danger">Cancelar Reserva</a>
     </div>
 </form>

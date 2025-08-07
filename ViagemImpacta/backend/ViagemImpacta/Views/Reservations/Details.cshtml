@@ -4,63 +4,152 @@
     var days = (Model.CheckOut - Model.CheckIn).Days;
 }
 
-<div class="d-flex align-items-center mb-4">
-    @if (!string.IsNullOrWhiteSpace(Model.User?.Photo))
-    {
-        <img src="@Model.User.Photo" alt="Foto do usuário" class="rounded-circle me-3" style="width:56px; height:56px; object-fit:cover; border:2px solid #dee2e6;" />
-    }
-    <h1 class="m-0">Detalhes da Reserva #@Model.ReservationId</h1>
-</div>
-
-@if (Model != null)
-{
-    <div class="card" style="max-width: 600px;">
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-4">ID</dt>
-                <dd class="col-sm-8">@Model.ReservationId</dd>
-                <dt class="col-sm-4">Cliente</dt>
-                <dd class="col-sm-8">
-                    <a asp-controller="Users" asp-action="Details" asp-route-id="@Model.User.UserId" class="btn btn-link p-0 align-baseline" title="Ver detalhes do usuário">
-                        <i class="bi bi-person-lines-fill"></i>
-                        @((Model.User?.FirstName ?? "") + (string.IsNullOrWhiteSpace(Model.User?.LastName) ? "" : $" {Model.User.LastName}"))
-                    </a>
-                </dd>
-                <dt class="col-sm-4">Hotel</dt>
-                <dd class="col-sm-8">
-                    <a asp-controller="Hotels" asp-action="Details" asp-route-id="@Model.Hotel.HotelId" class="btn btn-link p-0 align-baseline" title="Ver detalhes do hotel">
-                        <i class="bi bi-person-lines-fill"></i>
-                        @Model.Hotel?.Name
-                    </a>
-                </dd>
-                <dt class="col-sm-4">Quarto</dt>
-                <dd class="col-sm-8">@Model.Room?.TypeName</dd>
-                <dt class="col-sm-4">Check-In</dt>
-                <dd class="col-sm-8">@Model.CheckIn.ToString("dd/MM/yyyy")</dd>
-                <dt class="col-sm-4">Check-Out</dt>
-                <dd class="col-sm-8">@Model.CheckOut.ToString("dd/MM/yyyy")</dd>
-                <dt class="col-sm-4">Nº de Noites</dt>
-                <dd class="col-sm-8">@days noite(s)</dd>
-                <dt class="col-sm-4">Preço Total</dt>
-                <dd class="col-sm-8">@Model.TotalPrice.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</dd>
-                <dt class="col-sm-4">Confirmada</dt>
-                <dd class="col-sm-8">@(Model.IsConfirmed ? "Sim" : "Não")</dd>
-                <dt class="col-sm-4">Descrição</dt>
-                <dd class="col-sm-8">@Model.Description</dd>
-                <dt class="col-sm-4">Criada em</dt>
-                <dd class="col-sm-8">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
-                <dt class="col-sm-4">Atualizada em</dt>
-                <dd class="col-sm-8">@Model.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
-            </dl>
-            <div class="d-flex gap-2">
-                <button onclick="history.back()" class="btn btn-secondary">Voltar</button>
-                <a asp-action="Edit" asp-route-id="@Model.ReservationId" class="btn btn-primary">Editar</a>
-                <a asp-action="Delete" asp-route-id="@Model.ReservationId" class="btn btn-danger">Deletar</a>
-            </div>
-        </div>
+<h1 class="d-flex align-items-center gap-2 mb-4">
+    <span class="material-symbols-outlined" style="font-size: 2.5rem">event</span>
+    Detalhes da Reserva #@Model.ReservationId
+</h1>
+<hr />
+<div class="row mb-3">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Cliente">
+                person
+            </span>
+            Cliente
+        </label>
+        <p class="form-control form-control-plaintext">
+            <a asp-controller="Users" asp-action="Details" asp-route-id="@Model.User.UserId" class="btn btn-link p-0 align-baseline" title="Ver detalhes do usuário">
+                @((Model.User?.FirstName ?? "") + (string.IsNullOrWhiteSpace(Model.User?.LastName) ? "" : $" {Model.User.LastName}"))
+            </a>
+        </p>
     </div>
-}
-else
-{
-    <div class="alert alert-warning">Reserva não encontrada.</div>
-}
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Hotel">
+                hotel
+            </span>
+            Hotel
+        </label>
+        <p class="form-control form-control-plaintext">
+            <a asp-controller="Hotels" asp-action="Details" asp-route-id="@Model.Hotel.HotelId" class="btn btn-link p-0 align-baseline" title="Ver detalhes do hotel">
+                @Model.Hotel?.Name
+            </a>
+        </p>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Quarto">
+                meeting_room
+            </span>
+            Tipo de Quarto
+        </label>
+        <p class="form-control form-control-plaintext">
+            <span class="badge bg-info">@Model.Room.TypeName</span>
+        </p>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-symbols-outlined align-middle" title="Nº de Noites">
+                moon_stars
+            </span>
+            Nº de Noites
+        </label>
+        <p class="form-control form-control-plaintext">@days noite(s)</p>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Check-In">
+                login
+            </span>
+            Check-In
+        </label>
+        <p class="form-control form-control-plaintext">@Model.CheckIn.ToString("dd/MM/yyyy")</p>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Check-Out">
+                logout
+            </span>
+            Check-Out
+        </label>
+        <p class="form-control form-control-plaintext">@Model.CheckOut.ToString("dd/MM/yyyy")</p>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-symbols-outlined align-middle" title="Preço Total">
+                universal_currency_alt
+            </span>
+            Preço Total
+        </label>
+        <p class="form-control form-control-plaintext">@Model.TotalPrice.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</p>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Confirmada">
+                check_circle
+            </span>
+            Confirmada
+        </label>
+        <p class="form-control form-control-plaintext">
+            @if (Model.IsConfirmed)
+            {
+                <span class="badge bg-success">Sim</span>
+            }
+            else
+            {
+                <span class="badge bg-danger">Não</span>
+            }
+        </p>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-12 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Descrição">
+                description
+            </span>
+            Descrição
+        </label>
+        <p class="form-control form-control-plaintext">
+            @if (Model.Description == null)
+            {
+                <span class="text-secondary">O usuário não inseriu nenhuma descrição na reserva.</span>
+            }
+            else
+            {
+                <span>@Model.Description</span>
+            }
+        </p>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Criada em">
+                calendar_month
+            </span>
+            Criada em
+        </label>
+        <p class="form-control form-control-plaintext">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Atualizada em">
+                calendar_month
+            </span>
+            Atualizada em
+        </label>
+        <p class="form-control form-control-plaintext">@Model.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+</div>
+<div class="d-flex gap-2">
+    <button onclick="history.back()" class="btn btn-outline-secondary">Voltar</button>
+    <a class="btn @(Model.IsCanceled ? "btn-outline-secondary disabled" : "btn-primary")" asp-action="Edit" asp-route-id="@Model.ReservationId">Editar</a>
+    <a asp-action="Delete" asp-route-id="@Model.ReservationId" class="btn btn-danger">Deletar</a>
+</div>

@@ -37,11 +37,11 @@
                     <input type="hidden" id="checkin" name="checkin" value="@checkin" />
                     <input type="hidden" id="checkout" name="checkout" value="@checkout" />
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <label for="search" class="form-label">Cliente ou Hotel</label>
                     <input type="text" class="form-control" id="search" name="search" placeholder="Nome do cliente ou hotel" value="@search" />
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label for="status" class="form-label">Status</label>
                     <select class="form-select" id="status" name="status">
                         <option value="" selected="@(string.IsNullOrEmpty(status) ? "selected" : null)">Todos</option>
@@ -63,7 +63,7 @@
                     const picker = new Litepicker({
                         element: document.getElementById('dateRange'),
                         singleMode: false,
-                        format: 'DD/MM/YYYY',
+                        format: 'YYYY/MM/DD',
                         numberOfMonths: 2,
                         numberOfColumns: 2,
                         minDate: new Date(),
@@ -74,8 +74,8 @@
                         },
                         setup: (picker) => {
                             picker.on('selected', (start, end) => {
-                                document.getElementById('checkin').value = start.format('DD-MM-YYYY');
-                                document.getElementById('checkout').value = end.format('DD-MM-YYYY');
+                                document.getElementById('checkin').value = start.format('YYYY/MM/DD');
+                                document.getElementById('checkout').value = end.format('YYYY/MM/DD');
                             });
                         }
                     });
@@ -117,8 +117,8 @@
                     <td>@(reserva.User?.FirstName) @(reserva.User?.LastName)</td>
                     <td>@reserva.Hotel?.Name</td>
                     <td>@reserva.Room?.TypeName</td>
-                    <td>@reserva.CheckIn.ToString("dd/MM/yyyy")</td>
-                    <td>@reserva.CheckOut.ToString("dd/MM/yyyy")</td>
+                    <td>@reserva.CheckIn.ToString("yyyy/MM/dd")</td>
+                    <td>@reserva.CheckOut.ToString("yyyy/MM/dd")</td>
                     <td class="col text-center">@reserva.TotalPrice.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
                     <td class="col text-center">
                         @if (reserva.IsConfirmed && !reserva.IsCanceled)
@@ -136,7 +136,7 @@
                     </td>
                     <td>
                         <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@reserva.ReservationId">Detalhar</a>
-                        <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@reserva.ReservationId">Editar</a>
+                        <a class="btn btn-sm @(reserva.IsCanceled ? "btn-outline-secondary disabled" : "btn-warning")" asp-action="Edit" asp-route-id="@reserva.ReservationId">Editar</a>
                     </td>
                 </tr>
             }
