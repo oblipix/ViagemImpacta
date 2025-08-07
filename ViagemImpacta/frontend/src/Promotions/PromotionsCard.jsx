@@ -47,7 +47,7 @@ function PromotionsCard({ promotion }) {
                             R$ {Number(promotion.originalPrice).toFixed(2).replace('.', ',')}
                         </span>
                         <span className="text-green-600 text-xl font-bold">
-                            R$ {Number(promotion.finalPrice).toFixed(2).replace('.', ',')}
+                            R$ {Number(promotion.totalPrice).toFixed(2).replace('.', ',')}
                         </span>
                         <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
                             -{promotion.discountPercent}%

@@ -41,7 +41,7 @@ namespace ViagemImpacta.DTO.Promotion
         [Range(1, int.MaxValue, ErrorMessage = "Quantidade de quartos deve ser maior que 0.")]
         public int TotalRoomsAvailable { get; set; }
 
-        public decimal FinalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
         public decimal OriginalPrice { get; set; }
 
         [Range(0.01, 100, ErrorMessage = "Desconto deve ser entre 0,01% e 100%.")]

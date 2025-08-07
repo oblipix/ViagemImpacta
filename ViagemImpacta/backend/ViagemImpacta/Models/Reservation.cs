@@ -10,7 +10,7 @@
         public bool IsPromotion { get; set; }
         public int? IdPromotion { get; set; }
         public int IdRoomPromotional { get; set; }
-        public Room? RoomPromotional { get; set; }
+        public RoomsPromotional? RoomPromotional { get; set; }
         public int? RoomId { get; set; }
         public Room? Room { get; set; }
         public DateTime CheckIn { get; set; }

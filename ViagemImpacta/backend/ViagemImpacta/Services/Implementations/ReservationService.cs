@@ -163,7 +163,11 @@ namespace ViagemImpacta.Services.Implementations
             reservation.IsConfirmed = true;
             reservation.UpdatedAt = DateTime.Now;
             reservation.PaymentIntentId = session.PaymentIntentId;
-
+            if (reservation.IsPromotion == true)
+            {
+                await AddReservationRoomsPromotion(reservation);
+            }
+           
             _unitOfWork.Reservations.Update(reservation);
             await _unitOfWork.CommitAsync();
             await SendEmailAsync(reservation);
@@ -389,7 +393,7 @@ namespace ViagemImpacta.Services.Implementations
                 HotelId = promotion.HotelId,
                 CheckIn = promotion.CheckIn,
                 CheckOut = promotion.CheckOut,
-                TotalPrice = promotion.FinalPrice,
+                TotalPrice = promotion.TotalPrice,
                 IsPromotion = true,
                 IdPromotion = Dto.idPromotion,
                 IdRoomPromotional = promotion.RoomsPromotional.RoomsPromotionalId,
@@ -424,7 +428,18 @@ namespace ViagemImpacta.Services.Implementations
             var createdReservation = await _unitOfWork.Reservations.GetReservationWithDetailsAsync(reservationFinal.ReservationId);
             return createdReservation;
         }
-        
+
+        public async Task<bool> AddReservationRoomsPromotion(Reservation reservation)
+        {
+            reservation.RoomPromotional = await _unitOfWork.RoomsPromotions.GetRoomPromotionalByIdAsync(reservation.IdRoomPromotional);
+            reservation.RoomPromotional.TotalRoomsReserved += 1;
+            
+            await _unitOfWork.RoomsPromotions.UpdateAsync(reservation.RoomPromotional);
+            await _unitOfWork.CommitAsync();
+            return true;
+
+        }
+
         public async Task<bool> RoomsAvailable(int idPromotion)
         {
             var RoomsAvailable = await _unitOfWork.RoomsPromotions.RoomsAvailableAsync(idPromotion);

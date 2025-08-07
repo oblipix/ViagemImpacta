@@ -9,6 +9,5 @@ namespace ViagemImpacta.Services.Interfaces
         Task<IEnumerable<Promotion>> GetActivePromotionsAsync();
         Task<Promotion?> GetPromotionByIdAsync(int idPromotion);
         Task<bool> SoftDeletePromotion(int idPromotion);
-
     }
 }

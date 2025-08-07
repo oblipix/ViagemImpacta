@@ -103,8 +103,8 @@ class PromotionService {
             checkIn: new Date(promotion.checkIn).toLocaleDateString('pt-BR'),
             checkOut: new Date(promotion.checkOut).toLocaleDateString('pt-BR'),
             originalPrice: promotion.originalPrice,
-            finalPrice: promotion.finalPrice,
-            discountPercent: promotion.discountPercentage || this.calculateDiscountPercent(promotion.originalPrice, promotion.finalPrice),
+            totalPrice: promotion.totalPrice,
+            discountPercent: promotion.discountPercentage || this.calculateDiscountPercent(promotion.originalPrice, promotion.totalPrice),
             isActive: promotion.isActive,
             validUntil: new Date(promotion.endDate).toLocaleDateString('pt-BR'),
             roomsReserved: roomsReserved,
@@ -116,7 +116,7 @@ class PromotionService {
     /**
      * Calcula a porcentagem de desconto
      * @param {number} originalPrice - Preço original
-     * @param {number} finalPrice - Preço final
+     * @param {number} totalPrice - Preço total
      * @returns {number} Porcentagem de desconto
      */
 }

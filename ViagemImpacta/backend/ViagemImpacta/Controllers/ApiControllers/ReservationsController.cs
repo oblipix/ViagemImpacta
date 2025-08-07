@@ -1,8 +1,9 @@
+using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using ViagemImpacta.DTO.ReservationDTO;
+using ViagemImpacta.Models;
 using ViagemImpacta.Services.Interfaces;
 
 namespace ViagemImpacta.Controllers.ApiControllers
@@ -15,10 +16,11 @@ namespace ViagemImpacta.Controllers.ApiControllers
         private readonly IPromotionService _promotionService;
         private readonly IMapper _mapper;
 
-        public ReservationsController(IReservationService reservationService, IMapper mapper)
+        public ReservationsController(IReservationService reservationService, IMapper mapper, IPromotionService promotionService)
         {
             _reservationService = reservationService;
             _mapper = mapper;
+            _promotionService = promotionService;   
         }
 
         /// <summary>
@@ -56,20 +58,17 @@ namespace ViagemImpacta.Controllers.ApiControllers
         //[Authorize]
         public async Task<ActionResult<ReservationDto>> CreateReservationByPromotion([FromBody] CreateReservationPromotionDto dto)
         {
+            if (!ModelState.IsValid) 
+            return BadRequest(ModelState);
+
+            if (dto == null) 
+            return BadRequest("Dados da reserva não podem ser nulos");
+
             var roomsAvailable = await _reservationService.RoomsAvailable(dto.idPromotion);
             if (roomsAvailable)
             {
                 try
                 {
-                    if (!ModelState.IsValid)
-                    {
-                        return BadRequest(ModelState);
-                    }
-                    if (dto == null)
-                    {
-                        return BadRequest("Dados da reserva não podem ser nulos");
-                    }
-
                     var reservation = await _reservationService.CreateReservationByPromotion(dto);
                     var reservationDto = _mapper.Map<ReservationDto>(reservation);
                     return Ok(CreatedAtAction(nameof(GetReservation), new { id = reservation.ReservationId }, reservationDto));

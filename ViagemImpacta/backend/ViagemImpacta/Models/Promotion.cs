@@ -18,9 +18,9 @@ namespace ViagemImpacta.Models
         public int HotelId { get; set; }
         public Hotel? Hotel { get; set; }
 
-        public decimal FinalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
         public decimal OriginalPrice { get; set; }
-        public decimal DiscountPercentage { get; set; } = 0.15m;
+        public decimal DiscountPercentage { get; set; }
 
         public bool IsActive { get; set; } = true;
         public DateTime UpdatedAt { get; set; } 

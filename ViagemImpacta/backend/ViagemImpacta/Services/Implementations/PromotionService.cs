@@ -42,8 +42,8 @@ namespace ViagemImpacta.Services.Implementations
             var dailyPrice = await _unititOfWork.Rooms.GetPriceRoomByHotelAndType(dto.HotelId, dto.RoomID);
             var originalPrice = dailyPrice * (dto.CheckOut - dto.CheckIn).Days;
             var calcDiscaunt = originalPrice * (dto.DiscountPercentage / 100);
-            var finalPrice = originalPrice - calcDiscaunt;
-            dto.FinalPrice = finalPrice;
+            var totalPrice = originalPrice - calcDiscaunt;
+            dto.TotalPrice = totalPrice;
 
 
             var promocao = _mapper.Map<Promotion>(dto);
@@ -71,7 +71,6 @@ namespace ViagemImpacta.Services.Implementations
 
             await _unititOfWork.RoomsPromotions.CreateRoomsPromotion(roomsPromotional);
             await _unititOfWork.CommitAsync();
-
 
             return promocao;
         }

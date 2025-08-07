@@ -307,7 +307,7 @@ const PromotionDetailsPage = () => {
                             <div className="text-center mb-3">
                                 <p className="text-sm text-red-600 mb-1 font-medium">Por apenas:</p>
                                 <p className="text-4xl text-red-600 font-bold">
-                                    {formatCurrency(promotion.finalPrice || 0)}
+                                    {formatCurrency(promotion.totalPrice || 0)}
                                 </p>
                             </div>
                         </div>
@@ -315,7 +315,7 @@ const PromotionDetailsPage = () => {
                         {/* Economia */}
                         <div className="flex items-center justify-center space-x-2 text-green-600 font-medium">
                             <span>💰</span>
-                            <span>Você economiza: {formatCurrency((promotion.originalPrice || 0) - (promotion.finalPrice || 0))}</span>
+                            <span>Você economiza: {formatCurrency((promotion.originalPrice || 0) - (promotion.totalPrice || 0))}</span>
                         </div>
                     </div>
                 </div>
@@ -613,7 +613,7 @@ const PromotionDetailsPage = () => {
                             onClick={() => handleReserveRoom({
                                 id: 1,
                                 type: 'Promoção',
-                                price: promotion.finalPrice,
+                                price: promotion.totalPrice,
                                 capacity: 2
                             })}
                             className={`px-10 py-4 font-bold text-xl rounded-full transition duration-300 shadow-lg transform hover:scale-105 ${
