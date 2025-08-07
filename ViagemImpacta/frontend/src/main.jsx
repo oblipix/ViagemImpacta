@@ -13,7 +13,6 @@ import { ModalProvider } from './components/context/ModalContext.jsx';
 if (import.meta.env.DEV) {
   import('./utils/testCache.js').then(({ testCache }) => {
     window.testCache = testCache;
-    console.log('🧪 testCache disponível no console! Digite: testCache.showCacheInfo()');
   });
 }
 

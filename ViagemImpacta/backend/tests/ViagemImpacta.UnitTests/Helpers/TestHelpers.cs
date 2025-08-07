@@ -41,7 +41,7 @@ public class HotelBuilder
         return this;
     }
 
-    public HotelBuilder WithRating(decimal rating)
+    public HotelBuilder WithRating(float rating)
     {
         _hotel.Rating = rating;
         return this;
