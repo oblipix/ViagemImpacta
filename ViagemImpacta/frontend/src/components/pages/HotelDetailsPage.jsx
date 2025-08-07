@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useHotels } from '../hooks/useHotels.js';
@@ -98,14 +100,12 @@ const leisureIconMap = {
     'Wi-Fi': Icons.Wifi,
     'Internet': Icons.Wifi,
     'Estacionamento': Icons.TotalRooms,
-    'Estacionamento': Icons.TotalRooms,
     'Estacionamento Grátis': Icons.TotalRooms,
     'Serviço de Quarto': BroomIcon,
     'Acessibilidade': Icons.User,
     'Pet Friendly': PetIcon,
     'Aceita Animais': PetIcon,
     'Aceita Pets': PetIcon,
-    'Café da Manhã Incluso': CoffeeIcon,
     'Café da Manhã Incluso': CoffeeIcon,
     'Café da Manhã': CoffeeIcon,
     'Recepção 24h': Icons.User,

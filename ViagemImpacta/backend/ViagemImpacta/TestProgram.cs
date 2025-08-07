@@ -124,7 +124,7 @@ public class TestProgram
         builder.Services.AddScoped<ITravellerRepository, TravellerRepository>();
         builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
         builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
-        builder.Services.AddScoped<IRoomsPromotionalRepository, RoomsPromotionRepository>();
+        builder.Services.AddScoped<IRoomsPromotionalRepository, RoomsPromotionalRepository>();
         builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
         // Configuração dos Services (apenas os que têm interface e existem)
