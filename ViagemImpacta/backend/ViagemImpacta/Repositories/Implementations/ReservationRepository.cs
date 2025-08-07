@@ -93,19 +93,18 @@ namespace ViagemImpacta.Repositories.Implementations
                 .ToListAsync();
         }
 
-        public async Task<int> GetOccupiedRoomCountByTypeAsync(int hotelId, RoomType roomType, DateTime checkIn, DateTime checkOut, int? excludeReservationId = null)
+        public async Task<int> GetOccupiedRoomCountByTypeAsync(int hotelId, RoomType roomType, DateTime checkIn, DateTime checkOut)
         {
             return await _context.Reservations
                 .Include(r => r.Room)
                 .Where(r => r.HotelId == hotelId &&
                            r.Room!.TypeName == roomType &&
                            r.IsConfirmed &&
-                           (excludeReservationId == null || r.ReservationId != excludeReservationId) &&
-                           ((r.CheckIn < checkOut && r.CheckOut > checkIn)))
+                           (r.CheckIn < checkOut && r.CheckOut > checkIn))
                 .CountAsync();
         }
 
-        public async Task<bool> IsRoomTypeAvailableAsync(int hotelId, RoomType roomType, DateTime checkIn, DateTime checkOut, int? excludeReservationId = null)
+        public async Task<bool> IsRoomTypeAvailableAsync(int hotelId, RoomType roomType, DateTime checkIn, DateTime checkOut)
         {
             // Buscar o total de quartos deste tipo no hotel
             var totalRoomsOfType = await _context.Rooms
@@ -117,7 +116,7 @@ namespace ViagemImpacta.Repositories.Implementations
                 return false; // Não há quartos deste tipo no hotel
 
             // Contar quantos quartos deste tipo estão ocupados no período
-            var occupiedRooms = await GetOccupiedRoomCountByTypeAsync(hotelId, roomType, checkIn, checkOut, excludeReservationId);
+            var occupiedRooms = await GetOccupiedRoomCountByTypeAsync(hotelId, roomType, checkIn, checkOut);
     
             // Verificar se há pelo menos um quarto disponível
             return occupiedRooms < totalRoomsOfType;

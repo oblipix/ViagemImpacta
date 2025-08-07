@@ -15,8 +15,8 @@ namespace ViagemImpacta.Repositories.Interfaces
         Task<IEnumerable<Reservation>> GetReservationsByDateRangeAsync(DateTime startDate, DateTime endDate);
 
         // Novos métodos para validação por tipo de quarto
-        Task<int> GetOccupiedRoomCountByTypeAsync(int hotelId, RoomType roomType, DateTime checkIn, DateTime checkOut, int? excludeReservationId = null);
-        Task<bool> IsRoomTypeAvailableAsync(int hotelId, RoomType roomType, DateTime checkIn, DateTime checkOut, int? excludeReservationId = null);
+        Task<int> GetOccupiedRoomCountByTypeAsync(int hotelId, RoomType roomType, DateTime checkIn, DateTime checkOut);
+        Task<bool> IsRoomTypeAvailableAsync(int hotelId, RoomType roomType, DateTime checkIn, DateTime checkOut);
 
         Task<IEnumerable<Reservation>> GetAllReservationsAsync();
         Task<Reservation?> GetReservationById(int id);
