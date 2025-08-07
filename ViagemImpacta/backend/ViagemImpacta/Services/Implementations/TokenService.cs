@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ViagemImpacta.Models;
+using ViagemImpacta.Services.Interfaces;
 
 namespace ViagemImpacta.Services.Implementations;
 
@@ -13,7 +14,7 @@ public static class TokensService
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(Settings.Secret);
 
-        var tokenDescriptor = new SecurityTokenDescriptor //Leva as infos necessarias pro token funcionar
+        var tokenDescriptor = new SecurityTokenDescriptor 
         {
             Subject = new ClaimsIdentity(new[]
             {
@@ -29,5 +30,3 @@ public static class TokensService
         return tokenHandler.WriteToken(token);
     }
 }
-
-//Expires = DateTime.UtcNow.AddHours(2),

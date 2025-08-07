@@ -64,18 +64,10 @@ namespace ViagemImpacta.Services.Implementations
                 createReservationDto.CheckOut);
 
             if (!isRoomTypeAvailable)
-            {
-                var occupiedRooms = await _unitOfWork.Reservations.GetOccupiedRoomCountByTypeAsync(
-                    createReservationDto.HotelId,
-                    room.TypeName,
-                    createReservationDto.CheckIn,
-                    createReservationDto.CheckOut);
-                
+            {               
                 throw new InvalidOperationException(
-                    $"N�o h� quartos do tipo {room.TypeName} dispon�veis para o per�odo solicitado. " +
-                    $"Total de quartos ocupados: {occupiedRooms}/{room.TotalRooms}");
+                    $"N�o h� quartos do tipo {room.TypeName} dispon�veis para o per�odo solicitado.");
             }
-
 
             // Calcular pre�o total
             var totalDays = (createReservationDto.CheckOut - createReservationDto.CheckIn).Days;

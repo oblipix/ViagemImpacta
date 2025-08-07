@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using ViagemImpacta.Models;
 

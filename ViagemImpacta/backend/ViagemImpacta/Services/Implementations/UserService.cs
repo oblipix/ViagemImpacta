@@ -90,7 +90,7 @@ namespace ViagemImpacta.Services.Implementations
             if (id <= 0) return null;
             var user = await _unitOfWork.Users.GetByIdAsync(id);
             // CORREÇÃO: Só retorna se o usuário existir E estiver ativo
-            if (user == null || !user.Active) return null;
+            if (user == null) return null;
             return user;
         }
 

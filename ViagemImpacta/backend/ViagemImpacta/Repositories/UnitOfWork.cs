@@ -1,7 +1,6 @@
 using ViagemImpacta.Data;
-using ViagemImpacta.Repositories.Interfaces;
 using ViagemImpacta.Repositories.Implementations;
-using Microsoft.Extensions.Logging;
+using ViagemImpacta.Repositories.Interfaces;
 
 namespace ViagemImpacta.Repositories
 {

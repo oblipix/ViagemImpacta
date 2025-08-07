@@ -18,7 +18,6 @@ public class UserRepository : Repository<User>, IUserRepository
     public async Task<IEnumerable<User>> GetUserByPredicate(Expression<Func<User, bool>> predicate, int skip, int take)
     {
         return await _context.Users
-            .Where(u => u.Active)
             .Where(predicate)
             .Skip(skip)
             .Take(take)
@@ -49,7 +48,8 @@ public class UserRepository : Repository<User>, IUserRepository
 
     public async Task<IEnumerable<User>> SearchClientUsers(string search, int skip, int take)
     {
-        var query = _context.Users.Where(u => u.Active);
+        var query = _context.Users.AsQueryable();
+
         if (!string.IsNullOrWhiteSpace(search))
         {
             query = query.Where(u => u.Cpf.Contains(search) || 
