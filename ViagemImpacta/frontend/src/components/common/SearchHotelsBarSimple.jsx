@@ -121,7 +121,7 @@ function SearchHotelsBar() {
             const fallbackTypes = [
                 { name: 'Standard' },
                 { name: 'Luxo' },
-                { name: 'Suíte' }
+                { name: 'Suite' }
             ];
             setRoomTypeOptions(fallbackTypes);
             setSelectedRoomType(fallbackTypes[0].name);

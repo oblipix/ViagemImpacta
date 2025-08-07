@@ -46,7 +46,7 @@ public class DebugControllerTests
 
         _mockHotelRepository.Setup(x => x.SearchHotelsAsync(
             destination, minPrice, maxPrice, stars, roomType,
-            amenities, guests, checkIn, checkOut))
+            amenities, guests, checkIn, checkOut, null))
             .ReturnsAsync(mockHotels);
 
         // Act
@@ -69,7 +69,7 @@ public class DebugControllerTests
         _mockHotelRepository.Setup(x => x.SearchHotelsAsync(
             It.IsAny<string>(), It.IsAny<decimal?>(), It.IsAny<decimal?>(),
             It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>()))
+            It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(emptyResults);
 
         // Act
@@ -89,7 +89,7 @@ public class DebugControllerTests
         _mockHotelRepository.Setup(x => x.SearchHotelsAsync(
             It.IsAny<string>(), It.IsAny<decimal?>(), It.IsAny<decimal?>(),
             It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>()))
+            It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(mockResults);
 
         // Act
@@ -105,7 +105,7 @@ public class DebugControllerTests
         // Verify repository was called
         _mockHotelRepository.Verify(x => x.SearchHotelsAsync(
             "Rio de Janeiro", 200m, 800m, 5, "Standard",
-            "wifi,parking", 2, "2025-01-15", "2025-01-20"), Times.Once);
+            "wifi,parking", 2, "2025-01-15", "2025-01-20", null), Times.Once);
     }
 
     [Theory]
@@ -124,7 +124,7 @@ public class DebugControllerTests
         _mockHotelRepository.Setup(x => x.SearchHotelsAsync(
             destination, It.IsAny<decimal?>(), It.IsAny<decimal?>(),
             It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>()))
+            It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(mockResults);
 
         // Act
@@ -143,7 +143,7 @@ public class DebugControllerTests
         _mockHotelRepository.Setup(x => x.SearchHotelsAsync(
             It.IsAny<string>(), It.IsAny<decimal?>(), It.IsAny<decimal?>(),
             It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>()))
+            It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(expectedHotels);
 
         // Act
@@ -153,7 +153,7 @@ public class DebugControllerTests
         // Assert
         _mockUnitOfWork.Verify(x => x.Hotels, Times.AtLeastOnce);
         _mockHotelRepository.Verify(x => x.SearchHotelsAsync(
-            "Test", 100m, 200m, 3, "Standard", "wifi", 2, "2025-01-01", "2025-01-02"),
+            "Test", 100m, 200m, 3, "Standard", "wifi", 2, "2025-01-01", "2025-01-02", null),
             Times.Once);
     }
 }

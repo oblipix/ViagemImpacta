@@ -51,7 +51,7 @@ namespace ViagemImpacta.Tests.Controllers
 
             _mockHotelRepository.Setup(x => x.SearchHotelsAsync(
                 destination, minPrice, maxPrice, stars, roomType,
-                amenities, guests, checkIn, checkOut))
+                amenities, guests, checkIn, checkOut, null))
                 .ReturnsAsync(mockHotels);
 
             // Act
@@ -74,7 +74,7 @@ namespace ViagemImpacta.Tests.Controllers
             _mockHotelRepository.Setup(x => x.SearchHotelsAsync(
                 It.IsAny<string>(), It.IsAny<decimal?>(), It.IsAny<decimal?>(),
                 It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>()))
+                It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(emptyResults);
 
             // Act
@@ -101,7 +101,7 @@ namespace ViagemImpacta.Tests.Controllers
             _mockHotelRepository.Setup(x => x.SearchHotelsAsync(
                 It.IsAny<string>(), It.IsAny<decimal?>(), It.IsAny<decimal?>(),
                 It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>()))
+                It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(mockResults);
 
             // Act
@@ -115,7 +115,7 @@ namespace ViagemImpacta.Tests.Controllers
             // Verify that the method was called with correct parameters
             _mockHotelRepository.Verify(x => x.SearchHotelsAsync(
                 destination, minPrice, maxPrice, stars, roomType,
-                amenities, guests, checkIn, checkOut), Times.Once);
+                amenities, guests, checkIn, checkOut, It.IsAny<string>()), Times.Once);
         }
     }
 }

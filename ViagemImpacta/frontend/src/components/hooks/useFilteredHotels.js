@@ -33,7 +33,8 @@ export default function useFilteredHotels(filters) {
     filters.roomType,
     filters.checkIn,
     filters.checkOut,
-    filters.estrelas
+    filters.estrelas,
+    filters.sortBy
   ]);
 
   useEffect(() => {

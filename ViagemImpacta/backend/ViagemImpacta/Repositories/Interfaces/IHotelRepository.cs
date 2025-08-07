@@ -27,7 +27,8 @@ namespace ViagemImpacta.Repositories.Interfaces
             string? amenities,
             int? guests,
             string? checkIn,
-            string? checkOut
+            string? checkOut,
+            string? sortBy = null
         );
     }
 }

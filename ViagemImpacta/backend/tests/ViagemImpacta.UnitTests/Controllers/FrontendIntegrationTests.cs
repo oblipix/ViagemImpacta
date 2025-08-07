@@ -119,7 +119,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                "Rio de Janeiro", null, null, null, null, null, null, null, null))
+                "Rio de Janeiro", null, null, null, null, null, null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -149,7 +149,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, null, null, "2025-08-10", "2025-08-15"))
+                null, null, null, null, null, null, null, "2025-08-10", "2025-08-15", null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -179,7 +179,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, 200.00M, 400.00M, null, null, null, null, null, null))
+                null, 200.00M, 400.00M, null, null, null, null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -209,7 +209,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, null, 2, null, null))
+                null, null, null, null, null, null, 2, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -239,7 +239,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, 5, null, null, null, null, null))
+                null, null, null, 5, null, null, null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -384,7 +384,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, "wifi", null, null, null))
+                null, null, null, null, null, "wifi", null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -414,7 +414,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, "wifi,parking,pool", null, null, null))
+                null, null, null, null, null, "wifi,parking,pool", null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -444,7 +444,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, "pool", null, null, null))
+                null, null, null, null, null, "pool", null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -474,7 +474,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, "restaurant", null, null, null))
+                null, null, null, null, null, "restaurant", null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -504,7 +504,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, "bar", null, null, null))
+                null, null, null, null, null, "bar", null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -534,7 +534,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, "roomService", null, null, null))
+                null, null, null, null, null, "roomService", null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -564,7 +564,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, "accessibility", null, null, null))
+                null, null, null, null, null, "accessibility", null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -594,7 +594,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, "breakfastIncludes", null, null, null))
+                null, null, null, null, null, "breakfastIncludes", null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -624,7 +624,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, "Suite", null, null, null, null))
+                null, null, null, null, "Suite", null, null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -654,7 +654,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, "Standard", null, null, null, null))
+                null, null, null, null, "Standard", null, null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -684,7 +684,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, "Luxo", null, null, null, null))
+                null, null, null, null, "Luxo", null, null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -714,7 +714,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, "academia,estacionamento,restaurante", null, null, null))
+                null, null, null, null, null, "academia,estacionamento,restaurante", null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -744,7 +744,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, "WiFi,PARKING,Gym", null, null, null))
+                null, null, null, null, null, "WiFi,PARKING,Gym", null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -774,7 +774,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, "", null, null, null))
+                null, null, null, null, null, "", null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -804,7 +804,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                null, null, null, null, null, "invalidAmenity,wifi,pool", null, null, null))
+                null, null, null, null, null, "invalidAmenity,wifi,pool", null, null, null, null))
                 .ReturnsAsync(hotels);
 
             // Act
@@ -834,7 +834,7 @@ namespace ViagemImpacta.UnitTests.Controllers
             var hotels = _context.Hotels.Include(h => h.Rooms).ToList();
 
             _mockUnitOfWork.Setup(x => x.Hotels.SearchHotelsAsync(
-                "Rio de Janeiro", 200.00M, 500.00M, 5, "Suite", "wifi,pool", 2, "2025-08-10", "2025-08-15"))
+                "Rio de Janeiro", 200.00M, 500.00M, 5, "Suite", "wifi,pool", 2, "2025-08-10", "2025-08-15", null))
                 .ReturnsAsync(hotels);
 
             // Act

@@ -13,9 +13,7 @@ class HotelService {
     // Sistema de cache simples em memória
     this.cache = new Map();
     this.CACHE_TTL = {
-      getAllHotels: 10 * 60 * 1000,        // 10 minutos
-      getHotelsWithFilters: 2 * 60 * 1000, // 2 minutos
-      getHotelById: 15 * 60 * 1000         // 15 minutos
+      getHotelsWithFilters: 2 * 60 * 1000  // 2 minutos
     };
   }
 
@@ -29,7 +27,8 @@ class HotelService {
     if (params === null) {
       return method;
     }
-    return `${method}-${JSON.stringify(params)}`;
+    const key = `${method}-${JSON.stringify(params)}`;
+    return key;
   }
 
   /**
@@ -64,6 +63,7 @@ class HotelService {
    */
   _getFromCache(key, method) {
     const cacheEntry = this.cache.get(key);
+    
     if (this._isValidCache(cacheEntry, method)) {
       return cacheEntry.data;
     }
@@ -97,14 +97,6 @@ class HotelService {
    * @returns {Promise<Array>} Lista de hotéis
    */
   async getAllHotels() {
-    const cacheKey = this._getCacheKey('getAllHotels');
-    
-    // Verifica cache primeiro
-    const cachedData = this._getFromCache(cacheKey, 'getAllHotels');
-    if (cachedData) {
-      return cachedData;
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/hotels`, {
         method: 'GET',
@@ -122,9 +114,6 @@ class HotelService {
       // Transforma os dados do backend para o formato esperado pelo frontend
       const transformedData = this.transformHotelsData(hotels);
       
-      // Armazena no cache
-      this._setCache(cacheKey, transformedData);
-      
       return transformedData;
      
     } catch (error) {
@@ -139,14 +128,6 @@ class HotelService {
    * @returns {Promise<Object>} Dados do hotel
    */
   async getHotelById(id) {
-    const cacheKey = this._getCacheKey('getHotelById', { id });
-    
-    // Verifica cache primeiro
-    const cachedData = this._getFromCache(cacheKey, 'getHotelById');
-    if (cachedData) {
-      return cachedData;
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/hotels/${id}`, {
         method: 'GET',
@@ -164,9 +145,6 @@ class HotelService {
  
       const hotel = await response.json();
       const transformedData = this.transformSingleHotelData(hotel);
-      
-      // Armazena no cache
-      this._setCache(cacheKey, transformedData);
       
       return transformedData;
      
@@ -251,7 +229,6 @@ class HotelService {
       price: this.generatePrice(backendHotel),
       rating: this.generateRating(backendHotel),
       lowestRoomPrice: backendHotel.lowestRoomPrice || backendHotel.LowestRoomPrice,
-      filteredLowestRoomPrice: backendHotel.filteredLowestRoomPrice || backendHotel.FilteredLowestRoomPrice,
 
 
       address: backendHotel.hotelAddress || backendHotel.HotelAddress,
@@ -297,14 +274,16 @@ class HotelService {
   }
 
   async getHotelsWithFilters(filters) {
+    const startTime = performance.now();
     const cacheKey = this._getCacheKey('getHotelsWithFilters', filters);
     
-    // Verifica cache primeiro
     const cachedData = this._getFromCache(cacheKey, 'getHotelsWithFilters');
     if (cachedData) {
+      const cacheTime = performance.now() - startTime;
+      console.log(`🎯 CACHE HIT! Tempo de cache: ${cacheTime.toFixed(2)}ms`);
       return cachedData;
     }
-
+    
     try {
       const params = {};
       if (filters.destination) params.destination = filters.destination;
@@ -318,18 +297,20 @@ class HotelService {
       if (filters.amenities) params.amenities = filters.amenities;
       if (filters.checkIn) params.checkIn = filters.checkIn;
       if (filters.checkOut) params.checkOut = filters.checkOut;
+      if (filters.sortBy) params.sortBy = filters.sortBy;
       
       const response = await axios.get(`${API_BASE_URL}/hotels/search`, { params });
       const transformedData = this.transformHotelsData(response.data);
       
-      // Armazena no cache
       this._setCache(cacheKey, transformedData);
+      
+      const totalTime = performance.now() - startTime;
+      console.log(`❌ CACHE MISS! Tempo total: ${totalTime.toFixed(2)}ms`);
       
       return transformedData;
     } catch (error) {
-      console.error('❌ Error in getHotelsWithFilters:', error);
+      console.error('Error in getHotelsWithFilters:', error);
       
-      // Se a busca com filtros falhar, tenta buscar todos os hotéis
       if (error.response?.status === 404) {
         return await this.getAllHotels();
       }
@@ -361,6 +342,11 @@ class HotelService {
    * Gera preço baseado nos quartos reais ou nas estrelas
    */
   generatePrice(hotel) {
+    // Usa o preço calculado pelo backend (já filtrado pelos quartos disponíveis)
+    if (hotel.lowestRoomPrice || hotel.LowestRoomPrice) {
+      return parseFloat(hotel.lowestRoomPrice || hotel.LowestRoomPrice);
+    }
+    
     // Se tem quartos com preços reais, usa o menor preço
     if (hotel.rooms && Array.isArray(hotel.rooms) && hotel.rooms.length > 0) {
       const prices = hotel.rooms.map(room => 
@@ -551,13 +537,22 @@ class HotelService {
       }
     ];
   }
-getRoomTypes() {
-  return [
-    { id: 0, name: 'Quarto Standard' },
-    { id: 1, name: 'Quarto Luxo' },
-    { id: 2, name: 'Suíte' }
-  ];
-}
+  getRoomTypes() {
+    return [
+      { id: 0, name: 'Standard' },
+      { id: 1, name: 'Luxo' },
+      { id: 2, name: 'Suite' }
+    ];
+  }
+
+  getSortOptions() {
+    return [
+      { value: 'price_asc', label: 'Menor Preço' },
+      { value: 'price_desc', label: 'Maior Preço' },
+      { value: 'name_asc', label: 'Nome A-Z' },
+      { value: 'name_desc', label: 'Nome Z-A' }
+    ];
+  }
   /**
    * Converte o enum RoomType para nome legível
    */
