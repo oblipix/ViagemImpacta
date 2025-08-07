@@ -805,6 +805,7 @@ export const AuthProvider = ({ children }) => {
             try {
                 // Criar a reserva usando o reservationService
                 const savedReservation = await reservationService.createReservation({
+                    idPromotion: reservationData.idPromotion || null,
                     userId: newReservation.userId,
                     roomId: reservationData.roomId, // Precisa do roomId para a API
                     hotelId: newReservation.hotelId,

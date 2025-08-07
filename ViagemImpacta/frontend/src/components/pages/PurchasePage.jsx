@@ -54,7 +54,7 @@ const PurchasePage = () => {
             {/* O restante do seu JSX continua exatamente o mesmo */}
             <div className="mb-8 text-center">
                 <img
-                    src={promotionData.imageUrl}
+                    src={promotionData.bannerPromotion || promotionData.imageUrl || promotionData.mainImageUrl || '/default-promotion.jpg'}
                     alt={promotionData.title}
                     className="w-full max-w-lg h-64 object-cover rounded-lg mx-auto shadow-md"
                 />

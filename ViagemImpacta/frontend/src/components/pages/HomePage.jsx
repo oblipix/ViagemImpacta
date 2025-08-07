@@ -18,7 +18,7 @@ import RecommendedHotelsSection from '../hotels/RecommendedHotelsSection.jsx';
 import ScrollReveal from '../common/ScrollReveal.jsx';
 import AnimatedSection from '../common/AnimatedSection.jsx';
 
-
+console.log(window.Location.url)
 function HomePage() {
   const { isLoaded } = useOutletContext();
   const navigate = useNavigate();
@@ -29,12 +29,12 @@ function HomePage() {
     if (destination) searchParams.append('destination', destination);
     if (minPrice > 0) searchParams.append('minPrice', minPrice);
     if (maxPrice < 10000) searchParams.append('maxPrice', maxPrice);
-    if (Array.isArray(selectedAmenities) && selectedAmenities.length > 0) 
+    if (Array.isArray(selectedAmenities) && selectedAmenities.length > 0)
       searchParams.append('amenities', selectedAmenities.join(','));
     if (selectedRoomType) searchParams.append('roomType', selectedRoomType);
-    if (guests) searchParams.append('guests', guests); 
+    if (guests) searchParams.append('guests', guests);
     if (checkIn) searchParams.append('checkIn', checkIn);
-    if (checkOut) searchParams.append('checkOut', checkOut); 
+    if (checkOut) searchParams.append('checkOut', checkOut);
     // Adicione outros filtros se necessário
     navigate(`/hoteis?${searchParams.toString()}`);
   };
@@ -43,10 +43,10 @@ function HomePage() {
     <>
       {/* Hero aparece imediatamente */}
       <HeroSwiper />
-      
+
       {/* Menu surge de baixo - temporariamente sem animação para teste */}
       <HomeMenu />
-      
+
       {/* Barra de pesquisa sem wrapper animado para evitar bugs no mobile */}
       <SearchHotelsBar
         enableOnChange={true}
@@ -65,9 +65,9 @@ function HomePage() {
 
       {/* Blog surgindo com zoom */}
       <ScrollReveal animation="zoomIn" delay={200}>
-        <BlogSection 
+        <BlogSection
           id="dicas-de-viagem"
-          title="Dicas de Viagem: Prepare sua Aventura!" 
+          title="Dicas de Viagem: Prepare sua Aventura!"
         />
       </ScrollReveal>
 
@@ -75,7 +75,7 @@ function HomePage() {
       <ScrollReveal animation="slideRight" delay={300}>
         <HotelsMapSection isLoaded={isLoaded} />
       </ScrollReveal>
-      
+
       {/* Newsletter surge de baixo */}
       <ScrollReveal animation="fadeUp" delay={400}>
         <NewsletterSection />

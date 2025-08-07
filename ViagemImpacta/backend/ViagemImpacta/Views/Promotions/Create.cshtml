@@ -1,92 +1,134 @@
-﻿@model ViagemImpacta.Models.Promotion
-
+@model ViagemImpacta.DTO.Promotion.CreatePromotionDTO
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Criar Nova Promoção";
 }
 
-<h1>Create</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Criar Nova Promoção</h1>
+    <a class="btn btn-secondary" asp-action="Index">Voltar à Lista</a>
+</div>
 
-<h4>Promotion</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="TitlePromotion" class="control-label"></label>
-                <input asp-for="TitlePromotion" class="form-control" />
-                <span asp-validation-for="TitlePromotion" class="text-danger"></span>
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="TitlePromotion" class="form-label">Título da Promoção</label>
+                        <input asp-for="TitlePromotion" class="form-control" placeholder="Ex: Pacote Final de Ano" />
+                        <span asp-validation-for="TitlePromotion" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="HotelId" class="form-label">Hotel</label>
+                        <select asp-for="HotelId" class="form-select" asp-items="ViewBag.Hotels">
+                            <option value="">Selecione um hotel</option>
+                        </select>
+                        <span asp-validation-for="HotelId" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
+
+            <div class="form-group mb-3">
+                <label asp-for="Description" class="form-label">Descrição</label>
+                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Descreva os detalhes da promoção"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="StartDate" class="control-label"></label>
-                <input asp-for="StartDate" class="form-control" />
-                <span asp-validation-for="StartDate" class="text-danger"></span>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="StartDate" class="form-label">Data de Início da Promoção</label>
+                        <input asp-for="StartDate" type="date" class="form-control" />
+                        <span asp-validation-for="StartDate" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="EndDate" class="form-label">Data de Fim da Promoção</label>
+                        <input asp-for="EndDate" type="date" class="form-control" />
+                        <span asp-validation-for="EndDate" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="EndDate" class="control-label"></label>
-                <input asp-for="EndDate" class="form-control" />
-                <span asp-validation-for="EndDate" class="text-danger"></span>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="CheckIn" class="form-label">Data de Check-In</label>
+                        <input asp-for="CheckIn" type="date" class="form-control" />
+                        <span asp-validation-for="CheckIn" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="CheckOut" class="form-label">Data de Check-Out</label>
+                        <input asp-for="CheckOut" type="date" class="form-control" />
+                        <span asp-validation-for="CheckOut" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="CheckIn" class="control-label"></label>
-                <input asp-for="CheckIn" class="form-control" />
-                <span asp-validation-for="CheckIn" class="text-danger"></span>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="RoomType" class="form-label">Tipo de Quarto</label>
+                        <select asp-for="RoomType" class="form-select">
+                            <option value="">Selecione o tipo</option>
+                            <option value="Standard">Standard</option>
+                            <option value="Suite">Suíte</option>
+                            <option value="Luxo">Luxo</option>
+                        </select>
+                        <span asp-validation-for="RoomType" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="TotalRoomsAvailable" class="form-label">Quartos Disponíveis</label>
+                        <input asp-for="TotalRoomsAvailable" type="number" class="form-control" min="1" placeholder="10" />
+                        <span asp-validation-for="TotalRoomsAvailable" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="DiscountPercentage" class="form-label">Desconto (%)</label>
+                        <input asp-for="DiscountPercentage" type="number" step="0.01" class="form-control" min="0" max="100" placeholder="15.00" />
+                        <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="CheckOut" class="control-label"></label>
-                <input asp-for="CheckOut" class="form-control" />
-                <span asp-validation-for="CheckOut" class="text-danger"></span>
+
+            <div id="imageUrlsContainer">
+                <div class="image-url-entry mb-3">
+                    <label class="form-label">Imagem Principal *</label>
+                    <div class="input-group">
+                        <input type="url" name="BannerPromotion" class="form-control" placeholder="https://exemplo.com/imagem.jpg" />
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="HotelId" class="control-label"></label>
-                <select asp-for="HotelId" class ="form-control" asp-items="ViewBag.HotelId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="FinalPrice" class="control-label"></label>
-                <input asp-for="FinalPrice" class="form-control" />
-                <span asp-validation-for="FinalPrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="OriginalPrice" class="control-label"></label>
-                <input asp-for="OriginalPrice" class="form-control" />
-                <span asp-validation-for="OriginalPrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DiscountPercentage" class="control-label"></label>
-                <input asp-for="DiscountPercentage" class="form-control" />
-                <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control" />
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RoomsPromotionalId" class="control-label"></label>
-                <input asp-for="RoomsPromotionalId" class="form-control" />
-                <span asp-validation-for="RoomsPromotionalId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save me-2"></i>Criar Promoção
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </a>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -8,9 +8,9 @@ import { paymentService } from '../../services/paymentService.js';
 import { Icons } from '../layout/Icons.jsx';
 import DateErrorModal from './DateErrorModal.jsx'; // Importa o modal de erro de data
 
-const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
+const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess, isPromotion = false, promotion = null, promotionDates = null }) => {
   const { currentUser, isLoggedIn, addReservationToHistory } = useAuth();
-  
+
   // Função para obter a data mínima permitida (amanhã)
   const getMinDate = () => {
     const today = new Date();
@@ -25,8 +25,8 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
   };
 
   const [formData, setFormData] = useState({
-    checkIn: '',
-    checkOut: '',
+    checkIn: isPromotion && promotionDates ? promotionDates.checkIn : '',
+    checkOut: isPromotion && promotionDates ? promotionDates.checkOut : '',
     numberOfGuests: 1,
     specialRequests: '',
     travellers: [
@@ -37,7 +37,24 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
       }
     ]
   });
-  
+
+  // Debug log para verificar as datas da promoção
+  React.useEffect(() => {
+    console.log('ReservationModal - isPromotion:', isPromotion);
+    console.log('ReservationModal - promotionDates:', promotionDates);
+    console.log('ReservationModal - formData.checkIn:', formData.checkIn);
+    console.log('ReservationModal - formData.checkOut:', formData.checkOut);
+
+    // Para promoções, define o total fixo imediatamente
+    if (isPromotion && room?.price) {
+      setCalculatedTotal({
+        nights: 1, // Não importa o número real de noites para promoções
+        basePrice: room.price,
+        total: room.price
+      });
+    }
+  }, [isPromotion, promotionDates, formData.checkIn, formData.checkOut, room?.price]);
+
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState([]);
   const [calculatedTotal, setCalculatedTotal] = useState(null);
@@ -56,12 +73,17 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
+    // Se for promoção, não permitir alteração das datas
+    if (isPromotion && (name === 'checkIn' || name === 'checkOut')) {
+      return; // Não faz nada, mantém as datas bloqueadas
+    }
+
     // Validação para campos de data
     if (name === 'checkIn' || name === 'checkOut') {
       const today = getTodayDate();
       const minDate = getMinDate();
-      
+
       // Valida se a data não é anterior a amanhã (ou igual a hoje)
       if (value && (value < minDate || value === today)) {
         setDateErrorModal({
@@ -71,7 +93,7 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
         });
         return;
       }
-      
+
       // Validação adicional para check-out: deve ser posterior ao check-in
       if (name === 'checkOut' && formData.checkIn && value && value <= formData.checkIn) {
         setDateErrorModal({
@@ -81,7 +103,7 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
         });
         return;
       }
-      
+
       // Se check-in for alterado e check-out for anterior, limpar check-out
       if (name === 'checkIn' && formData.checkOut && value && formData.checkOut <= value) {
         setFormData(prev => ({
@@ -93,11 +115,11 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
         return;
       }
     }
-    
+
     if (name === 'numberOfGuests') {
       const guestCount = parseInt(value);
       const newTravellers = [];
-      
+
       // Ajusta a lista de viajantes baseado no número de hóspedes
       for (let i = 0; i < guestCount; i++) {
         newTravellers.push(formData.travellers[i] || {
@@ -106,7 +128,7 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
           cpf: ''
         });
       }
-      
+
       setFormData(prev => ({
         ...prev,
         [name]: guestCount,
@@ -119,20 +141,27 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
       }));
     }
 
-    // Recalcula o total quando as datas mudam
+    // Recalcula o total quando as datas mudam (apenas para reservas normais, não promoções)
     const checkIn = name === 'checkIn' ? value : formData.checkIn;
     const checkOut = name === 'checkOut' ? value : formData.checkOut;
-    
-    if (checkIn && checkOut && checkOut > checkIn) {
+
+    if (!isPromotion && checkIn && checkOut && checkOut > checkIn) {
       const total = reservationService.calculateReservationTotal(room.price, checkIn, checkOut);
       setCalculatedTotal(total);
+    } else if (isPromotion) {
+      // Para promoções, usa o preço fixo do room sem cálculos
+      setCalculatedTotal({
+        nights: 1, // Não importa o número real de noites para promoções
+        basePrice: room.price,
+        total: room.price
+      });
     }
   };
 
   const handleTravellerChange = (index, field, value) => {
     setFormData(prev => ({
       ...prev,
-      travellers: prev.travellers.map((traveller, i) => 
+      travellers: prev.travellers.map((traveller, i) =>
         i === index ? { ...traveller, [field]: value } : traveller
       )
     }));
@@ -145,39 +174,39 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
 
     try {
       // Debug: vamos ver os dados que estão sendo enviados
-      console.log('Room data:', room);
-      console.log('Hotel data:', hotel);
-      console.log('Current user:', currentUser);
+      console.log('🔍 Room data:', room);
+      console.log('🔍 Hotel data:', hotel);
+      console.log('🔍 Current user:', currentUser);
+      console.log('🔍 Is promotion:', isPromotion);
+      console.log('🔍 Promotion data:', promotion);
 
-      // Prepara os dados da reserva usando o paymentService
-      const reservationData = paymentService.formatReservationData(
-        formData, 
-        room, 
-        hotel, 
-        currentUser.id || currentUser.userId
-      );
+      // Prepara os dados da reserva CORRETAMENTE
+      const reservationData = {
+        UserId: currentUser.id || currentUser.userId,
+        RoomId: room.id || 1,
+        HotelId: hotel.id,
+        CheckIn: formData.checkIn,
+        CheckOut: formData.checkOut,
+        NumberOfGuests: parseInt(formData.numberOfGuests),
+        SpecialRequests: formData.specialRequests || '',
+        Travellers: formData.travellers.map(traveller => ({
+          FirstName: traveller.firstName,
+          LastName: traveller.lastName,
+          Cpf: traveller.cpf.replace(/\D/g, '')
+        })),
+        // ADICIONA O CAMPO DA PROMOÇÃO AQUI - tenta diferentes propriedades possíveis:
+        idPromotion: isPromotion ? (promotion?.id || promotion?.promotionId || promotion?.PromotionId || null) : null
+      };
 
-      console.log('Reservation data being sent:', reservationData);
-
-      // Valida os dados
-      const validation = reservationService.validateReservationData({
-        ...reservationData,
-        userId: currentUser.id || currentUser.userId,
-        roomId: room.id || 1,
-        hotelId: hotel.id,
-        checkIn: formData.checkIn,
-        checkOut: formData.checkOut,
-        numberOfGuests: parseInt(formData.numberOfGuests),
-        specialRequests: formData.specialRequests,
-        travellers: formData.travellers
-      });
-
-      if (!validation.isValid) {
-        console.log('Validation errors:', validation.errors);
-        setErrors(validation.errors);
-        setLoading(false);
-        return;
-      }
+      console.log('🎯 DADOS DA RESERVA FINAL ESTRUTURADOS:', JSON.stringify(reservationData, null, 2));
+      console.log('🎯 VERIFICAÇÃO DE idPromotion:');
+      console.log('   - isPromotion:', isPromotion);
+      console.log('   - promotion existe:', !!promotion);
+      console.log('   - promotion.id:', promotion?.id);
+      console.log('   - promotion.promotionId:', promotion?.promotionId);
+      console.log('   - promotion.PromotionId:', promotion?.PromotionId);
+      console.log('   - Valor final de idPromotion:', reservationData.idPromotion);
+      console.log('   - Todas as chaves do objeto promotion:', promotion ? Object.keys(promotion) : 'promotion é null');
 
       // Processa a reserva e redireciona para o pagamento
       // Salva imediatamente no histórico (como "pendente" até o pagamento ser confirmado)
@@ -195,11 +224,11 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
         location: hotel.location,
         status: 'pending' // Marcamos como pendente até confirmação do pagamento
       };
-      
+
       addReservationToHistory(reservationForHistory);
-      
+
       await paymentService.processReservationAndPayment(reservationData);
-      
+
       // Se chegou até aqui, o processo foi iniciado com sucesso
       // O usuário será redirecionado para o Stripe, então fechamos o modal
       onClose();
@@ -249,8 +278,8 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
             </button>
           </div>
         </div>
-        
-        <div className="flex-1 overflow-y-auto p-6" style={{maxHeight: 'calc(90vh - 200px)'}}>
+
+        <div className="flex-1 overflow-y-auto p-6" style={{ maxHeight: 'calc(90vh - 200px)' }}>
           {/* Info do Hotel e Quarto */}
           <div className="mb-6 p-4 bg-gray-100 rounded-lg">
             <h3 className="font-semibold text-lg text-gray-800">{hotel.title}</h3>
@@ -284,7 +313,7 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Check-in
+                  Check-in {isPromotion && <span className="text-red-600 text-xs">(Data da Promoção - Não Alterável)</span>}
                 </label>
                 <input
                   type="date"
@@ -292,11 +321,12 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
                   value={formData.checkIn}
                   min={getMinDate()}
                   onChange={handleInputChange}
+                  readOnly={isPromotion}
                   onBlur={(e) => {
                     const { value } = e.target;
                     const today = getTodayDate();
                     const minDate = getMinDate();
-                    
+
                     if (value && (value < minDate || value === today)) {
                       e.target.setCustomValidity('Só é permitido agendar em datas posteriores ao dia de hoje!');
                     } else {
@@ -306,13 +336,14 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
                   onInvalid={(e) => {
                     e.target.setCustomValidity('Só é permitido agendar em datas posteriores ao dia de hoje!');
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${isPromotion ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Check-out
+                  Check-out {isPromotion && <span className="text-red-600 text-xs">(Data da Promoção - Não Alterável)</span>}
                 </label>
                 <input
                   type="date"
@@ -320,12 +351,13 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
                   value={formData.checkOut}
                   min={formData.checkIn || getMinDate()}
                   onChange={handleInputChange}
+                  readOnly={isPromotion}
                   onBlur={(e) => {
                     const { value } = e.target;
                     const today = getTodayDate();
                     const minDate = getMinDate();
                     const checkInDate = formData.checkIn;
-                    
+
                     if (value && (value < minDate || value === today)) {
                       e.target.setCustomValidity('Só é permitido agendar em datas posteriores ao dia de hoje!');
                     } else if (value && checkInDate && value <= checkInDate) {
@@ -342,7 +374,8 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
                       e.target.setCustomValidity('Só é permitido agendar em datas posteriores ao dia de hoje!');
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${isPromotion ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
                   required
                 />
               </div>
@@ -374,7 +407,7 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
                   <h5 className="font-medium text-gray-700 mb-3">
                     Viajante {index + 1} {index === 0 && '(Responsável pela reserva)'}
                   </h5>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -403,7 +436,7 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
                       />
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       CPF * (apenas números)
@@ -443,12 +476,21 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
             {/* Resumo do valor */}
             {calculatedTotal && (
               <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-semibold text-gray-800 mb-2">Resumo da Reserva</h4>
+                <h4 className="font-semibold text-gray-800 mb-2">
+                  {isPromotion ? 'Resumo da Promoção' : 'Resumo da Reserva'}
+                </h4>
                 <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span>{calculatedTotal.days} {calculatedTotal.days === 1 ? 'noite' : 'noites'} × R$ {calculatedTotal.dailyPrice.toFixed(2).replace('.', ',')}</span>
-                    <span>R$ {calculatedTotal.subtotal.toFixed(2).replace('.', ',')}</span>
-                  </div>
+                  {isPromotion ? (
+                    <div className="flex justify-between">
+                      <span>Valor da Promoção (Datas Fixas)</span>
+                      <span>R$ {calculatedTotal.total.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between">
+                      <span>{calculatedTotal.days} {calculatedTotal.days === 1 ? 'noite' : 'noites'} × R$ {calculatedTotal.dailyPrice.toFixed(2).replace('.', ',')}</span>
+                      <span>R$ {calculatedTotal.subtotal.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                  )}
                   {/* TAXAS REMOVIDAS - NÃO MOSTRAR MAIS
                   <div className="flex justify-between">
                     <span>Taxas e impostos</span>
@@ -459,12 +501,17 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess }) => {
                     <span>Total</span>
                     <span>R$ {calculatedTotal.total.toFixed(2).replace('.', ',')}</span>
                   </div>
+                  {isPromotion && (
+                    <div className="text-xs text-red-600 mt-2 font-medium">
+                      🔥 Valor promocional fixo - Datas não alteráveis
+                    </div>
+                  )}
                 </div>
               </div>
             )}
           </form>
         </div>
-        
+
         <div className="flex-shrink-0 p-6 border-t border-gray-200">
           <div className="flex gap-3">
             <button

@@ -1,4 +1,6 @@
-﻿namespace ViagemImpacta.Models
+﻿using Microsoft.EntityFrameworkCore.Update.Internal;
+
+namespace ViagemImpacta.Models
 {
     public class Promotion
     {
@@ -16,15 +18,16 @@
         public int HotelId { get; set; }
         public Hotel? Hotel { get; set; }
 
-        public decimal FinalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
         public decimal OriginalPrice { get; set; }
-        public decimal DiscountPercentage { get; set; } = 0.15m;
+        public decimal DiscountPercentage { get; set; }
 
         public bool IsActive { get; set; } = true;
+        public DateTime UpdatedAt { get; set; } 
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        public int RoomsPromotionalId { get; set; }
-        public RoomsPromotional? RoomsPromotional { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string BannerPromotion { get; set; } 
+        public RoomsPromotional RoomsPromotional { get; set; }
+        
     }
 }

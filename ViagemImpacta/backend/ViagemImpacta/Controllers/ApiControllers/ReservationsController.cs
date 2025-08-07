@@ -1,9 +1,11 @@
+using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using ViagemImpacta.DTO.ReservationDTO;
+using ViagemImpacta.Models;
 using ViagemImpacta.Services.Interfaces;
+using ViagemImpacta.Services.Implementations;
 
 namespace ViagemImpacta.Controllers.ApiControllers
 {
@@ -12,12 +14,16 @@ namespace ViagemImpacta.Controllers.ApiControllers
     public class ReservationsController : ControllerBase
     {
         private readonly IReservationService _reservationService;
+        private readonly IPromotionService _promotionService;
         private readonly IMapper _mapper;
+        private readonly StripeService _stripeService;
 
-        public ReservationsController(IReservationService reservationService, IMapper mapper)
+        public ReservationsController(IReservationService reservationService, IMapper mapper, IPromotionService promotionService, StripeService stripeService)
         {
             _reservationService = reservationService;
             _mapper = mapper;
+            _promotionService = promotionService;
+            _stripeService = stripeService;
         }
 
         /// <summary>
@@ -48,7 +54,36 @@ namespace ViagemImpacta.Controllers.ApiControllers
             {
                 return BadRequest(ex.Message);
             }
-            
+
+        }
+
+        [HttpPost("promotionReservation")]
+        //[Authorize]
+        public async Task<ActionResult<ReservationDto>> CreateReservationByPromotion([FromBody] CreateReservationPromotionDto dto)
+        {
+            if (!ModelState.IsValid) 
+            return BadRequest(ModelState);
+
+            if (dto == null) 
+            return BadRequest("Dados da reserva não podem ser nulos");
+
+            var roomsAvailable = await _reservationService.RoomsAvailable(dto.idPromotion);
+            if (roomsAvailable)
+            {
+                try
+                {
+                    var reservation = await _reservationService.CreateReservationByPromotion(dto);
+                    var reservationDto = _mapper.Map<ReservationDto>(reservation);
+                    return CreatedAtAction(nameof(GetReservation), new { id = reservation.ReservationId }, reservationDto);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.StackTrace);
+                    return BadRequest(ex.Message);
+                }
+            }
+
+            return BadRequest("retorno final");
         }
 
         /// <summary>

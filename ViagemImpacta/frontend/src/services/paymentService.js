@@ -18,7 +18,7 @@ class PaymentService {
       console.log('Creating checkout session for reservation ID:', reservationId);
       const token = localStorage.getItem('authToken');
       console.log('Auth token exists:', !!token);
-      
+
       const response = await fetch(`https://localhost:7010/api/Stripe/checkout?id=${reservationId}`, {
         method: 'POST',
         headers: {
@@ -58,7 +58,7 @@ class PaymentService {
    */
   redirectToStripeCheckout(checkoutUrl) {
     if (checkoutUrl) {
-      window.location.href = checkoutUrl.result;
+      window.location.href = checkoutUrl;
     } else {
       throw new Error('URL de checkout inválida');
     }
@@ -71,8 +71,22 @@ class PaymentService {
    */
   async processReservationAndPayment(reservationData) {
     try {
+      console.log('🚀 INICIANDO PROCESSO DE RESERVA E PAGAMENTO');
+      console.log('📊 Dados completos da reserva:', JSON.stringify(reservationData, null, 2));
+      console.log('🎯 idPromotion encontrado:', reservationData.idPromotion);
+
+      const isPromotionPage = window.location.pathname.startsWith('/promocao/');
+      const endpoint = isPromotionPage ? "reservations/promotionReservation" : "reservations";
+      console.log('🌐 URL atual:', window.location.pathname);
+      console.log('🎯 É página de promoção?', isPromotionPage);
+      console.log('📍 Endpoint sendo usado:', endpoint);
+      
+      // Debug: verificar o que vai ser enviado
+      console.log('📤 DADOS QUE SERÃO ENVIADOS PARA O BACKEND:', JSON.stringify(reservationData, null, 2));
+      console.log('📤 idPromotion nos dados:', reservationData.idPromotion);
+      
       // Primeiro, criar a reserva
-      const reservationResponse = await fetch(`${API_BASE_URL}/reservations`, {
+      const reservationResponse = await fetch(`${API_BASE_URL}/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,24 +94,43 @@ class PaymentService {
         },
         body: JSON.stringify(reservationData)
       });
+      
       console.log('Reserva response status:', reservationResponse.status);
       if (!reservationResponse.ok) {
+        const errorText = await reservationResponse.text();
+        console.error('❌ ERRO DETALHADO DO BACKEND:', errorText);
+        console.error('❌ Status do erro:', reservationResponse.status);
+        console.error('❌ Headers da resposta:', Object.fromEntries(reservationResponse.headers.entries()));
+        
         if (reservationResponse.status === 400) {
-          throw new Error('Não foi possível criar sua reserva! Verifique seus dados ou ligue para nós para verificar a disponibilidade de quartos.');
+          throw new Error(`Erro 400 - Dados inválidos: ${errorText}`);
         }
         if (reservationResponse.status === 401) {
           throw new Error('Você precisa estar logado para fazer uma reserva. Por favor, faça login e tente novamente.');
         }
-        const errorData = await reservationResponse.json().catch(() => ({}));
-        throw new Error(errorData.message || `Erro ao criar reserva: ${reservationResponse.status} ${reservationResponse.statusText}`);
+        
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { message: errorText };
+        }
+        
+        throw new Error(errorData.message || `Erro ao criar reserva: ${reservationResponse.status} ${reservationResponse.statusText} - ${errorText}`);
       }
 
       const reservation = await reservationResponse.json();
-      console.log('Reserva criada com sucesso:', reservation);
-      console.log('Reservation ID:', reservation.reservationId || reservation.ReservationId);
+      console.log('✅ RESERVA CRIADA COM SUCESSO!');
+      console.log('📋 Resposta completa do backend:', JSON.stringify(reservation, null, 2));
+      console.log('🔍 Reservation ID (reservationId):', reservation.reservationId);
+      console.log('🔍 Reservation ID (ReservationId):', reservation.ReservationId);
+      console.log('🔍 Reservation ID (id):', reservation.id);
 
-      const reservationId = reservation.reservationId || reservation.ReservationId;
+      const reservationId = reservation.reservationId || reservation.ReservationId || reservation.id;
+      console.log('🎯 ID FINAL DA RESERVA:', reservationId);
+      
       if (!reservationId) {
+        console.error('❌ NENHUM ID ENCONTRADO NA RESPOSTA');
         throw new Error('ID da reserva não foi retornado pelo servidor');
       }
 

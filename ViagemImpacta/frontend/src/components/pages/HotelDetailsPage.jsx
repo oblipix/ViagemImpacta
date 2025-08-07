@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useHotels } from '../hooks/useHotels.js';
@@ -8,10 +10,13 @@ import ReservationModal from '../modals/ReservationModal.jsx';
 import { Icons } from '../layout/Icons.jsx';
 import '../styles/HotelDetailsPage.css';
 
+
 // Importa o carrossel e seus estilos
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+
+
 
 
 // Componente para renderizar estrelas de avaliação
@@ -25,6 +30,7 @@ const RatingDisplay = ({ rating }) => {
         </div>
     );
 };
+
 
 // Componente personalizado para ícone de xícara (café/restaurante)
 const CoffeeIcon = () => (
@@ -75,7 +81,7 @@ const leisureIconMap = {
     'Teatro': Icons.Cinema,
     'Bar': Icons.Bar,
     'Bar na piscina': Icons.Bar,
-    'Restaurante': CoffeeIcon, 
+    'Restaurante': CoffeeIcon,
     'Jardim': FlowerIcon,
     'Jardim Amplo': FlowerIcon,
     'Salão de Jogos': Icons.Saloon,
@@ -95,7 +101,7 @@ const leisureIconMap = {
     'Internet': Icons.Wifi,
     'Estacionamento': Icons.TotalRooms,
     'Estacionamento Grátis': Icons.TotalRooms,
-    'Serviço de Quarto': BroomIcon, 
+    'Serviço de Quarto': BroomIcon,
     'Acessibilidade': Icons.User,
     'Pet Friendly': PetIcon,
     'Aceita Animais': PetIcon,
@@ -128,25 +134,27 @@ const leisureIconMap = {
     'animais': PetIcon
 };
 
+
 function HotelDetailsPage() {
     const { hotelId } = useParams();
     const navigate = useNavigate();
     const { getHotelById } = useHotels();
     const { isLoggedIn, currentUser } = useAuth();
-    
+
     const [hotel, setHotel] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalImages, setModalImages] = useState([]);
     const [initialImageId, setInitialImageId] = useState(null);
-    
+
     const [reviews, setReviews] = useState([]);
     const [reviewsLoading, setReviewsLoading] = useState(false);
     const [reviewsError, setReviewsError] = useState(null);
-    
+
     const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
+
 
     useEffect(() => {
         const loadHotel = async () => {
@@ -161,6 +169,7 @@ function HotelDetailsPage() {
             }
         };
 
+
         if (hotelId) {
             loadHotel();
         }
@@ -168,15 +177,15 @@ function HotelDetailsPage() {
 
     const loadReviews = async () => {
         if (!hotelId || !isLoggedIn) return;
-        
+
         try {
             setReviewsLoading(true);
             setReviewsError(null);
             const reviewData = await reviewService.getHotelReviews(parseInt(hotelId));
-            
+
             const reviewsArray = reviewData.reviews || [];
 
-            
+
             setReviews(reviewsArray);
         } catch (error) {
             console.error('Erro ao carregar reviews:', error);
@@ -202,6 +211,7 @@ function HotelDetailsPage() {
         );
     }
 
+
     if (error || !hotel) {
         return (
             <div className="container mx-auto py-8 px-6 text-center">
@@ -214,11 +224,13 @@ function HotelDetailsPage() {
         );
     }
 
+
     const handleImageClick = (imagesArray, clickedImageId) => {
         setModalImages(imagesArray);
         setInitialImageId(clickedImageId);
         setIsModalOpen(true);
     };
+
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -281,12 +293,15 @@ function HotelDetailsPage() {
         ]
     };
 
+
     return (
         <div className="container mx-auto py-4 sm:py-8 px-4 sm:px-6">
             <button onClick={() => navigate(-1)} className="main-action-button bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-3 sm:px-4 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center mb-6 sm:mb-8 text-sm sm:text-base">
                 <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 Voltar
             </button>
+
 
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div className="relative">
@@ -306,16 +321,18 @@ function HotelDetailsPage() {
                         </p>
                     </div>
                 </div>
-                
+
                 <div className="p-4 sm:p-6 md:p-8">
                     <div className="bg-blue-50 border-l-4 border-blue-600 text-gray-800 leading-relaxed p-4 sm:p-6 rounded-r-lg mb-6 sm:mb-8 shadow-sm">
                         <h3 className="text-blue-800 font-semibold mb-2 text-sm sm:text-base">Sobre o hotel</h3>
                         <p className="text-sm sm:text-base">{hotel.description}</p>
                     </div>
 
+
                     {hotel.galleryImages && hotel.galleryImages.length > 0 && (
                         <div className="mb-6 sm:mb-8">
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 Galeria de Fotos
                             </h2>
@@ -334,8 +351,10 @@ function HotelDetailsPage() {
                         </div>
                     )}
 
+
                     <div className="my-6 sm:my-8 py-4 sm:py-6 border-t border-b border-gray-200">
                         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                            <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                             <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                             O que o hotel oferece
                         </h2>
@@ -352,9 +371,11 @@ function HotelDetailsPage() {
                         </div>
                     </div>
 
+
                     {hotel.roomOptions?.length > 0 && (
                         <div className="mb-6 sm:mb-8">
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                                 <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                                 Opções de Quartos
                             </h2>
@@ -365,6 +386,8 @@ function HotelDetailsPage() {
                                             <h3 className="text-lg sm:text-xl font-semibold text-gray-800 group-hover:text-blue-700 transition-colors duration-300">{room.type}</h3>
                                             <p className="text-gray-600 text-sm mt-2">{room.description}</p>
                                             <div className="mt-3 flex flex-wrap gap-2">
+                                                <span className="inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"><svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>Café da manhã</span>
+                                                <span className="inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"><svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>Wi-Fi grátis</span>
                                                 <span className="inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"><svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>Café da manhã</span>
                                                 <span className="inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"><svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>Wi-Fi grátis</span>
                                             </div>
@@ -421,10 +444,17 @@ function HotelDetailsPage() {
                                     </Slider>
                                 </div>
                             ) : (
-                                <div className="bg-gray-50 rounded-lg p-8 text-center"><svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg><p className="text-gray-600">Este hotel ainda não possui avaliações.</p><p className="text-gray-500 text-sm mt-2">Seja o primeiro a avaliar!</p></div>
+                                <div className="bg-gray-50 rounded-lg p-8 text-center">
+                                    <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                                    </svg>
+                                    <p className="text-gray-600">Este hotel ainda não possui avaliações.</p>
+                                    <p className="text-gray-500 text-sm mt-2">Seja o primeiro a avaliar!</p>
+                                </div>
                             )}
                         </div>
                     )}
+
 
                     {!isLoggedIn && (
                         <div className="mb-6 sm:mb-8">
@@ -442,6 +472,7 @@ function HotelDetailsPage() {
                     )}
                 </div>
             </div>
+
 
             {isModalOpen && (
                 <ImageModal
@@ -463,7 +494,6 @@ function HotelDetailsPage() {
         </div>
     );
 }
-
 
 export default HotelDetailsPage;
 
