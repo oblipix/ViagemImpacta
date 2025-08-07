@@ -58,7 +58,7 @@ class PaymentService {
    */
   redirectToStripeCheckout(checkoutUrl) {
     if (checkoutUrl) {
-      window.location.href = checkoutUrl.result;
+      window.location.href = checkoutUrl;
     } else {
       throw new Error('URL de checkout inválida');
     }
