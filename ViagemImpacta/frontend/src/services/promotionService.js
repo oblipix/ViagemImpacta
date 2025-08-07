@@ -95,10 +95,12 @@ class PromotionService {
 
         return {
             id: promotion.id || promotion.promotionId,
+            promotionId: promotion.promotionId || promotion.id, // Manter ambos os campos
             title: promotion.title || promotion.titlePromotion,
             description: promotion.description,
             mainImageUrl: promotion.mainImageUrl || promotion.imageUrl || '/default-promotion.jpg',
             bannerPromotion: promotion.bannerPromotion || promotion.BannerPromotion || promotion.banner_promotion || promotion.mainImageUrl || promotion.imageUrl,
+            hotelId: promotion.hotelId || promotion.hotel?.hotelId || promotion.hotel?.id, // Preservar hotelId
             hotelName: promotion.hotel?.name || promotion.hotelName || 'Hotel não informado',
             checkIn: new Date(promotion.checkIn).toLocaleDateString('pt-BR'),
             checkOut: new Date(promotion.checkOut).toLocaleDateString('pt-BR'),
@@ -109,7 +111,9 @@ class PromotionService {
             validUntil: new Date(promotion.endDate).toLocaleDateString('pt-BR'),
             roomsReserved: roomsReserved,
             roomsTotal: roomsTotal,
-            roomsAvailable: roomsTotal - roomsReserved
+            roomsAvailable: roomsTotal - roomsReserved,
+            // Preservar todos os dados originais como fallback
+            ...promotion
         };
     }
 

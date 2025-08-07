@@ -174,52 +174,39 @@ const ReservationModal = ({ isOpen, onClose, hotel, room, onSuccess, isPromotion
 
     try {
       // Debug: vamos ver os dados que estão sendo enviados
-      console.log('Room data:', room);
-      console.log('Hotel data:', hotel);
-      console.log('Current user:', currentUser);
+      console.log('🔍 Room data:', room);
+      console.log('🔍 Hotel data:', hotel);
+      console.log('🔍 Current user:', currentUser);
+      console.log('🔍 Is promotion:', isPromotion);
+      console.log('🔍 Promotion data:', promotion);
 
-      // Prepara os dados da reserva usando o paymentService
-      const reservationData = paymentService.formatReservationData(
-        formData,
-        room,
-        hotel,
-        currentUser.id || currentUser.userId
-      );
+      // Prepara os dados da reserva CORRETAMENTE
+      const reservationData = {
+        UserId: currentUser.id || currentUser.userId,
+        RoomId: room.id || 1,
+        HotelId: hotel.id,
+        CheckIn: formData.checkIn,
+        CheckOut: formData.checkOut,
+        NumberOfGuests: parseInt(formData.numberOfGuests),
+        SpecialRequests: formData.specialRequests || '',
+        Travellers: formData.travellers.map(traveller => ({
+          FirstName: traveller.firstName,
+          LastName: traveller.lastName,
+          Cpf: traveller.cpf.replace(/\D/g, '')
+        })),
+        // ADICIONA O CAMPO DA PROMOÇÃO AQUI - tenta diferentes propriedades possíveis:
+        idPromotion: isPromotion ? (promotion?.id || promotion?.promotionId || promotion?.PromotionId || null) : null
+      };
 
-      // Adiciona o idPromotion se for uma reserva de promoção
-      if (isPromotion && promotion && promotion.id) {
-        reservationData.idPromotion = promotion.id;
-        console.log('🎉 Adicionando idPromotion:', promotion.id);
-        console.log('🎉 Promotion completa:', promotion);
-      } else {
-        console.log('❌ Não é promoção ou dados incompletos:');
-        console.log('   - isPromotion:', isPromotion);
-        console.log('   - promotion:', promotion);
-        console.log('   - promotion.id:', promotion?.id);
-      }
-
-      console.log('Reservation data being sent:', reservationData);
-
-      // Valida os dados
-      const validation = reservationService.validateReservationData({
-        ...reservationData,
-        idPromotion: reservationData.idPromotion,
-        userId: currentUser.id || currentUser.userId,
-        roomId: room.id || 1,
-        hotelId: hotel.id,
-        checkIn: formData.checkIn,
-        checkOut: formData.checkOut,
-        numberOfGuests: parseInt(formData.numberOfGuests),
-        specialRequests: formData.specialRequests,
-        travellers: formData.travellers
-      });
-
-      if (!validation.isValid) {
-        console.log('Validation errors:', validation.errors);
-        setErrors(validation.errors);
-        setLoading(false);
-        return;
-      }
+      console.log('🎯 DADOS DA RESERVA FINAL ESTRUTURADOS:', JSON.stringify(reservationData, null, 2));
+      console.log('🎯 VERIFICAÇÃO DE idPromotion:');
+      console.log('   - isPromotion:', isPromotion);
+      console.log('   - promotion existe:', !!promotion);
+      console.log('   - promotion.id:', promotion?.id);
+      console.log('   - promotion.promotionId:', promotion?.promotionId);
+      console.log('   - promotion.PromotionId:', promotion?.PromotionId);
+      console.log('   - Valor final de idPromotion:', reservationData.idPromotion);
+      console.log('   - Todas as chaves do objeto promotion:', promotion ? Object.keys(promotion) : 'promotion é null');
 
       // Processa a reserva e redireciona para o pagamento
       // Salva imediatamente no histórico (como "pendente" até o pagamento ser confirmado)

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using ViagemImpacta.DTO.ReservationDTO;
 using ViagemImpacta.Models;
 using ViagemImpacta.Services.Interfaces;
+using ViagemImpacta.Services.Implementations;
 
 namespace ViagemImpacta.Controllers.ApiControllers
 {
@@ -15,12 +16,14 @@ namespace ViagemImpacta.Controllers.ApiControllers
         private readonly IReservationService _reservationService;
         private readonly IPromotionService _promotionService;
         private readonly IMapper _mapper;
+        private readonly StripeService _stripeService;
 
-        public ReservationsController(IReservationService reservationService, IMapper mapper, IPromotionService promotionService)
+        public ReservationsController(IReservationService reservationService, IMapper mapper, IPromotionService promotionService, StripeService stripeService)
         {
             _reservationService = reservationService;
             _mapper = mapper;
-            _promotionService = promotionService;   
+            _promotionService = promotionService;
+            _stripeService = stripeService;
         }
 
         /// <summary>
@@ -71,7 +74,7 @@ namespace ViagemImpacta.Controllers.ApiControllers
                 {
                     var reservation = await _reservationService.CreateReservationByPromotion(dto);
                     var reservationDto = _mapper.Map<ReservationDto>(reservation);
-                    return Ok(CreatedAtAction(nameof(GetReservation), new { id = reservation.ReservationId }, reservationDto));
+                    return CreatedAtAction(nameof(GetReservation), new { id = reservation.ReservationId }, reservationDto);
                 }
                 catch (Exception ex)
                 {

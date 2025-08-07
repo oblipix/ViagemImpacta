@@ -17,6 +17,6 @@ namespace ViagemImpacta.Services.Interfaces
         Task<Reservation> CreateReservationByPromotion( CreateReservationPromotionDto Dto);
         Task<bool> RoomsAvailable(int idPromotion);
         Task SendPaymentLinkToUserEmail(Reservation reservation);
-        Task<bool> AddReservationRoomsPromotion(Reservation reservetion);
+       // Task<bool> AddReservationRoomsPromotion(Reservation reservetion);
     }
 }

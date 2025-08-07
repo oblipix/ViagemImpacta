@@ -104,8 +104,8 @@ class ReservationService {
   async createReservation(reservationData) {
     try {
       const regex = new RegExp("[0-9]+");
-      const endpoint = window.location.href.match(`https://localhost:5173/hoteis/${regex}`) ? "reservation" : "reservations/promotionReservation";
-      console.log(`${API_BASE_URL}/${endpoint}` + "  ijdkj");
+      const endpoint = window.location.href.match(`https://localhost:5173/hotels/${regex}`) ? "reservation" : "reservations/promotionReservation";
+
       const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
         method: 'POST',
         headers: {
@@ -113,7 +113,6 @@ class ReservationService {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         },
         body: JSON.stringify({
-          idPromotion: reservationData.idPromotion || null,
           UserId: reservationData.userId,
           RoomId: reservationData.roomId,
           HotelId: reservationData.hotelId,
@@ -125,9 +124,11 @@ class ReservationService {
             FirstName: traveller.firstName,
             LastName: traveller.lastName,
             Cpf: traveller.cpf
-          }))
+          })),
+           IdPromotion: reservationData.idPromotion || null // <-- Adiciona aqui
         })
       });
+
       console.log('Response status:', response.status);
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

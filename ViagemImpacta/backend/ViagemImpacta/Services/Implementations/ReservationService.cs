@@ -163,11 +163,9 @@ namespace ViagemImpacta.Services.Implementations
             reservation.IsConfirmed = true;
             reservation.UpdatedAt = DateTime.Now;
             reservation.PaymentIntentId = session.PaymentIntentId;
-            if (reservation.IsPromotion == true)
-            {
-                await AddReservationRoomsPromotion(reservation);
-            }
-           
+   
+     
+            // Always update and commit the reservation regardless of promotion status
             _unitOfWork.Reservations.Update(reservation);
             await _unitOfWork.CommitAsync();
             await SendEmailAsync(reservation);
@@ -371,11 +369,11 @@ namespace ViagemImpacta.Services.Implementations
             var user = await _unitOfWork.Users.GetByIdAsync(Dto.UserId);
             if (user == null)
                 throw new ArgumentException("Usu�rio n�o encontrado");
-                
+
             var hotel = await _unitOfWork.Hotels.GetByIdAsync(promotion.HotelId);
             if (hotel == null)
                 throw new ArgumentException("Hotel n�o encontrado");
-                
+
             if (Dto.NumberOfGuests > promotion.RoomsPromotional.Capacity)
                 throw new ArgumentException($"N�mero de h�spedes ({Dto.NumberOfGuests}) excede a capacidade do quarto ({promotion.RoomsPromotional.Capacity})");
 
@@ -402,17 +400,21 @@ namespace ViagemImpacta.Services.Implementations
                 CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, BrazilTimeZone),
                 UpdatedAt = DateTime.UtcNow,
                 Description = Dto.SpecialRequests
-                
+
 
             };
 
-            
+
 
             // Criar viajantes
             var travellers = _mapper.Map<List<Travellers>>(Dto.Travellers);
 
             // Adicionar reserva
             await _unitOfWork.Reservations.AddAsync(reservationFinal);
+
+            promotion.RoomsPromotional.TotalRoomsReserved += 1;
+            await _unitOfWork.RoomsPromotions.UpdateAsync(promotion.RoomsPromotional);
+
             await _unitOfWork.CommitAsync();
 
             // Associar viajantes � reserva
@@ -429,16 +431,7 @@ namespace ViagemImpacta.Services.Implementations
             return createdReservation;
         }
 
-        public async Task<bool> AddReservationRoomsPromotion(Reservation reservation)
-        {
-            reservation.RoomPromotional = await _unitOfWork.RoomsPromotions.GetRoomPromotionalByIdAsync(reservation.IdRoomPromotional);
-            reservation.RoomPromotional.TotalRoomsReserved += 1;
-            
-            await _unitOfWork.RoomsPromotions.UpdateAsync(reservation.RoomPromotional);
-            await _unitOfWork.CommitAsync();
-            return true;
-
-        }
+       
 
         public async Task<bool> RoomsAvailable(int idPromotion)
         {
