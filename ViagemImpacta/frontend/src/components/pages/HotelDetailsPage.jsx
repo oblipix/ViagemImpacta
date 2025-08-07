@@ -3,14 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useHotels } from '../hooks/useHotels.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { reviewService } from '../../services/reviewService';
-import { reviewService } from '../../services/reviewService';
 import ImageModal from '../common/ImageModal.jsx';
 import ReservationModal from '../modals/ReservationModal.jsx';
 import { Icons } from '../layout/Icons.jsx';
 import '../styles/HotelDetailsPage.css';
 
-import { Icons } from '../layout/Icons.jsx';
-import '../styles/HotelDetailsPage.css';
 
 // Importa o carrossel e seus estilos
 import Slider from 'react-slick';
@@ -265,24 +262,13 @@ function HotelDetailsPage() {
     const slidesToShowTablet = Math.min(numReviews, 2);
     const slidesToShowMobile = 1;
 
-
-    // CORREÇÃO: Lógica do carrossel refeita para ser dinâmica e robusta.
-    const numReviews = reviews.length;
-    const slidesToShowDesktop = Math.min(numReviews, 2);
-    const slidesToShowTablet = Math.min(numReviews, 2);
-    const slidesToShowMobile = 1;
-
     const sliderSettings = {
         dots: true,
         speed: 500,
         infinite: numReviews > slidesToShowMobile,
         arrows: numReviews > slidesToShowMobile,
         slidesToShow: slidesToShowMobile,
-        infinite: numReviews > slidesToShowMobile,
-        arrows: numReviews > slidesToShowMobile,
-        slidesToShow: slidesToShowMobile,
         slidesToScroll: 1,
-        autoplay: numReviews > 1,
         autoplay: numReviews > 1,
         autoplaySpeed: 5000,
         responsive: [
@@ -290,10 +276,7 @@ function HotelDetailsPage() {
                 breakpoint: 1024,
                 settings: {
                     slidesToShow: slidesToShowDesktop,
-                    slidesToShow: slidesToShowDesktop,
                     slidesToScroll: 1,
-                    infinite: numReviews > slidesToShowDesktop,
-                    arrows: numReviews > slidesToShowDesktop,
                     infinite: numReviews > slidesToShowDesktop,
                     arrows: numReviews > slidesToShowDesktop,
                 }
@@ -302,10 +285,7 @@ function HotelDetailsPage() {
                 breakpoint: 768,
                 settings: {
                     slidesToShow: slidesToShowTablet,
-                    slidesToShow: slidesToShowTablet,
                     slidesToScroll: 1,
-                    infinite: numReviews > slidesToShowTablet,
-                    arrows: numReviews > slidesToShowTablet,
                     infinite: numReviews > slidesToShowTablet,
                     arrows: numReviews > slidesToShowTablet,
                 }
@@ -381,7 +361,6 @@ function HotelDetailsPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-gray-700">
                             {hotel.leisureFacilities.map((facility, index) => {
                                 let IconComponent = leisureIconMap[facility.toLowerCase()] || leisureIconMap[facility] || Icons.User;
-                                let IconComponent = leisureIconMap[facility.toLowerCase()] || leisureIconMap[facility] || Icons.User;
                                 return (
                                     <div key={index} className="flex items-center bg-gray-100 border border-gray-200 p-3 sm:p-4 rounded-lg sm:rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:border-blue-300">
                                         <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 text-blue-600 flex-shrink-0" />
@@ -418,7 +397,6 @@ function HotelDetailsPage() {
                                                 R$ {room.price.toFixed(2).replace('.', ',')}
                                             </div>
                                             <button onClick={() => handleReserveRoom(room)} className={`reservation-button font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg sm:rounded-xl transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 text-sm sm:text-base w-full lg:w-auto ${isLoggedIn ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-400 hover:bg-gray-500 text-white'}`}>
-                                            <button onClick={() => handleReserveRoom(room)} className={`reservation-button font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg sm:rounded-xl transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 text-sm sm:text-base w-full lg:w-auto ${isLoggedIn ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-400 hover:bg-gray-500 text-white'}`}>
                                                 {isLoggedIn ? 'Reservar' : 'Fazer Login para Reservar'}
                                             </button>
                                         </div>
@@ -427,8 +405,6 @@ function HotelDetailsPage() {
                             </div>
                         </div>
                     )}
-
-                    {isLoggedIn && (
 
                     {isLoggedIn && (
                         <div className="mb-6 sm:mb-8">
