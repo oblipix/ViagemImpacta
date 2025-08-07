@@ -3,49 +3,101 @@
     ViewData["Title"] = "Detalhes do Usuário";
 }
 
-<div class="d-flex align-items-center mb-4">
-    @if (!string.IsNullOrWhiteSpace(Model.Photo))
-    {
-        <img src="@Model.Photo" alt="Foto do usuário" class="rounded-circle me-3" style="width:56px; height:56px; object-fit:cover; border:2px solid #dee2e6;" />
-    }
-    <h1 class="m-0">Detalhes do @Model.FirstName @Model.LastName</h1>
-</div>
-
-@if (Model != null)
-{
-    <div class="card" style="max-width: 600px;">
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-4">ID</dt>
-                <dd class="col-sm-8">@Model.UserId</dd>
-                <dt class="col-sm-4">Email</dt>
-                <dd class="col-sm-8">@Model.Email</dd>
-                <dt class="col-sm-4">Telefone</dt>
-                <dd class="col-sm-8">@Model.Phone</dd>
-                <dt class="col-sm-4">CPF</dt>
-                <dd class="col-sm-8">@Model.Cpf</dd>
-                <dt class="col-sm-4">Idade</dt>
-                <dd class="col-sm-8">@Model.BirthDate</dd>
-                <dt class="col-sm-4">Ativo</dt>
-                <dd class="col-sm-8">@Model.Active</dd>
-                <dt class="col-sm-4">Criado em</dt>
-                <dd class="col-sm-8">@Model.CreatedAt</dd>
-                <dt class="col-sm-4">Atualizado em</dt>
-                <dd class="col-sm-8">@Model.UpdatedAt</dd>
-                <dt class="col-sm-4">Desativado em</dt>
-                <dd class="col-sm-8">@Model.DisabledAt</dd>
-                <dt class="col-sm-4">Role</dt>
-                <dd class="col-sm-8">@Model.Role</dd>
-            </dl>
-            <div class="d-flex gap-2">
-                <button onclick="history.back()" class="btn btn-secondary">Voltar</button>
-                <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-primary">Editar</a>
-                <a asp-action="Delete" asp-route-id="@Model.UserId" class="btn btn-danger">Deletar</a>
-            </div>
-        </div>
+<h1 class="d-flex align-items-center gap-2 mb-4">
+    <span class="material-symbols-outlined" style="font-size: 2.5rem">account_circle</span>
+    Detalhes do Usuário: @Model.FirstName @Model.LastName
+</h1>
+<hr />
+<div class="row mb-3">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Email">
+                mail
+            </span>
+            Email
+        </label>
+        <p class="form-control form-control-plaintext">@Model.Email</p>
     </div>
-}
-else
-{
-    <div class="alert alert-warning">Usuário não encontrado.</div>
-}
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Telefone">
+                call
+            </span>
+            Telefone
+        </label>
+        <p class="form-control form-control-plaintext">@Model.Phone</p>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-symbols-outlined align-middle" title="CPF">
+                id_card
+            </span>
+            CPF
+        </label>
+        <p class="form-control form-control-plaintext">@Model.Cpf</p>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Data de Nascimento">
+                cake
+            </span>
+            Data de Nascimento
+        </label>
+        <p class="form-control form-control-plaintext">@Model.BirthDate</p>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle">
+                check_circle
+            </span>
+            Ativo</label>
+        <p class="form-control form-control-plaintext">
+            @if (Model.Active)
+            {
+                <span class="badge bg-success">Sim</span>
+            }
+            else
+            {
+                <span class="badge bg-danger">Não</span>
+            }
+        </p>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1">
+            <span class="material-icons align-middle" title="Data de Nascimento">calendar_month</span>
+            Criado em
+        </label>
+        <p class="form-control form-control-plaintext">@Model.CreatedAt</p>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1"><span class="material-icons align-middle" title="Data de Nascimento">calendar_month</span>
+            Atualizado em</label>
+        <p class="form-control form-control-plaintext">@Model.UpdatedAt</p>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold d-flex gap-1"><span class="material-icons align-middle" title="Data de Nascimento">calendar_month</span>
+            Desativado em</label>
+        <p class="form-control form-control-plaintext">
+            @if (Model.DisabledAt != null)
+            {
+                <span>@Model.DisabledAt</span>
+            }
+            else
+            {
+                <span>-</span>
+            }
+        </p>
+    </div>
+</div>
+<div class="d-flex gap-2">
+    <button onclick="history.back()" class="btn btn-outline-secondary">Voltar</button>
+    <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-primary">Editar</a>
+</div>

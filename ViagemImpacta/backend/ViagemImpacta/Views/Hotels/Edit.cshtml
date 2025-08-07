@@ -5,7 +5,10 @@
     ViewData["Title"] = "Editar Hotel";
 }
 
-<h1>Editar Hotel: @Model.Name</h1>
+<h1 class="d-flex align-items-center gap-2 mb-4">
+    <span class="material-symbols-outlined" style="font-size: 2.5rem">location_city</span>
+    Editar: @Model.Name
+</h1>
 <hr />
 <form asp-action="Edit">
     <div class="row">
@@ -49,8 +52,8 @@
             <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i>
                 <strong>Dica:</strong> A primeira imagem será usada como imagem principal do hotel.
-                <a href="https://postimg.cc/gallery/fWZhj95" target="_blank" class="btn btn-sm btn-outline-primary ms-2">
-                    <i class="fas fa-external-link-alt"></i> Ver Galeria Postimg
+                <a href="https://postimg.cc/gallery/fWZhj95" target="_blank" class="btn btn-sm btn-outline-primary ms-2 d-flex gap-1">
+                    <span class="material-icons">arrow_outward</span> Ver Galeria Postimg
                 </a>
             </div>
             
@@ -63,8 +66,8 @@
                             <label class="form-label">@(i == 0 ? "Imagem Principal *" : $"Imagem {i + 1}")</label>
                             <div class="input-group">
                                 <input type="url" name="ImageUrls[@i]" value="@Model.ImageUrls[i]" class="form-control" placeholder="https://exemplo.com/imagem.jpg" />
-                                <button type="button" class="btn btn-outline-secondary" onclick="openPostimgGallery()">
-                                    <i class="fas fa-images"></i> Galeria
+                                <button type="button" class="btn btn-outline-secondary d-flex gap-1" onclick="openPostimgGallery()">
+                                    <span class="material-icons">image</span> Galeria
                                 </button>
                                 @if (i > 0)
                                 {
@@ -229,8 +232,8 @@
 
     <hr />
     <div class="form-group mt-4">
+        <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
         <input type="submit" value="Salvar Alterações" class="btn btn-success" />
-        <a asp-action="Index" class="btn btn-secondary">Voltar</a>
     </div>
 </form>
 
@@ -300,11 +303,15 @@
                     <label class="form-label">Imagem ${imageUrlIndex + 1}</label>
                     <div class="input-group">
                         <input type="url" name="ImageUrls[${imageUrlIndex}]" class="form-control" placeholder="https://exemplo.com/imagem.jpg" />
-                        <button type="button" class="btn btn-outline-secondary" onclick="openPostimgGallery()">
-                            <i class="fas fa-images"></i> Galeria
+                        <button type="button" class="btn btn-outline-secondary d-flex gap-1" onclick="openPostimgGallery()">
+                            <span class="material-symbols-outlined">
+                                art_track
+                            </span> Galeria
                         </button>
-                        <button type="button" class="btn btn-outline-danger" onclick="removeImageUrl(this)">
-                            <i class="fas fa-trash"></i>
+                        <button type="button" class="btn btn-outline-danger d-flex" onclick="removeImageUrl(this)">
+                            <span class="material-symbols-outlined">
+                                delete
+                            </span>
                         </button>
                     </div>
                 `;

@@ -54,15 +54,7 @@
                     <td>@user.UserId</td>
                     <td>@user.FirstName @user.LastName</td>
                     <td>@user.Email</td>
-                    <td>
-                        @{
-                            var cpf = user.Cpf?.ToString() ?? "";
-                            string formattedCpf = cpf.Length >= 11
-                                ? $"{cpf.Substring(0, 3)}.{cpf.Substring(3, 3)}.{cpf.Substring(6, 3)}-{cpf.Substring(7, 2)}"
-                                : cpf;
-                        }
-                        @formattedCpf
-                    </td>
+                    <td>@user.Cpf</td>
                     <td>
                         @if (user.Role == Roles.Admin)
                         {

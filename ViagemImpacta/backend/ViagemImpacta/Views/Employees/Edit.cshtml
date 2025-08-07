@@ -5,72 +5,70 @@
 
 <h1 class="d-flex align-items-center gap-2 mb-4">
     <span class="material-symbols-outlined" style="font-size: 2.5rem">account_box</span>
-    Editar Usuário
+    Editar Funcionário
 </h1>
 
 <form asp-action="Edit" asp-route-id="@Model.UserId" method="post">
     <input type="hidden" asp-for="UserId" />
     <div class="row mb-3">
         <div class="col-md-6 mb-3">
-            <label asp-for="FirstName" class="form-label">
+            <label asp-for="FirstName" class="form-label d-flex gap-1">
                 <span class="material-icons align-middle" title="Nome">person</span> Nome
             </label>
-            <input asp-for="FirstName" class="form-control" />
+            <input asp-for="FirstName" class="form-control d-flex gap-1" />
             <span asp-validation-for="FirstName" class="text-danger"></span>
         </div>
         <div class="col-md-6 mb-3">
-            <label asp-for="LastName" class="form-label">
+            <label asp-for="LastName" class="form-label d-flex gap-1">
                 <span class="material-icons align-middle" title="Sobrenome">badge</span> Sobrenome
             </label>
-            <input asp-for="LastName" class="form-control" />
+            <input asp-for="LastName" class="form-control d-flex gap-1" />
             <span asp-validation-for="LastName" class="text-danger"></span>
         </div>
     </div>
     <div class="row mb-3">
         <div class="col-md-6 mb-3">
-            <label asp-for="Email" class="form-label">
+            <label asp-for="Email" class="form-label d-flex gap-1">
                 <span class="material-icons align-middle" title="Email">mail</span> Email
             </label>
-            <input asp-for="Email" class="form-control" />
+            <input asp-for="Email" class="form-control d-flex gap-1" />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
         <div class="col-md-6 mb-3">
-            <label asp-for="Phone" class="form-label">
+            <label asp-for="Phone" class="form-label d-flex gap-1">
                 <span class="material-icons align-middle" title="Telefone">call</span> Telefone
             </label>
-            <input asp-for="Phone" class="form-control" />
+            <input asp-for="Phone" class="form-control d-flex gap-1" />
             <span asp-validation-for="Phone" class="text-danger"></span>
         </div>
     </div>
     <div class="row mb-3">
         @{
-            string FormatCpf(string cpf) 
-            { 
-                if (string.IsNullOrEmpty(cpf))
-                {
-                    return string.Empty;
-                }
-                return $"{cpf.Substring(0, 3)}.{cpf.Substring(3, 3)}.{cpf.Substring(6, 3)}-{cpf.Substring(7, 2)}"; 
+            string FormatCpf(string cpf)
+            {
+                if (string.IsNullOrEmpty(cpf) || cpf.Length < 11) return string.Empty;
+                return $"{cpf.Substring(0, 3)}.{cpf.Substring(3, 3)}.{cpf.Substring(6, 3)}-{cpf.Substring(7, 2)}";
             }
         }
         <div class="col-md-6 mb-3">
-            <label asp-for="Cpf" class="form-label">
+            <label asp-for="Cpf" class="form-label d-flex gap-1">
                 <span class="material-symbols-outlined align-middle" title="CPF">id_card</span> CPF
             </label>
-            <input class="form-control" value="@FormatCpf(Model.Cpf)" disabled />
+            <input asp-for="Cpf" class="form-control" readonly />
             <span asp-validation-for="Cpf" class="text-danger"></span>
         </div>
         <div class="col-md-6 mb-3">
-            <label asp-for="BirthDate" class="form-label">
-                <span class="material-icons align-middle" title="Data de Nascimento">calendar_month</span> Data de Nascimento
+            <label asp-for="BirthDate" class="form-label d-flex gap-1">
+                <span class="material-icons align-middle" title="Data de Nascimento">cake</span> Data de Nascimento
             </label>
-            <input asp-for="BirthDate" class="form-control" disabled />
+            <input asp-for="BirthDate" class="form-control" readonly />
             <span asp-validation-for="BirthDate" class="text-danger"></span>
         </div>
     </div>
     <div class="d-flex gap-2">
-        <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
         <button type="submit" class="btn btn-primary">Salvar</button>
+        <a asp-action="Delete" asp-route-id="@Model.UserId" class="btn btn-danger">Desativar</a>
     </div>
 </form>
 
