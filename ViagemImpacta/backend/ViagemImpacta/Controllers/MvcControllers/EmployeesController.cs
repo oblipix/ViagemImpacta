@@ -106,6 +106,7 @@ public class EmployeesController : Controller
 
     // POST: Employees/Edit/5
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, UpdateUserViewModel user)
     {
         if (id != user.UserId) return BadRequest();

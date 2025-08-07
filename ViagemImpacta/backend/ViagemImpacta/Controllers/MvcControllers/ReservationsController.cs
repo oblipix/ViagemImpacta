@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
 using ViagemImpacta.DTO.ReservationDTO;
 using ViagemImpacta.Models;
 using ViagemImpacta.Services.Interfaces;

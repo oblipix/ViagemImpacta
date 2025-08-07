@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using ViagemImpacta.Repositories.Interfaces;
 using ViagemImpacta.Repositories;
 
 namespace ViagemImpacta.Controllers.ApiControllers

@@ -1,7 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using ViagemImpacta.DTO.ReservationDTO;
 using ViagemImpacta.Services.Interfaces;
 

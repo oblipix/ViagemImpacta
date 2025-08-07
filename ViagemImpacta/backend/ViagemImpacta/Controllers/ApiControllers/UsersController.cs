@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using ViagemImpacta.DTO.UserDTO;
 using ViagemImpacta.Services.Interfaces;
 
