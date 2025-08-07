@@ -464,4 +464,6 @@ function HotelDetailsPage() {
     );
 }
 
+
 export default HotelDetailsPage;
+
