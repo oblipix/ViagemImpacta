@@ -1,0 +1,34 @@
+@model ViagemImpacta.Models.Review
+
+@{
+    ViewData["Title"] = "Excluir Avaliação";
+}
+
+<h1>Excluir Avaliação</h1>
+
+<h3 class="text-danger">Você tem certeza que quer excluir esta avaliação?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Hotel</dt>
+        <dd class="col-sm-10">@Model.Hotel?.Name</dd>
+
+        <dt class="col-sm-2">Usuário</dt>
+        <dd class="col-sm-10">@Model.User?.FirstName @Model.User?.LastName</dd>
+
+        <dt class="col-sm-2">Nota</dt>
+        <dd class="col-sm-10">@Model.Rating</dd>
+
+        <dt class="col-sm-2">Comentário</dt>
+        <dd class="col-sm-10">@Model.Comment</dd>
+
+        <dt class="col-sm-2">Data de Criação</dt>
+        <dd class="col-sm-10">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+    </dl>
+
+    <form asp-action="DeleteMVC">
+        <input type="hidden" asp-for="ReviewId" />
+        <input type="submit" value="Excluir" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

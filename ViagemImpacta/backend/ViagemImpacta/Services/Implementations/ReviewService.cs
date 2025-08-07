@@ -30,7 +30,7 @@ namespace ViagemImpacta.Services.Implementations
 
         public async Task<Review?> GetReviewByIdAsync(int reviewId)
         {
-            return await _unitOfWork.Reviews.GetByIdAsync(reviewId);
+            return await _unitOfWork.Reviews.GetByIdWithIncludesAsync(reviewId);
         }
 
         public async Task<IEnumerable<Review>> GetReviewsByHotelIdAsync(int hotelId)
@@ -45,8 +45,8 @@ namespace ViagemImpacta.Services.Implementations
 
         public async Task<Review?> GetUserReviewForHotelAsync(int userId, int hotelId)
         {
-            var userReviews = await _unitOfWork.Reviews.GetReviewsByUserIdAsync(userId);
-            return userReviews.FirstOrDefault(r => r.HotelId == hotelId);
+            var reviews = await _unitOfWork.Reviews.GetReviewsByHotelIdAsync(hotelId);
+            return reviews.FirstOrDefault(r => r.UserId == userId);
         }
 
         public async Task<Review> UpdateReviewAsync(Review review)
@@ -66,6 +66,11 @@ namespace ViagemImpacta.Services.Implementations
             await _unitOfWork.CommitAsync();
             await UpdateHotelRatingAsync(hotelId);
             return true;
+        }
+
+        public async Task<IEnumerable<Review>> GetAllReviewsAsync()
+        {
+            return await _unitOfWork.Reviews.GetAllAsync();
         }
 
         private async Task UpdateHotelRatingAsync(int hotelId)

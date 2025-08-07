@@ -167,6 +167,12 @@ frontend
 -  [Projeto - Jira](https://matheusclcclc-1752064913933.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog?atlOrigin=eyJpIjoiYzUzNTk3YzEyOWY4NGQwNWJjODQ4NzE3Nzk2MmEzNzAiLCJwIjoiaiJ9)
 - [Protótipo Lo-Fi & Sketchboard - Figma](https://www.figma.com/proto/epp3vRexzmU4C3Twsh4ZWI/Untitled?node-id=0-1&t=R4FQwUqcs4BoGPUP-1)
 
+#### Deploy
+- [Site administrativo](https://tripzback.azurewebsites.net/)
+
+- [Site do cliente](https://mango-mud-0485cd210.1.azurestaticapps.net/)
+
+
 
 
 ## 🙋‍♂️ Criado por:
