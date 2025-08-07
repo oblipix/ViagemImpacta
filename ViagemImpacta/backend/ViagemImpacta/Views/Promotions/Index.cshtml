@@ -1,107 +1,87 @@
 ﻿@model IEnumerable<ViagemImpacta.Models.Promotion>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Promoções";
 }
 
-<h1>Index</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Lista de Promoções</h1>
+    <a class="btn btn-secondary" asp-controller="Admins" asp-action="Dashboard">Voltar ao Dashboard</a>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-success">Cadastrar Nova Promoção</a>
+</div>
+
+<table class="table table-striped">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.TitlePromotion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EndDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CheckIn)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CheckOut)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Hotel)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FinalPrice)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OriginalPrice)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DiscountPercentage)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RoomsPromotionalId)
-            </th>
-            <th></th>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Descrição</th>
+            <th>Hotel</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Preço Original</th>
+            <th>Preço Final</th>
+            <th>Desconto</th>
+            <th>Status</th>
+            <th>Válida até</th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TitlePromotion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CheckIn)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CheckOut)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Hotel.City)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FinalPrice)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OriginalPrice)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DiscountPercentage)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RoomsPromotionalId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.PromotionId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PromotionId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PromotionId">Delete</a>
-            </td>
-        </tr>
-}
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.PromotionId</td>
+                    <td>@item.TitlePromotion</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.Description) && item.Description.Length > 50)
+                        {
+                            @(item.Description.Substring(0, 50) + "...")
+                        }
+                        else
+                        {
+                            @(item.Description ?? "N/A")
+                        }
+                    </td>
+                    <td>@(item.Hotel?.Name ?? "N/A") - @(item.Hotel?.City ?? "N/A")</td>
+                    <td>@item.CheckIn.ToString("dd/MM/yyyy")</td>
+                    <td>@item.CheckOut.ToString("dd/MM/yyyy")</td>
+                    <td>@item.OriginalPrice.ToString("C")</td>
+                    <td>@item.TotalPrice.ToString("C")</td>
+                    <td>@((item.DiscountPercentage / 100).ToString("P"))</td>
+                    <td>
+                        @if (item.IsActive && item.EndDate >= DateTime.Now)
+                        {
+                            <span class="badge bg-success">Ativa</span>
+                        }
+                        else if (item.EndDate < DateTime.Now)
+                        {
+                            <span class="badge bg-danger">Expirada</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inativa</span>
+                        }
+                    </td>
+                    <td>@item.EndDate.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Details" asp-route-id="@item.PromotionId" class="btn btn-sm btn-info">Detalhar</a>
+                            <a asp-action="Delete" asp-route-id="@item.PromotionId" class="btn btn-sm btn-danger">Deletar</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="12" class="text-center">Nenhuma promoção encontrada.</td>
+            </tr>
+        }
     </tbody>
 </table>

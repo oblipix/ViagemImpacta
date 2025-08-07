@@ -19,6 +19,8 @@ namespace ViagemImpacta.Repositories.Interfaces
         Task<bool> IsRoomTypeAvailableAsync(int hotelId, RoomType roomType, DateTime checkIn, DateTime checkOut);
 
         Task<IEnumerable<Reservation>> GetAllReservationsAsync();
+
+        Task<bool> RoomsAvailable(int idPromotion);
         Task<Reservation?> GetReservationById(int id);
     }
 }

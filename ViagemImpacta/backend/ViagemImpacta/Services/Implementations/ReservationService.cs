@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
 using Stripe;
 using Stripe.Checkout;
 using System.Net;
@@ -17,6 +18,7 @@ namespace ViagemImpacta.Services.Implementations
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly SmtpOptions _smtpOptions;
+        private readonly TimeZoneInfo BrazilTimeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
         private readonly StripeModel _model;
         private readonly StripeService _stripeService;
 
@@ -76,6 +78,8 @@ namespace ViagemImpacta.Services.Implementations
             // Mapear DTO para entidade
             var reservation = _mapper.Map<Reservation>(createReservationDto);
             reservation.TotalPrice = totalPrice;
+            reservation.IsPromotion = false;
+            reservation.IdPromotion = null;
 
             // Criar viajantes
             var travellers = _mapper.Map<List<Travellers>>(createReservationDto.Travellers);
@@ -151,7 +155,9 @@ namespace ViagemImpacta.Services.Implementations
             reservation.IsConfirmed = true;
             reservation.UpdatedAt = DateTime.Now;
             reservation.PaymentIntentId = session.PaymentIntentId;
-
+   
+     
+            // Always update and commit the reservation regardless of promotion status
             _unitOfWork.Reservations.Update(reservation);
             await _unitOfWork.CommitAsync();
             await SendEmailAsync(reservation);
@@ -344,5 +350,94 @@ namespace ViagemImpacta.Services.Implementations
                 throw;
             }
         }
+
+        public async Task<Reservation> CreateReservationByPromotion(CreateReservationPromotionDto Dto)
+        {
+            var promotion = await _unitOfWork.Promotions.GetPromotionByIdAsync(Dto.idPromotion);
+            if (promotion == null)
+                throw new ArgumentException("Promo��o n�o encontrada");
+
+            // Valida��es de neg�cio
+            var user = await _unitOfWork.Users.GetByIdAsync(Dto.UserId);
+            if (user == null)
+                throw new ArgumentException("Usu�rio n�o encontrado");
+
+            var hotel = await _unitOfWork.Hotels.GetByIdAsync(promotion.HotelId);
+            if (hotel == null)
+                throw new ArgumentException("Hotel n�o encontrado");
+
+            if (Dto.NumberOfGuests > promotion.RoomsPromotional.Capacity)
+                throw new ArgumentException($"N�mero de h�spedes ({Dto.NumberOfGuests}) excede a capacidade do quarto ({promotion.RoomsPromotional.Capacity})");
+
+            if (Dto.Travellers.Count != Dto.NumberOfGuests)
+                throw new ArgumentException("N�mero de viajantes deve ser igual ao n�mero de h�spedes");
+
+            // Verificar se h� quartos dispon�veis na promo��o
+            var roomsAvailable = await _unitOfWork.RoomsPromotions.RoomsAvailableAsync(Dto.idPromotion);
+            if (!roomsAvailable)
+                throw new InvalidOperationException("N�o h� quartos dispon�veis para esta promo��o");
+
+            var reservationFinal = new Reservation
+            {
+                UserId = Dto.UserId,
+                HotelId = promotion.HotelId,
+                CheckIn = promotion.CheckIn,
+                CheckOut = promotion.CheckOut,
+                TotalPrice = promotion.TotalPrice,
+                IsPromotion = true,
+                IdPromotion = Dto.idPromotion,
+                IdRoomPromotional = promotion.RoomsPromotional.RoomsPromotionalId,
+                RoomId = null, // Para reservas promocionais, RoomId n�o � usado
+                IsConfirmed = false,
+                CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, BrazilTimeZone),
+                UpdatedAt = DateTime.UtcNow,
+                Description = Dto.SpecialRequests
+
+
+            };
+
+
+
+            // Criar viajantes
+            var travellers = _mapper.Map<List<Travellers>>(Dto.Travellers);
+
+            // Adicionar reserva
+            await _unitOfWork.Reservations.AddAsync(reservationFinal);
+
+            promotion.RoomsPromotional.TotalRoomsReserved += 1;
+            await _unitOfWork.RoomsPromotions.UpdateAsync(promotion.RoomsPromotional);
+
+            await _unitOfWork.CommitAsync();
+
+            // Associar viajantes � reserva
+            foreach (var traveller in travellers)
+            {
+                traveller.ReservationId = reservationFinal.ReservationId;
+                await _unitOfWork.Travellers.AddAsync(traveller);
+            }
+
+            await _unitOfWork.CommitAsync();
+
+            // Buscar reserva com detalhes para retorno
+            var createdReservation = await _unitOfWork.Reservations.GetReservationWithDetailsAsync(reservationFinal.ReservationId);
+            return createdReservation;
+        }
+
+       
+
+        public async Task<bool> RoomsAvailable(int idPromotion)
+        {
+            var RoomsAvailable = await _unitOfWork.RoomsPromotions.RoomsAvailableAsync(idPromotion);
+            if (RoomsAvailable)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }
+

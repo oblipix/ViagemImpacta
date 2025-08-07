@@ -22,7 +22,7 @@ namespace ViagemImpacta.DTO.ReservationDTO
         [DataType(DataType.Date)]
         public DateTime CheckOut { get; set; }
 
-        [Range(1, 20, ErrorMessage = "Número de hóspedes deve ser entre 1 e 20")]
+        [Range(1, 4, ErrorMessage = "Número de hóspedes deve ser entre 1 e 4")]
         public int NumberOfGuests { get; set; }
 
         [StringLength(500, ErrorMessage = "Solicitações especiais devem ter no máximo 500 caracteres")]

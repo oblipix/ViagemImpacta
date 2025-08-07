@@ -1,0 +1,23 @@
+@model ViagemImpacta.Models.Review
+@{
+    ViewData["Title"] = "Detalhes da Avaliação";
+}
+<h2>Detalhes da Avaliação</h2>
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-2">Hotel</dt>
+            <dd class="col-sm-10">@Model.Hotel?.Name</dd>
+            <dt class="col-sm-2">Usuário</dt>
+            <dd class="col-sm-10">@Model.User?.FirstName @Model.User?.LastName</dd>
+            <dt class="col-sm-2">Nota</dt>
+            <dd class="col-sm-10">@Model.Rating</dd>
+            <dt class="col-sm-2">Comentário</dt>
+            <dd class="col-sm-10">@Model.Comment</dd>
+            <dt class="col-sm-2">Data</dt>
+            <dd class="col-sm-10">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+        </dl>
+        <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+        <a asp-action="Delete" asp-route-id="@Model.ReviewId" class="btn btn-danger">Excluir</a>
+    </div>
+</div>

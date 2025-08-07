@@ -91,6 +91,7 @@ class ReservationService {
   /**
    * Cria uma nova reserva
    * @param {Object} reservationData - Dados da reserva
+   * @param {number} reservationData.idPromotion - ID da promoção (opcional)
    * @param {number} reservationData.userId - ID do usuário
    * @param {number} reservationData.roomId - ID do quarto
    * @param {number} reservationData.hotelId - ID do hotel
@@ -102,7 +103,10 @@ class ReservationService {
    */
   async createReservation(reservationData) {
     try {
-      const response = await fetch(`${API_BASE_URL}/reservations`, {
+      const regex = new RegExp("[0-9]+");
+      const endpoint = window.location.href.match(`https://localhost:5173/hotels/${regex}`) ? "reservation" : "reservations/promotionReservation";
+
+      const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -120,9 +124,11 @@ class ReservationService {
             FirstName: traveller.firstName,
             LastName: traveller.lastName,
             Cpf: traveller.cpf
-          }))
+          })),
+           IdPromotion: reservationData.idPromotion || null // <-- Adiciona aqui
         })
       });
+
       console.log('Response status:', response.status);
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -289,8 +295,8 @@ class ReservationService {
       const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
       const subtotal = dailyPrice * daysDiff;
-      const taxes = subtotal * 0.1; // 10% de taxas
-      const total = subtotal + taxes;
+      const taxes = 0; // Taxa removida conforme solicitado
+      const total = subtotal; // Total sem taxa adicional
 
       return {
         days: daysDiff,

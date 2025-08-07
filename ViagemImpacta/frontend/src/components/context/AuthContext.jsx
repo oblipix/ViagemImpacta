@@ -9,7 +9,7 @@ import reservationService from '../../services/reservationService';
 const AuthContext = createContext(null);
  
 // APIs de hotéis para uso no contexto de autenticação
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7010/api';
 const HOTELS_API = {
     SAVED: `${API_BASE_URL}/Hotels/saved`,
     VISITED: `${API_BASE_URL}/Hotels/visited`,
@@ -36,9 +36,14 @@ export const AuthProvider = ({ children }) => {
     // Função auxiliar para buscar dados do usuário autenticado
     const fetchUserHotels = async (token, userId) => {
         try {
-            // Primeiro, carrega do localStorage para garantir algum dado
+            // TEMPORÁRIO: Desabilitando chamadas para endpoints de hotéis que retornam 404
+            console.log('📝 FETCH HOTELS - Carregando apenas do localStorage (endpoints de hotéis desabilitados)');
+            
+            // Carrega apenas do localStorage para evitar erros 404
             loadSavedHotelsFromLocalStorage();
             
+            // COMENTADO TEMPORARIAMENTE - Endpoints não existem no backend
+            /*
             // Tenta buscar do backend e atualizar
             try {
                 // Busca hotéis salvos
@@ -87,6 +92,7 @@ export const AuthProvider = ({ children }) => {
                 console.warn('Erro ao buscar dados do backend, usando localStorage:', backendError);
                 // Já carregamos do localStorage, então continuamos com esses dados
             }
+            */
         } catch (error) {
             console.error('Erro ao buscar dados de hotéis do usuário:', error);
             // Tenta carregar do localStorage como último recurso
@@ -98,6 +104,11 @@ export const AuthProvider = ({ children }) => {
     const checkReservationsAndMarkVisited = async (token, userId) => {
         if (!token || !userId) return;
         
+        // TEMPORÁRIO: Desabilitando verificação de hotéis visitados
+        console.log('📝 CHECK RESERVATIONS - Função desabilitada temporariamente (endpoints não existem)');
+        return;
+        
+        /*
         try {
             // Buscar reservas do usuário
             const reservationsResponse = await fetch(`${HOTELS_API.RESERVATIONS}/user/${userId}`, {
@@ -155,6 +166,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Erro ao verificar reservas:', error);
         }
+        */
     };
 
     // Função para carregar hotéis salvos do localStorage
@@ -284,6 +296,49 @@ export const AuthProvider = ({ children }) => {
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLoggedIn, token, currentUser]);
+
+    // Efeito para escutar eventos de token expirado
+    useEffect(() => {
+        const handleTokenExpired = () => {
+            console.log('🚨 === EVENTO tokenExpired DETECTADO NO AUTHCONTEXT ===');
+            console.log('🚨 Stack trace:', new Error().stack);
+            console.log('🚨 Token atual no localStorage:', localStorage.getItem('authToken') ? 'EXISTS' : 'NULL');
+            console.log('🚨 User atual no state:', currentUser ? 'EXISTS' : 'NULL');
+            console.log('🚨 isLoggedIn atual:', isLoggedIn);
+            console.log('🚨 Timestamp:', new Date().toISOString());
+            
+            console.log('🔄 Executando logout automático...');
+            
+            // Executa logout diretamente sem depender da referência da função
+            setCurrentUser(null);
+            setIsLoggedIn(false);
+            setToken(null);
+            setSavedHotels([]);
+            setVisitedHotels([]);   
+            setReservationHistory([]);
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('authUser');
+
+            console.log('🔄 Estado limpo, navegando para login...');
+            // Navega para login de forma segura
+            try {
+                navigate('/login');
+            } catch (navError) {
+                console.warn('⚠️ Não foi possível navegar para /login:', navError);
+                window.location.href = '/login';
+            }
+        };
+
+        console.log('✅ Adicionando listener para tokenExpired');
+        // Adiciona o listener para o evento personalizado
+        window.addEventListener('tokenExpired', handleTokenExpired);
+
+        // Remove o listener quando o componente for desmontado
+        return () => {
+            console.log('❌ Removendo listener para tokenExpired');
+            window.removeEventListener('tokenExpired', handleTokenExpired);
+        };
+    }, [navigate, currentUser, isLoggedIn]);
 
     // Função para carregar o histórico de reservas do backend
     const loadReservationHistory = async (userId, token) => {
@@ -451,6 +506,9 @@ export const AuthProvider = ({ children }) => {
  
     // <<<<<<<<<<<< FUNÇÃO DE LOGOUT >>>>>>>>>>>>
     const logout = () => {
+        console.log('=== EXECUTANDO LOGOUT ===');
+        console.log('Stack trace do logout:', new Error().stack);
+        
         setCurrentUser(null);
         setIsLoggedIn(false);
         setToken(null);
@@ -459,6 +517,8 @@ export const AuthProvider = ({ children }) => {
         setReservationHistory([]); // Limpa histórico de reservas do estado local
         localStorage.removeItem('authToken');
         localStorage.removeItem('authUser');
+
+        console.log('Estado limpo, navegando para login...');
 
         // Navega para login de forma segura
         try {
@@ -745,6 +805,7 @@ export const AuthProvider = ({ children }) => {
             try {
                 // Criar a reserva usando o reservationService
                 const savedReservation = await reservationService.createReservation({
+                    idPromotion: reservationData.idPromotion || null,
                     userId: newReservation.userId,
                     roomId: reservationData.roomId, // Precisa do roomId para a API
                     hotelId: newReservation.hotelId,

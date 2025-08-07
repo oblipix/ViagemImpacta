@@ -14,16 +14,12 @@ namespace ViagemImpacta.Data
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Reservation> Reservations { get; set; } = null!;
         public DbSet<Travellers> Travellers { get; set; } = null!;
-        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
         public DbSet<Promotion> Promotions { get; set; } = null!;
         public DbSet<RoomsPromotional> RoomsPromotional { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configuração da chave primária para RoomsPromotional
-            modelBuilder.Entity<RoomsPromotional>()
-                .HasKey(rp => rp.RoomPromotionalId);
-
             // Configuração para armazenar lista de URLs de imagem como string delimitada
             modelBuilder.Entity<Hotel>()
                 .Property(h => h.ImageUrls)
@@ -107,6 +103,27 @@ namespace ViagemImpacta.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
+            // Review configuration
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.HasKey(e => e.ReviewId);
+                entity.Property(e => e.Rating).IsRequired();
+                entity.Property(e => e.Comment).HasMaxLength(1000);
+                entity.Property(e => e.CreatedAt).IsRequired();
+
+                // Relacionamento com User
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.Reviews)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Relacionamento com Hotel
+                entity.HasOne(e => e.Hotel)
+                    .WithMany(h => h.Reviews)
+                    .HasForeignKey(e => e.HotelId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
@@ -138,3 +155,4 @@ namespace ViagemImpacta.Data
         }
     }
 }
+

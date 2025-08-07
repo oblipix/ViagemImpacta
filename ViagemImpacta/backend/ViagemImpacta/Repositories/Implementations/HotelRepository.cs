@@ -30,6 +30,14 @@ namespace ViagemImpacta.Repositories.Implementations
             .ToListAsync();
         }
 
+        public async Task<Hotel> GetHotelByIdAsync(int id)
+        {
+            return await _context.Hotels
+                                .Include(h => h.Rooms)
+                .FirstOrDefaultAsync(h => h.HotelId == id)
+                ?? throw new KeyNotFoundException($"Hotel with ID {id} not found.");
+        }
+
 
         public async Task<IEnumerable<Hotel>> GetHotelsWithAmenitiesAsync(bool wifi, bool parking, bool gym)
         {
@@ -58,6 +66,7 @@ namespace ViagemImpacta.Repositories.Implementations
                 .ToListAsync();
         }
 
+
         public async Task<IEnumerable<Hotel>> SearchHotelsAsync(
             string? destination,
             decimal? minPrice,
@@ -69,73 +78,9 @@ namespace ViagemImpacta.Repositories.Implementations
             string? checkIn,
             string? checkOut)
         {
-            var stopwatch = Stopwatch.StartNew();
-            var validationResults = new List<string>();
+            var query = _context.Hotels.AsNoTracking().Include(h => h.Rooms).AsQueryable();
 
-            // 🚀 FAIL-FAST: Validações no início para evitar processamento desnecessário
-
-            // Validação de preços
-            if (minPrice.HasValue && minPrice.Value < 0)
-            {
-                var reason = $"MinPrice negative: {minPrice.Value}";
-                validationResults.Add(reason);
-                LogFailFast("NegativeMinPrice", reason, stopwatch.ElapsedMilliseconds);
-                return Enumerable.Empty<Hotel>();
-            }
-
-            if (maxPrice.HasValue && maxPrice.Value < 0)
-            {
-                var reason = $"MaxPrice negative: {maxPrice.Value}";
-                validationResults.Add(reason);
-                LogFailFast("NegativeMaxPrice", reason, stopwatch.ElapsedMilliseconds);
-                return Enumerable.Empty<Hotel>();
-            }
-
-            if (minPrice.HasValue && maxPrice.HasValue && minPrice.Value > maxPrice.Value)
-            {
-                var reason = $"MinPrice ({minPrice.Value}) > MaxPrice ({maxPrice.Value})";
-                validationResults.Add(reason);
-                LogFailFast("InvalidPriceRange", reason, stopwatch.ElapsedMilliseconds);
-                return Enumerable.Empty<Hotel>();
-            }
-
-            // Validação de estrelas (hotéis têm 1-5 estrelas)
-            if (stars.HasValue && (stars.Value < 1 || stars.Value > 5))
-            {
-                var reason = $"Invalid stars: {stars.Value} (must be 1-5)";
-                validationResults.Add(reason);
-                LogFailFast("InvalidStars", reason, stopwatch.ElapsedMilliseconds);
-                return Enumerable.Empty<Hotel>();
-            }
-
-            // Validação de hóspedes
-            if (guests.HasValue && guests.Value <= 0)
-            {
-                var reason = $"Invalid guests: {guests.Value} (must be > 0)";
-                validationResults.Add(reason);
-                LogFailFast("InvalidGuests", reason, stopwatch.ElapsedMilliseconds);
-                return Enumerable.Empty<Hotel>();
-            }
-
-            // Validação de datas
-            if (!string.IsNullOrWhiteSpace(checkIn) && !string.IsNullOrWhiteSpace(checkOut))
-            {
-                if (!DateTime.TryParse(checkIn, out var checkInDate) ||
-                    !DateTime.TryParse(checkOut, out var checkOutDate) ||
-                    checkOutDate <= checkInDate ||
-                    checkInDate < DateTime.Today) // Não pode reservar no passado
-                {
-                    var reason = $"Invalid dates: CheckIn={checkIn}, CheckOut={checkOut}";
-                    validationResults.Add(reason);
-                    LogFailFast("InvalidDates", reason, stopwatch.ElapsedMilliseconds);
-                    return Enumerable.Empty<Hotel>();
-                }
-            }
-
-            // Se chegou até aqui, todas as validações passaram
-            LogValidationsPassed(stopwatch.ElapsedMilliseconds);
-
-            var query = _context.Hotels.AsNoTracking().Include(h => h.Rooms).AsQueryable();            // Filtro por destino
+            // Filtro por destino
             if (!string.IsNullOrWhiteSpace(destination))
             {
                 var searchTerm = destination.ToLowerInvariant();
@@ -145,7 +90,7 @@ namespace ViagemImpacta.Repositories.Implementations
                     (h.HotelAddress != null && h.HotelAddress.ToLower().Contains(searchTerm)));
             }
 
-            // ✅ OTIMIZAÇÃO: Filtro por preço aplicado no banco de dados
+            // Filtro por preço aplicado no banco de dados
             if (minPrice.HasValue || maxPrice.HasValue)
             {
                 if (minPrice.HasValue)
@@ -166,7 +111,7 @@ namespace ViagemImpacta.Repositories.Implementations
 
             var hotels = await query.ToListAsync();
 
-            // ✅ PÓS-PROCESSAMENTO: Aplicar filtros específicos de preço nos quartos após carregar
+            // Pós-processamento: Aplicar filtros específicos de preço nos quartos após carregar
             if (minPrice.HasValue || maxPrice.HasValue)
             {
                 var filteredHotels = new List<Hotel>();
@@ -202,7 +147,7 @@ namespace ViagemImpacta.Repositories.Implementations
                             Theater = hotel.Theater,
                             Garden = hotel.Garden,
                             BreakfastIncludes = hotel.BreakfastIncludes,
-                            ImageUrls = hotel.ImageUrls, // 🖼️ CORREÇÃO: Copiar URLs das imagens
+                            ImageUrls = hotel.ImageUrls,
                             Rooms = filteredRooms
                         };
                         filteredHotels.Add(hotelCopy);
@@ -212,7 +157,7 @@ namespace ViagemImpacta.Repositories.Implementations
                 hotels = filteredHotels;
             }
 
-            //  CORREÇÃO: Filtro por tipo de quarto específico (aplicado após carregar)
+            // Filtro por tipo de quarto específico (aplicado após carregar)
             if (!string.IsNullOrWhiteSpace(roomType))
             {
                 if (Enum.TryParse<RoomType>(roomType, true, out var parsedType))
@@ -250,7 +195,7 @@ namespace ViagemImpacta.Repositories.Implementations
                                 Theater = hotel.Theater,
                                 Garden = hotel.Garden,
                                 BreakfastIncludes = hotel.BreakfastIncludes,
-                                ImageUrls = hotel.ImageUrls, // 🖼️ CORREÇÃO: Copiar URLs das imagens
+                                ImageUrls = hotel.ImageUrls,
                                 Rooms = roomsOfRequestedType
                             };
                             filteredHotels.Add(hotelCopy);
@@ -327,27 +272,38 @@ namespace ViagemImpacta.Repositories.Implementations
                 }
             }
 
-            // Filtro por capacidade de hóspedes (já validado no início)
+            // Filtro por capacidade de hóspedes
             if (guests.HasValue)
             {
                 hotels = hotels.Where(h => h.Rooms.Any(r => r.Capacity >= guests.Value)).ToList();
             }
 
-            // ✅ OTIMIZAÇÃO: Filtro por disponibilidade de datas (query otimizada)
+            // Filtro por disponibilidade de datas (query otimizada)
             if (!string.IsNullOrWhiteSpace(checkIn) && !string.IsNullOrWhiteSpace(checkOut))
             {
-                var checkInDate = DateTime.Parse(checkIn);
-                var checkOutDate = DateTime.Parse(checkOut);
+                if (!DateTime.TryParse(checkIn, out var checkInDate) ||
+                    !DateTime.TryParse(checkOut, out var checkOutDate))
+                {
+                    return Enumerable.Empty<Hotel>(); // Retorna vazio se datas inválidas
+                }
+
+                // Validações adicionais de datas
+                if (checkOutDate <= checkInDate || checkInDate < DateTime.Today)
+                {
+                    return Enumerable.Empty<Hotel>(); // Retorna vazio se datas inválidas
+                }
 
                 // Busca todas as reservas conflitantes de uma vez
                 var allRoomIds = hotels.SelectMany(h => h.Rooms).Select(r => r.RoomId).ToList();
 
                 var conflictingReservations = await _context.Reservations
-                    .Where(r => allRoomIds.Contains(r.RoomId) &&
+                    .Where(r => r.RoomId.HasValue && 
+                               allRoomIds.Contains(r.RoomId.Value) &&
                                r.IsConfirmed &&
+                               !r.IsCanceled &&
                                r.CheckIn < checkOutDate &&
                                r.CheckOut > checkInDate)
-                    .GroupBy(r => r.RoomId)
+                    .GroupBy(r => r.RoomId.Value)
                     .Select(g => new { RoomId = g.Key, Count = g.Count() })
                     .ToDictionaryAsync(x => x.RoomId, x => x.Count);
 
@@ -360,10 +316,22 @@ namespace ViagemImpacta.Repositories.Implementations
                     foreach (var room in hotel.Rooms)
                     {
                         var conflictCount = conflictingReservations.GetValueOrDefault(room.RoomId, 0);
+                        var availableCount = room.TotalRooms - conflictCount;
 
-                        if (conflictCount < room.TotalRooms)
+                        if (availableCount > 0)
                         {
-                            availableRooms.Add(room);
+                            // Cria uma cópia do quarto com a disponibilidade atualizada
+                            var availableRoom = new Room
+                            {
+                                RoomId = room.RoomId,
+                                HotelId = room.HotelId,
+                                TypeName = room.TypeName,
+                                TotalRooms = availableCount,
+                                Capacity = room.Capacity,
+                                AverageDailyPrice = room.AverageDailyPrice,
+                                Description = room.Description
+                            };
+                            availableRooms.Add(availableRoom);
                         }
                     }
 
@@ -391,7 +359,7 @@ namespace ViagemImpacta.Repositories.Implementations
                             Theater = hotel.Theater,
                             Garden = hotel.Garden,
                             BreakfastIncludes = hotel.BreakfastIncludes,
-                            ImageUrls = hotel.ImageUrls, // 🖼️ CORREÇÃO: Copiar URLs das imagens
+                            ImageUrls = hotel.ImageUrls,
                             Rooms = availableRooms
                         };
                         filteredHotels.Add(hotelCopy);
@@ -401,34 +369,7 @@ namespace ViagemImpacta.Repositories.Implementations
                 hotels = filteredHotels;
             }
 
-            // Log de sucesso com métricas
-            stopwatch.Stop();
-            LogSearchSuccess(hotels.Count(), stopwatch.ElapsedMilliseconds, destination, minPrice, maxPrice, stars, guests);
-
             return hotels;
         }
-
-        // 📊 MÉTODOS DE DEBUG - Performance otimizada
-        private void LogFailFast(string validationType, string reason, long elapsedMs)
-        {
-            _logger.LogWarning("🚀 FAIL-FAST: {ValidationType} | Reason: {Reason} | Time: {ElapsedMs}ms | Status: BLOCKED",
-                validationType, reason, elapsedMs);
-        }
-
-        private void LogValidationsPassed(long elapsedMs)
-        {
-            _logger.LogInformation("✅ VALIDATIONS: All passed | Time: {ElapsedMs}ms | Status: PROCEEDING", elapsedMs);
-        }
-
-        private void LogSearchSuccess(int resultCount, long elapsedMs, string? destination, decimal? minPrice, decimal? maxPrice, int? stars, int? guests)
-        {
-            _logger.LogInformation("🎯 SEARCH: Success | Results: {ResultCount} | Time: {ElapsedMs}ms | Filters: [Dest: {Destination}, Price: {MinPrice}-{MaxPrice}, Stars: {Stars}, Guests: {Guests}]",
-                resultCount, elapsedMs, destination ?? "Any", minPrice?.ToString() ?? "Any", maxPrice?.ToString() ?? "Any", stars?.ToString() ?? "Any", guests?.ToString() ?? "Any");
-        }
-
     }
-
-
-
-
 }

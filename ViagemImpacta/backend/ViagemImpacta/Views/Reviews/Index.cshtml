@@ -1,0 +1,54 @@
+@model IEnumerable<ViagemImpacta.Models.Review>
+@{
+    ViewData["Title"] = "Avaliações";
+}
+
+<h2>Avaliações dos Usuários</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a class="btn btn-secondary" asp-controller="Admins" asp-action="Dashboard">Voltar ao Dashboard</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Hotel</th>
+            <th>Usuário</th>
+            <th>Nota</th>
+            <th>Comentário</th>
+            <th>Data</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Hotel?.Name</td>
+            <td>@item.User?.FirstName @item.User?.LastName</td>
+            <td>@item.Rating</td>
+            <td>@item.Comment</td>
+            <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.ReviewId" class="btn btn-info btn-sm">Detalhes</a>
+                <a asp-action="DeleteMVC" asp-route-id="@item.ReviewId" class="btn btn-danger btn-sm">Excluir</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

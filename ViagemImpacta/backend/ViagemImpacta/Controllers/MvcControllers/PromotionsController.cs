@@ -1,160 +1,161 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using ViagemImpacta.Data;
+using ViagemImpacta.DTO.Promotion;
 using ViagemImpacta.Models;
+using ViagemImpacta.Services.Interfaces;
 
 namespace ViagemImpacta.Controllers.MvcControllers
 {
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme, Roles = "Admin, Attendant")]
     public class PromotionsController : Controller
     {
-        private readonly AgenciaDbContext _context;
+        private readonly IPromotionService _service;
+        private readonly IHotelService _hotelService;
+        private readonly IMapper _mapper;
 
-        public PromotionsController(AgenciaDbContext context)
+        public PromotionsController(IPromotionService service, IHotelService hotelService, IMapper mapper)
         {
-            _context = context;
+            _service = service;
+            _hotelService = hotelService;
+            _mapper = mapper;
         }
 
         // GET: Promotions
         public async Task<IActionResult> Index()
         {
-            var agenciaDbContext = _context.Promotions.Include(p => p.Hotel);
-            return View(await agenciaDbContext.ToListAsync());
+            var allPromotionsActive = await _service.GetActivePromotionsAsync();
+            return View(allPromotionsActive);
         }
 
         // GET: Promotions/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var promotion = await _context.Promotions
-                .Include(p => p.Hotel)
-                .FirstOrDefaultAsync(m => m.PromotionId == id);
+            var promotion = await _service.GetPromotionByIdAsync(id.Value);
             if (promotion == null)
-            {
                 return NotFound();
-            }
 
             return View(promotion);
         }
 
         // GET: Promotions/Create
-        public IActionResult Create()
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create()
         {
-            ViewData["HotelId"] = new SelectList(_context.Hotels, "HotelId", "City");
+            // Buscar todos os hotéis para o dropdown
+            var hotels = await _hotelService.GetAllHotelsAsync();
+            ViewBag.Hotels = new SelectList(hotels.Select(h => new {
+                HotelId = h.HotelId,
+                DisplayName = $"{h.Name} - {h.City}"
+            }), "HotelId", "DisplayName");
+
             return View();
         }
 
         // POST: Promotions/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PromotionId,TitlePromotion,Description,StartDate,EndDate,CheckIn,CheckOut,HotelId,FinalPrice,OriginalPrice,DiscountPercentage,IsActive,CreatedAt,RoomsPromotionalId")] Promotion promotion)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create(CreatePromotionDTO dto)
         {
-            if (ModelState.IsValid)
+            // Normalizar as datas para comparação (remover componente de hora)
+            var today = DateTime.Today;
+            var startDate = dto.StartDate.Date;
+            var endDate = dto.EndDate.Date;
+            var checkIn = dto.CheckIn.Date;
+            var checkOut = dto.CheckOut.Date;
+
+            // Validações de data
+            if (startDate < today)
             {
-                _context.Add(promotion);
-                await _context.SaveChangesAsync();
+                ModelState.AddModelError("StartDate", "Data de início deve ser hoje ou no futuro.");
+            }
+
+            if (endDate < startDate)
+            {
+                ModelState.AddModelError("EndDate", "Data de fim deve ser posterior à data de início.");
+            }
+
+            if (checkIn < today)
+            {
+                ModelState.AddModelError("CheckIn", "Data de check-in deve ser hoje ou no futuro.");
+            }
+
+            if (checkOut <= checkIn)
+            {
+                ModelState.AddModelError("CheckOut", "Data de check-out deve ser posterior à data de check-in.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                // Recarregar dados para dropdown em caso de erro
+                var hotels = await _hotelService.GetAllHotelsAsync();
+                ViewBag.Hotels = new SelectList(hotels.Select(h => new {
+                    HotelId = h.HotelId,
+                    DisplayName = $"{h.Name} - {h.City}"
+                }), "HotelId", "DisplayName");
+
+                return View(dto);
+            }
+
+            try
+            {
+                await _service.CreatePromotionAsync(dto);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["HotelId"] = new SelectList(_context.Hotels, "HotelId", "City", promotion.HotelId);
-            return View(promotion);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Erro ao criar promoção: {ex.Message}");
+
+                // Recarregar dados para dropdown em caso de erro
+                var hotels = await _hotelService.GetAllHotelsAsync();
+                ViewBag.Hotels = new SelectList(hotels.Select(h => new {
+                    HotelId = h.HotelId,
+                    DisplayName = $"{h.Name} - {h.City}"
+                }), "HotelId", "DisplayName");
+
+                return View(dto);
+            }
         }
 
-        // GET: Promotions/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
+
             if (id == null)
             {
-                return NotFound();
+                 return BadRequest();
             }
-
-            var promotion = await _context.Promotions.FindAsync(id);
-            if (promotion == null)
-            {
-                return NotFound();
-            }
-            ViewData["HotelId"] = new SelectList(_context.Hotels, "HotelId", "City", promotion.HotelId);
-            return View(promotion);
-        }
-
-        // POST: Promotions/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PromotionId,TitlePromotion,Description,StartDate,EndDate,CheckIn,CheckOut,HotelId,FinalPrice,OriginalPrice,DiscountPercentage,IsActive,CreatedAt,RoomsPromotionalId")] Promotion promotion)
-        {
-            if (id != promotion.PromotionId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(promotion);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PromotionExists(promotion.PromotionId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["HotelId"] = new SelectList(_context.Hotels, "HotelId", "City", promotion.HotelId);
-            return View(promotion);
-        }
-
-        // GET: Promotions/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var promotion = await _context.Promotions
-                .Include(p => p.Hotel)
-                .FirstOrDefaultAsync(m => m.PromotionId == id);
-            if (promotion == null)
-            {
-                return NotFound();
-            }
+            var promotion = await _service.GetPromotionByIdAsync(id);
+            if (promotion == null) return NotFound();
 
             return View(promotion);
         }
 
-        // POST: Promotions/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var promotion = await _context.Promotions.FindAsync(id);
-            if (promotion != null)
+            if (id == null)
             {
-                _context.Promotions.Remove(promotion);
+                return BadRequest();
+            } 
+            var promotion = await _service.GetPromotionByIdAsync(id);
+            if (promotion == null)
+            return NotFound();
+            try
+            {
+                var result = await _service.SoftDeletePromotion(id);
+                return RedirectToAction(nameof(Index));
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool PromotionExists(int id)
-        {
-            return _context.Promotions.Any(e => e.PromotionId == id);
+            catch (Exception e)
+            {
+                return View(promotion);
+            }       
         }
     }
 }

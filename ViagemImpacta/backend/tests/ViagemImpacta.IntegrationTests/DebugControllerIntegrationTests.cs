@@ -8,7 +8,7 @@ namespace ViagemImpacta.IntegrationTests;
 /// <summary>
 /// Factory customizada para testes de integração
 /// </summary>
-public class ViagemImpactaWebApplicationFactory : WebApplicationFactory<Program>
+public class ViagemImpactaWebApplicationFactory : WebApplicationFactory<TestProgram>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

@@ -26,7 +26,9 @@ namespace ViagemImpacta.Repositories.Implementations
 
         public async Task<Reservation?> GetReservationById(int id)
         {
-            return await GetReservationWithUserRoomAndHotel().FirstOrDefaultAsync(r => r.ReservationId == id);
+            return await GetReservationWithUserRoomAndHotel()
+                .Include(r => r.RoomPromotional) // Incluir RoomPromotional para evitar lazy loading
+                .FirstOrDefaultAsync(r => r.ReservationId == id);
         }
 
         public async Task<IEnumerable<Reservation>> GetReservationsByUserIdAsync(int userId)
@@ -125,6 +127,15 @@ namespace ViagemImpacta.Repositories.Implementations
         public async Task<IEnumerable<Reservation>> GetAllReservationsAsync()
         {
             return await GetReservationWithUserRoomAndHotel().ToListAsync();
+        }
+
+        public Task<bool> RoomsAvailable(int idPromotion)
+        {
+            var roomsAvailable = _context.RoomsPromotional
+                .Where(rp => rp.PromotionId == idPromotion && rp.TotalRoomsAvailable > rp.TotalRoomsReserved)
+                .AnyAsync();
+
+            return roomsAvailable;
         }
     }
 }

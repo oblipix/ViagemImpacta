@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ViagemImpacta.Data;
 using ViagemImpacta.Models;
+using ViagemImpacta.Models.Enums;
 using ViagemImpacta.Repositories.Interfaces;
 
 namespace ViagemImpacta.Repositories.Implementations
@@ -46,6 +47,14 @@ namespace ViagemImpacta.Repositories.Implementations
             return await _context.Rooms
                 .Include(r => r.Hotel)
                 .FirstOrDefaultAsync(r => r.RoomId == roomId);
+        }
+
+        public async Task<decimal> GetPriceRoomByHotelAndType(int hotelId, RoomType roomTypeId)
+        {
+            return await _context.Rooms
+                .Where(r => r.HotelId == hotelId && r.TypeName == roomTypeId)
+                .Select(r => r.AverageDailyPrice)
+                .FirstOrDefaultAsync();
         }
     }
 }

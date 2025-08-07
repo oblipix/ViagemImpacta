@@ -1,53 +1,14 @@
 // src/components/pages/PromocoesPage.jsx
 
-import React, { useState, useEffect } from 'react';
-import { useHotels } from '../hooks/useHotels.js';
-import HotelCard from '../hotels/HotelCard.jsx';
-import ScrollReveal from '../common/ScrollReveal.jsx';
-import AnimatedSection from '../common/AnimatedSection.jsx';
-import AnimatedHotelCard from '../common/AnimatedHotelCard.jsx';
+import React from 'react';
+import { usePromotions } from '../hooks/usePromotions.js';
+import PromotionsCard from './PromotionsCard.jsx';
+import ScrollReveal from '../components/common/ScrollReveal.jsx';
+import AnimatedSection from '../components/common/AnimatedSection.jsx';
+import AnimatedHotelCard from '../components/common/AnimatedHotelCard.jsx';
 
 function PromocoesPage() {
-    const { hotels, loading, error } = useHotels();
-    const [promocoes, setPromocoes] = useState([]);
-    
-    // Filtra os hotéis com promoção
-    useEffect(() => {
-        if (hotels && hotels.length > 0) {
-            // Cálculo do preço médio para definir quais são as promoções
-            const avgPrice = hotels.reduce((acc, hotel) => {
-                const hotelPrice = hotel.price || 
-                    (hotel.roomOptions?.length > 0 
-                        ? Math.min(...hotel.roomOptions.map(room => room.price).filter(price => price > 0))
-                        : 0);
-                return acc + hotelPrice;
-            }, 0) / hotels.length;
-            
-            // Filtrar hotéis em promoção (abaixo da média de preço)
-            const hoteisPromocao = hotels
-                .filter(hotel => {
-                    const hotelPrice = hotel.price || 
-                        (hotel.roomOptions?.length > 0 
-                            ? Math.min(...hotel.roomOptions.map(room => room.price).filter(price => price > 0))
-                            : 0);
-                    return hotelPrice > 0 && hotelPrice < avgPrice;
-                })
-                .sort((a, b) => {
-                    // Ordenar do menor para o maior preço
-                    const priceA = a.price || 
-                        (a.roomOptions?.length > 0 
-                            ? Math.min(...a.roomOptions.map(room => room.price).filter(price => price > 0))
-                            : 0);
-                    const priceB = b.price || 
-                        (b.roomOptions?.length > 0 
-                            ? Math.min(...b.roomOptions.map(room => room.price).filter(price => price > 0))
-                            : 0);
-                    return priceA - priceB;
-                });
-            
-            setPromocoes(hoteisPromocao);
-        }
-    }, [hotels]);
+    const { promotions: promocoes, loading, error } = usePromotions();
 
     if (loading) {
         return (
@@ -105,21 +66,21 @@ function PromocoesPage() {
                         <ScrollReveal animation="slideLeft" delay={400}>
                             <div className="mb-8 bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
                                 <p className="text-blue-800">
-                                    <span className="font-bold">{promocoes.length}</span> hotéis com preços promocionais encontrados. Os melhores preços estão aqui!
+                                    <span className="font-bold">{promocoes.length}</span> promoções especiais encontradas. Aproveite essas ofertas imperdíveis!
                                 </p>
                             </div>
                         </ScrollReveal>
-                        
+
                         <AnimatedSection animation="fadeUp" delay={600}>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {promocoes.map((hotel, index) => (
-                                    <AnimatedHotelCard key={hotel.id} index={index}>
+                                {promocoes.map((promotion, index) => (
+                                    <AnimatedHotelCard key={promotion.id} index={index}>
                                         <div className="relative">
                                             {/* Badge de promoção */}
                                             <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full font-bold z-10 shadow-lg transform rotate-12">
-                                                OFERTA
+                                                -{promotion.discountPercent}%
                                             </div>
-                                            <HotelCard hotel={hotel} />
+                                            <PromotionsCard promotion={promotion} />
                                         </div>
                                     </AnimatedHotelCard>
                                 ))}
