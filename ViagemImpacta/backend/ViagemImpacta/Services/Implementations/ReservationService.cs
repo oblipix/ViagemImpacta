@@ -397,7 +397,7 @@ namespace ViagemImpacta.Services.Implementations
                 IsConfirmed = false,
                 CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, BrazilTimeZone),
                 UpdatedAt = DateTime.UtcNow,
-                Description = Dto.SpecialRequests,
+                Description = Dto.SpecialRequests
                 
 
             };

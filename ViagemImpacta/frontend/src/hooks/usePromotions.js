@@ -21,8 +21,8 @@ export function usePromotions() {
             const formattedPromotions = promotionsData.map(promotion =>
                 promotionService.formatPromotionData(promotion)
             );
-
             setPromotions(formattedPromotions);
+            return formattedPromotions;
         } catch (err) {
             console.error('Erro ao carregar promoções:', err);
             setError(err.message);
