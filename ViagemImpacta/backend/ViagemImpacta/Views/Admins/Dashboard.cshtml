@@ -1,15 +1,17 @@
-﻿@model ViagemImpacta.Models.User 
+﻿@using ViagemImpacta.Models.Dashboard
 @{  
     var name = ViewBag.Name ?? "Admin";  
     var balance = ViewBag.Balance ?? 0.0;  
+    var hotelRevenueData = ViewBag.HotelRevenueData as IEnumerable<HotelRevenueData>;
+    var reservationStatusData = ViewBag.ReservationStatusData as IEnumerable<ReservationStatusData>;
 }  
 
 <link rel="stylesheet" href="~/css/dashboard.css"/>  
 
 @if (ViewBag.Role == "Attendant")
 {  
-    <div class="alert alert-warning text-center" role="alert">  
-        Você está acessando o dashboard como atendente, logo, possui algumas opções bloqueadas.  
+    <div class="alert alert-warning text-center" role="alert">
+        Você está acessando o dashboard como <strong>atendente</strong>, logo, possui algumas opções bloqueadas.
     </div>  
 }
 <div class="dashboard-container">  
@@ -23,7 +25,7 @@
             </form>  
         </div>  
         <div class="faturamento-box">  
-            <strong>Faturamento:</strong>  
+            <strong>Faturamento Mensal:</strong>  
             <span class="fs-4">@balance.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</span>  
         </div>  
     </div>  
@@ -41,60 +43,75 @@
         <section class="dashboard-content">  
             <div class="row g-4">  
                 <div class="col-lg-6 col-md-12">  
-                    <div class="card h-100 shadow-sm">  
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-white border-0 text-center">
+                            <h5 class="card-title m-2">Informações de Status de Reservas</h5> 
+                        </div>
                         <div class="card-body">  
-                            <h5 class="card-title mb-4">Faturamento por Hospedagem</h5>  
-                            <canvas id="faturamentoPacoteChart" style="min-height: 260px;"></canvas>  
+                            <canvas id="reservationStatusChart" style="min-height: 240px;"></canvas>
                         </div>  
                     </div>  
                 </div>  
-                <div class="col-lg-6 col-md-12">  
+                <div class="col-lg-6 col-md-12">
                     <div class="card h-100 shadow-sm">  
+                        <div class="card-header bg-white border-0 text-center">
+                            <h5 class="card-title m-2">Faturamento por Hotel</h5>
+                        </div>
                         <div class="card-body">  
-                            <h5 class="card-title mb-4">Faturamento por Hotel</h5>  
-                            <canvas id="faturamentoHotelChart" style="min-height: 260px;"></canvas>  
+                            <canvas id="hotelRevenueChart" style="min-height: 240px;"></canvas>
                         </div>  
                     </div>  
                 </div>  
-            </div>  
-             @section Scripts {  
-                <script>  
-                    const faturamentoPacoteData = {  
-                    labels: ["Pacote A", "Pacote B", "Pacote C"],  
-                    datasets: [{  
-                    label: "Faturamento (R$)",  
-                    data: [40000, 50000, 35000],  
-                    backgroundColor: ["#0d6efd", "#6c757d", "#198754"],  
-                    }]  
-                    };  
-                    const faturamentoHotelData = {  
-                    labels: ["Hotel X", "Hotel Y", "Hotel Z", "Hotel W", "Hotel V", "Hotel U"],  
-                    datasets: [{  
-                    label: "Faturamento (R$)",  
-                    data: [10000, 60000, 35000, 45000, 25000, 55000],  
-                    backgroundColor: ["#ffc107", "#dc3545", "#20c997", "#6f42c1", "#fd7e14", "#e83e8c"],  
-                    }]  
-                    };  
-
-                    new Chart(document.getElementById('faturamentoPacoteChart'), {  
-                    type: 'pie',  
-                    data: faturamentoPacoteData,  
-                    options: {  
-                    responsive: true,  
-                    }  
-                    });  
-                    new Chart(document.getElementById('faturamentoHotelChart'), {  
-                    type: 'pie',  
-                    data: faturamentoHotelData,  
-                    options: {  
-                    responsive: true,  
-                    }  
-                    });  
-                </script>  
-            }  
-            <div class="d-flex justify-content-end mt-4">  
-                <a asp-controller="Admins" asp-action="FaturamentoDetalhado" class="btn btn-outline-primary"><span class="material-icons align-middle">bar_chart</span> Ver detalhes do faturamento</a>  
             </div>  
         </section>  
     </div>  
 </div>
+
+@section Scripts {
+    <script>
+        const hotelRevenueData = @Html.Raw(hotelRevenueData != null ? Newtonsoft.Json.JsonConvert.SerializeObject(hotelRevenueData) : "[]");
+        const reservationStatusData = @Html.Raw(reservationStatusData != null ? Newtonsoft.Json.JsonConvert.SerializeObject(reservationStatusData) : "[]");
+
+        if (reservationStatusData && reservationStatusData.length > 0)
+        {
+            const faturamentoPacoteData = {
+                labels: reservationStatusData.map(r => r.status || r.Status),
+                datasets: [{
+                    label: "Status de Reservas",
+                    data: reservationStatusData.map(r => r.count || r.Count),
+                    backgroundColor: ["#28a745", "#ffc107", "#dc3545"],
+                    borderWidth: 0,
+                    cutout: '65%'
+                    }]
+            };
+            new Chart(document.getElementById('reservationStatusChart'), {
+                type: 'doughnut',
+                data: faturamentoPacoteData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                }
+            });
+        }
+
+        if (hotelRevenueData && hotelRevenueData.length > 0) 
+        {
+            const faturamentoHotelData = {
+                labels: hotelRevenueData.slice(0, 10).map(h => h.hotelName || h.HotelName),
+                datasets: [{
+                    label: "Faturamento (R$)",
+                    data: hotelRevenueData.slice(0, 10).map(h => h.revenue || h.Revenue),
+                    backgroundColor: ["#dc3545", "#20c997", "#6f42c1", "#fd7e14", "#e83e8c", "#ffc107"],
+                    }]
+            };
+            new Chart(document.getElementById('hotelRevenueChart'), {
+                type: 'pie',
+                data: faturamentoHotelData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                }
+            });
+        }
+    </script>
+}
