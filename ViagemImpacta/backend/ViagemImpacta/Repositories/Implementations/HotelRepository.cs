@@ -67,7 +67,8 @@ namespace ViagemImpacta.Repositories.Implementations
             string? amenities,
             int? guests,
             string? checkIn,
-            string? checkOut)
+            string? checkOut,
+            string? sortBy = null)
         {
             var query = _context.Hotels.AsNoTracking().Include(h => h.Rooms).AsQueryable();
 
@@ -357,6 +358,30 @@ namespace ViagemImpacta.Repositories.Implementations
                 }
 
                 hotels = filteredHotels;
+            }
+
+            // Aplicar ordenamento
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                switch (sortBy.ToLowerInvariant())
+                {
+                    case "price_asc":
+                    case "preco_menor":
+                        hotels = hotels.OrderBy(h => h.Rooms.Any() ? h.Rooms.Min(r => r.AverageDailyPrice) : decimal.MaxValue).ToList();
+                        break;
+                    case "price_desc":
+                    case "preco_maior":
+                        hotels = hotels.OrderByDescending(h => h.Rooms.Any() ? h.Rooms.Min(r => r.AverageDailyPrice) : 0).ToList();
+                        break;
+                    case "name_asc":
+                    case "nome_az":
+                        hotels = hotels.OrderBy(h => h.Name).ToList();
+                        break;
+                    case "name_desc":
+                    case "nome_za":
+                        hotels = hotels.OrderByDescending(h => h.Name).ToList();
+                        break;
+                }
             }
 
             return hotels;

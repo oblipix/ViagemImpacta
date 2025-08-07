@@ -342,9 +342,9 @@ function SearchHotelsBar({ enableOnChange = true, onSearch, loadingState }) {
             console.error('Erro ao carregar tipos de quarto:', error);
             // Fallback para dados locais em caso de erro
             const fallbackTypes = [
-                { id: 1, name: 'Standard' },
-                { id: 2, name: 'Luxo' },
-                { id: 3, name: 'Suíte' }
+                { id: 0, name: 'Standard' },
+                { id: 1, name: 'Luxo' },
+                { id: 2, name: 'Suite' }
             ];
             setRoomTypeOptions(fallbackTypes);
             // ✅ NÃO define mais fallback como padrão

@@ -251,7 +251,6 @@ class HotelService {
       price: this.generatePrice(backendHotel),
       rating: this.generateRating(backendHotel),
       lowestRoomPrice: backendHotel.lowestRoomPrice || backendHotel.LowestRoomPrice,
-      filteredLowestRoomPrice: backendHotel.filteredLowestRoomPrice || backendHotel.FilteredLowestRoomPrice,
 
 
       address: backendHotel.hotelAddress || backendHotel.HotelAddress,
@@ -299,12 +298,11 @@ class HotelService {
   async getHotelsWithFilters(filters) {
     const cacheKey = this._getCacheKey('getHotelsWithFilters', filters);
     
-    // Verifica cache primeiro
     const cachedData = this._getFromCache(cacheKey, 'getHotelsWithFilters');
     if (cachedData) {
       return cachedData;
     }
-
+    
     try {
       const params = {};
       if (filters.destination) params.destination = filters.destination;
@@ -318,18 +316,17 @@ class HotelService {
       if (filters.amenities) params.amenities = filters.amenities;
       if (filters.checkIn) params.checkIn = filters.checkIn;
       if (filters.checkOut) params.checkOut = filters.checkOut;
+      if (filters.sortBy) params.sortBy = filters.sortBy;
       
       const response = await axios.get(`${API_BASE_URL}/hotels/search`, { params });
       const transformedData = this.transformHotelsData(response.data);
       
-      // Armazena no cache
       this._setCache(cacheKey, transformedData);
       
       return transformedData;
     } catch (error) {
-      console.error('❌ Error in getHotelsWithFilters:', error);
+      console.error('Error in getHotelsWithFilters:', error);
       
-      // Se a busca com filtros falhar, tenta buscar todos os hotéis
       if (error.response?.status === 404) {
         return await this.getAllHotels();
       }
@@ -361,6 +358,11 @@ class HotelService {
    * Gera preço baseado nos quartos reais ou nas estrelas
    */
   generatePrice(hotel) {
+    // Usa o preço calculado pelo backend (já filtrado pelos quartos disponíveis)
+    if (hotel.lowestRoomPrice || hotel.LowestRoomPrice) {
+      return parseFloat(hotel.lowestRoomPrice || hotel.LowestRoomPrice);
+    }
+    
     // Se tem quartos com preços reais, usa o menor preço
     if (hotel.rooms && Array.isArray(hotel.rooms) && hotel.rooms.length > 0) {
       const prices = hotel.rooms.map(room => 
@@ -551,13 +553,22 @@ class HotelService {
       }
     ];
   }
-getRoomTypes() {
-  return [
-    { id: 0, name: 'Quarto Standard' },
-    { id: 1, name: 'Quarto Luxo' },
-    { id: 2, name: 'Suíte' }
-  ];
-}
+  getRoomTypes() {
+    return [
+      { id: 0, name: 'Standard' },
+      { id: 1, name: 'Luxo' },
+      { id: 2, name: 'Suite' }
+    ];
+  }
+
+  getSortOptions() {
+    return [
+      { value: 'price_asc', label: 'Menor Preço' },
+      { value: 'price_desc', label: 'Maior Preço' },
+      { value: 'name_asc', label: 'Nome A-Z' },
+      { value: 'name_desc', label: 'Nome Z-A' }
+    ];
+  }
   /**
    * Converte o enum RoomType para nome legível
    */

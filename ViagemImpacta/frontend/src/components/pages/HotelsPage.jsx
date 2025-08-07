@@ -17,6 +17,7 @@ import { useHotels } from '../hooks/useHotels.js';
 import hotelService from '../../services/hotelService';
 import ScrollReveal from '../common/ScrollReveal.jsx';
 import AnimatedHotelCard from '../common/AnimatedHotelCard.jsx';
+import SortButton from '../common/SortButton.jsx';
  
 function HotelsPage() {
   const location = useLocation();
@@ -24,6 +25,10 @@ function HotelsPage() {
  
   // Estados do componente - SEMPRE na mesma ordem
   const [refreshFlag, setRefreshFlag] = useState(false);
+  const [currentSort, setCurrentSort] = useState(() => {
+    const queryParams = new URLSearchParams(location.search);
+    return queryParams.get('sortBy') || null;
+  });
 
   // Função para refresh
   const refresh = () => {
@@ -49,11 +54,32 @@ function HotelsPage() {
       roomType: queryParams.get('roomType') || '',
       checkIn: queryParams.get('checkIn') || '',
       checkOut: queryParams.get('checkOut') || '',
+      sortBy: queryParams.get('sortBy') || null,
     };
   }, [location.search]);
 
   // Hook customizado - SEMPRE após os estados e useMemo
   const { hotels, loading, error, loadingState } = useFilteredHotels(filters);
+
+  // Função para lidar com mudança de ordenação
+  const handleSortChange = (sortValue) => {
+    setCurrentSort(sortValue);
+    // Refazer a busca com a nova ordenação
+    const newFilters = { ...filters, sortBy: sortValue };
+    // Atualizar a URL com o parâmetro de ordenação
+    const newSearchParams = new URLSearchParams();
+    if (filters.destination) newSearchParams.append('destination', filters.destination);
+    if (filters.minPrice !== undefined) newSearchParams.append('minPrice', filters.minPrice);
+    if (filters.maxPrice !== undefined) newSearchParams.append('maxPrice', filters.maxPrice);
+    if (filters.amenities) newSearchParams.append('amenities', filters.amenities);
+    if (filters.guests) newSearchParams.append('guests', filters.guests);
+    if (filters.roomType) newSearchParams.append('roomType', filters.roomType);
+    if (filters.checkIn) newSearchParams.append('checkIn', filters.checkIn);
+    if (filters.checkOut) newSearchParams.append('checkOut', filters.checkOut);
+    if (sortValue) newSearchParams.append('sortBy', sortValue);
+    newSearchParams.append('page', '1');
+    navigate(`?${newSearchParams.toString()}`);
+  };
 
 
   const hotelsPerPage = 6;
@@ -75,6 +101,8 @@ function HotelsPage() {
     if (params.guests) newSearchParams.append('guests', params.guests);
     if (params.checkIn) newSearchParams.append('checkIn', params.checkIn);
     if (params.checkOut) newSearchParams.append('checkOut', params.checkOut);
+    // Manter ordenação atual se existir
+    if (currentSort) newSearchParams.append('sortBy', currentSort);
     // Adicione outros filtros do formulário aqui se necessário
     newSearchParams.append('page', '1');
     navigate(`?${newSearchParams.toString()}`);
@@ -91,6 +119,7 @@ function HotelsPage() {
     if (filters.roomType) newSearchParams.append('roomType', filters.roomType);
     if (filters.checkIn) newSearchParams.append('checkIn', filters.checkIn);
     if (filters.checkOut) newSearchParams.append('checkOut', filters.checkOut);
+    if (filters.sortBy) newSearchParams.append('sortBy', filters.sortBy);
     newSearchParams.append('page', pageNumber);
     // Adicione outros filtros se necessário
     navigate(`?${newSearchParams.toString()}`);
@@ -199,16 +228,26 @@ function HotelsPage() {
                 <HotelCardSkeleton key={index} />
               ))}
             </div>
-          ) : hotels.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 px-8 py-4">
-              {currentHotelsPaginated.map((hotel, index) => (
-                <AnimatedHotelCard key={hotel.id} index={index}>
-                  <div className="card-spacing">
-                    <SearchHotelCard hotel={hotel} />
-                  </div>
-                </AnimatedHotelCard>
-              ))}
-            </div>
+                     ) : hotels.length > 0 ? (
+             <div className="relative">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 px-8 py-4">
+                 {currentHotelsPaginated.map((hotel, index) => (
+                   <AnimatedHotelCard key={hotel.id} index={index}>
+                     <div className="card-spacing">
+                       <SearchHotelCard hotel={hotel} />
+                     </div>
+                   </AnimatedHotelCard>
+                 ))}
+               </div>
+               
+               {/* Botão de ordenação discreto - posicionado no canto superior direito da seção */}
+               <div className="absolute top-4 right-4 z-40">
+                 <SortButton 
+                   onSortChange={handleSortChange}
+                   currentSort={currentSort}
+                 />
+               </div>
+             </div>
           ) : (
             <ScrollReveal animation="fadeUp" delay={400}>
               <p className="text-gray-600 text-center text-lg mt-10">

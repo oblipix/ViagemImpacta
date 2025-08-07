@@ -61,7 +61,8 @@ namespace ViagemImpacta.Controllers.ApiControllers
             [FromQuery] string? roomType,
             [FromQuery] string? amenities,
             [FromQuery] string? checkIn,
-            [FromQuery] string? checkOut)
+            [FromQuery] string? checkOut,
+            [FromQuery] string? sortBy = null)
         {
             // Validação de parâmetros de entrada
             var validationErrors = ValidateSearchParameters(minPrice, maxPrice, stars, guests, checkIn, checkOut);
@@ -84,7 +85,8 @@ namespace ViagemImpacta.Controllers.ApiControllers
                 amenities,
                 guests,
                 checkIn,
-                checkOut
+                checkOut,
+                sortBy
             );
 
             var hotelDtos = _mapper.Map<IEnumerable<HotelDto>>(hotels);
