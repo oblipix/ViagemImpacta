@@ -414,29 +414,7 @@ function HotelDetailsPage() {
                                 {reviews.length > 0 && (
                                     <span className="ml-2 text-sm text-gray-500">({reviews.length} {reviews.length === 1 ? 'avaliação' : 'avaliações'})</span>
                                 )}
-                                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-                                Avaliações dos Hóspedes
-                                {reviews.length > 0 && (
-                                    <span className="ml-2 text-sm text-gray-500">({reviews.length} {reviews.length === 1 ? 'avaliação' : 'avaliações'})</span>
-                                )}
                             </h2>
-
-                            {reviewsLoading ? (
-                                <div className="bg-gray-50 rounded-lg p-8 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div><p className="text-gray-600">Carregando avaliações...</p></div>
-                            ) : reviewsError ? (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-4"><p className="text-red-600">{reviewsError}</p></div>
-                            ) : reviews.length > 0 ? (
-                                <div className="bg-gray-50 rounded-lg sm:rounded-2xl overflow-visible p-4 sm:p-6 md:p-8">
-                                    <Slider {...sliderSettings}>
-                                        {reviews.map(review => (
-                                            <div key={review.reviewID} className="p-2 sm:p-4">
-                                                <div className="feedback-bubble">
-                                                    <div>
-                                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-                                                            <RatingDisplay rating={review.rating} />
-                                                            <span className="text-xs sm:text-sm font-semibold text-gray-700 bg-blue-50 py-1 px-2 sm:px-3 rounded-full self-start sm:self-auto">Hóspede Verificado</span>
-                                                        </div>
-                                                        <p className="text-gray-600 italic text-sm sm:text-base leading-relaxed">"{review.comment}"</p>
 
                             {reviewsLoading ? (
                                 <div className="bg-gray-50 rounded-lg p-8 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div><p className="text-gray-600">Carregando avaliações...</p></div>
@@ -466,37 +444,17 @@ function HotelDetailsPage() {
                                     </Slider>
                                 </div>
                             ) : (
-                                <div className="bg-gray-50 rounded-lg p-8 text-center"><svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg><p className="text-gray-600">Este hotel ainda não possui avaliações.</p><p className="text-gray-500 text-sm mt-2">Seja o primeiro a avaliar!</p></div>
+                                <div className="bg-gray-50 rounded-lg p-8 text-center">
+                                    <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                                    </svg>
+                                    <p className="text-gray-600">Este hotel ainda não possui avaliações.</p>
+                                    <p className="text-gray-500 text-sm mt-2">Seja o primeiro a avaliar!</p>
+                                </div>
                             )}
                         </div>
                     )}
 
-                    {!isLoggedIn && (
-                        <div className="mb-6 sm:mb-8">
-                            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
-                                <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-                                Avaliações dos Hóspedes
-                            </h2>
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-                                <svg className="w-12 h-12 text-blue-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                <p className="text-blue-800 font-medium mb-2">Faça login para ver as avaliações</p>
-                                <p className="text-blue-600 text-sm">As avaliações reais dos hóspedes estão disponíveis apenas para usuários logados.</p>
-                                <button onClick={() => navigate('/login')} className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">Fazer Login</button>
-                                                    <div className="text-right mt-3 sm:mt-4">
-                                                        <span className="text-xs text-gray-400">
-                                                            {review.createdAt ? new Date(review.createdAt).toLocaleDateString('pt-BR') : 'Data não disponível'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </Slider>
-                                </div>
-                            ) : (
-                                <div className="bg-gray-50 rounded-lg p-8 text-center"><svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg><p className="text-gray-600">Este hotel ainda não possui avaliações.</p><p className="text-gray-500 text-sm mt-2">Seja o primeiro a avaliar!</p></div>
-                            )}
-                        </div>
-                    )}
 
                     {!isLoggedIn && (
                         <div className="mb-6 sm:mb-8">
