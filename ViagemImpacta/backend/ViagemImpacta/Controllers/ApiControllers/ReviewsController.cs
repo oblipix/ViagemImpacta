@@ -65,6 +65,7 @@ namespace ViagemImpacta.Controllers.ApiControllers
         }
 
         [HttpGet("hotel/{hotelId}")]
+        [AllowAnonymous] // Permite acesso sem autenticação para ver reviews de hotel
         public async Task<ActionResult<IEnumerable<Review>>> GetByHotel(int hotelId)
         {
             var reviews = await _reviewService.GetReviewsByHotelIdAsync(hotelId);
@@ -100,6 +101,7 @@ namespace ViagemImpacta.Controllers.ApiControllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous] // Permite acesso sem autenticação
         public async Task<ActionResult<Review>> GetById(int id)
         {
             var review = await _reviewService.GetReviewByIdAsync(id);

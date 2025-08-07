@@ -11,5 +11,6 @@ namespace ViagemImpacta.Services.Interfaces
         Task<Review?> GetUserReviewForHotelAsync(int userId, int hotelId);
         Task<Review> UpdateReviewAsync(Review review);
         Task<bool> DeleteReviewAsync(int reviewId);
+        Task<IEnumerable<Review>> GetAllReviewsAsync();
     }
 }

@@ -8,5 +8,7 @@ namespace ViagemImpacta.Repositories.Interfaces
     {
         Task<IEnumerable<Review>> GetReviewsByHotelIdAsync(int hotelId);
         Task<IEnumerable<Review>> GetReviewsByUserIdAsync(int userId);
+        Task<IEnumerable<Review>> GetAllAsync();
+        Task<Review?> GetByIdWithIncludesAsync(int reviewId);
     }
 }
