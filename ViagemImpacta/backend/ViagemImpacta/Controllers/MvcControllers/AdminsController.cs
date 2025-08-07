@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -31,16 +30,30 @@ public class AdminsController : Controller
     }
 
     [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme, Roles = "Admin, Attendant")]
-    public IActionResult Dashboard()
+    public async Task<IActionResult> Dashboard()
     {
-        var balance = _stripeService.GetBalance();
-        ViewBag.Balance = balance;
-        var userName = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
-        var userRole = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
-        ViewBag.Name = userName;
-        ViewBag.Role = userRole;
+        try
+        {
+            var balance = _stripeService.GetBalance();
+            ViewBag.Balance = balance;
+            var userName = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+            var userRole = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+            ViewBag.Name = userName;
+            ViewBag.Role = userRole;
 
-        return View();
+            var hotelRevenueData = await _dashboardService.GetHotelRevenueDataAsync();
+            var reservationStatusData = await _dashboardService.GetReservationStatusDataAsync();
+
+            ViewBag.HotelRevenueData = hotelRevenueData;
+            ViewBag.ReservationStatusData = reservationStatusData;
+
+            return View();
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, $"Erro ao carregar dados do dashboard: {ex.Message}");
+            return RedirectToAction("Dashboard");
+        }
     }
 
     [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme, Roles = "Admin, Attendant")]
@@ -53,29 +66,9 @@ public class AdminsController : Controller
             ViewBag.Name = userName;
             ViewBag.Role = userRole;
 
-            // Carregar apenas os dados essenciais para um dashboard limpo e funcional
-            var dashboardStats = await _dashboardService.GetDashboardStatsAsync();
-            var hotelRevenueData = await _dashboardService.GetHotelRevenueDataAsync();
-            var monthlyRevenueData = await _dashboardService.GetMonthlyRevenueDataAsync();
-            var reservationStatusData = await _dashboardService.GetReservationStatusDataAsync();
-            var topHotelsData = await _dashboardService.GetTopHotelsAsync();
-            var mostReservedRooms = await _dashboardService.GetMostReservedRoomsAsync();
-            var financialSummary = await _dashboardService.GetFinancialSummaryAsync();
-            
-            // Dados avançados apenas se necessário
-            var hotelDetailedAnalytics = await _dashboardService.GetHotelDetailedAnalyticsAsync();
-            var cityPerformance = await _dashboardService.GetCityPerformanceDataAsync();
-
             // Passar dados para a view
-            ViewBag.DashboardStats = dashboardStats;
-            ViewBag.HotelRevenueData = hotelRevenueData;
-            ViewBag.MonthlyRevenueData = monthlyRevenueData;
-            ViewBag.ReservationStatusData = reservationStatusData;
-            ViewBag.TopHotelsData = topHotelsData;
-            ViewBag.MostReservedRooms = mostReservedRooms;
-            ViewBag.FinancialSummary = financialSummary;
-            ViewBag.HotelDetailedAnalytics = hotelDetailedAnalytics;
-            ViewBag.CityPerformance = cityPerformance;
+            ViewBag.HotelRevenueData = await _dashboardService.GetHotelRevenueDataAsync(); ;
+            ViewBag.ReservationStatusData = await _dashboardService.GetReservationStatusDataAsync();
 
             return View();
         }
