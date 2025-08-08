@@ -6,7 +6,7 @@
 <h2 class="mb-4">Criar Funcionário</h2>
 <div class="card" style="max-width: 600px;">
     <div class="card-body">
-        <form asp-action="Create" method="post">
+        <form asp-controller="Employees" asp-action="Create" method="post">
             <div class="mb-3">
                 <label asp-for="Email" class="form-label">Email</label>
                 <input asp-for="Email" class="form-control" />
