@@ -1,6 +1,20 @@
 ﻿@model IEnumerable<ViagemImpacta.Models.Promotion>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @{
     ViewData["Title"] = "Promoções";
+    int pageSize = 10;
+    int skip = 0;
+    string search = "";
+    var request = HttpContextAccessor?.HttpContext?.Request;
+    if (request != null)
+    {
+        if (!string.IsNullOrEmpty(request.Query["take"]))
+            int.TryParse(request.Query["take"], out pageSize);
+        if (!string.IsNullOrEmpty(request.Query["skip"]))
+            int.TryParse(request.Query["skip"], out skip);
+        search = request.Query["search"].ToString() ?? "";
+    }
+    int page = (skip / pageSize) + 1;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -32,7 +46,7 @@
     <tbody>
         @if (Model != null && Model.Any())
         {
-            @foreach (var item in Model)
+            foreach (var item in Model)
             {
                 <tr>
                     <td>@item.PromotionId</td>
@@ -50,8 +64,8 @@
                     <td>@(item.Hotel?.Name ?? "N/A") - @(item.Hotel?.City ?? "N/A")</td>
                     <td>@item.CheckIn.ToString("dd/MM/yyyy")</td>
                     <td>@item.CheckOut.ToString("dd/MM/yyyy")</td>
-                    <td>@item.OriginalPrice.ToString("C")</td>
-                    <td>@item.TotalPrice.ToString("C")</td>
+                    <td>@item.OriginalPrice.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                    <td>@item.TotalPrice.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
                     <td>@((item.DiscountPercentage / 100).ToString("P"))</td>
                     <td>
                         @if (item.IsActive && item.EndDate >= DateTime.Now)
@@ -85,3 +99,17 @@
         }
     </tbody>
 </table>
+
+<nav>
+    <ul class="pagination">
+        <li class="page-item @(page == 1 ? "disabled" : "")">
+            <a class="page-link" href="?skip=@(skip - pageSize)&take=@pageSize&search=@search">Anterior</a>
+        </li>
+        <li class="page-item">
+            <span class="page-link">Página @(page.ToString())</span>
+        </li>
+        <li class="page-item @(Model == null || Model.Count() < pageSize ? "disabled" : "")">
+            <a class="page-link" href="?skip=@(skip + pageSize)&take=@pageSize&search=@search">Próxima</a>
+        </li>
+    </ul>
+</nav>
