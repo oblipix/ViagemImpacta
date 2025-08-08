@@ -187,7 +187,7 @@ frontend
 
 ## ✨ Contribuição
 <a href="https://github.com/oblipix/ViagemImpacta/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=oblipix/ViagemImpacta" />
+  <img src="https://contrib.rocks/image?repo=oblipix/ViagemImpacta&t=12345" />
 </a>
 
 
