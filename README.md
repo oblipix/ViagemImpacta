@@ -190,8 +190,5 @@ frontend
   <img src="https://contrib.rocks/image?repo=oblipix/ViagemImpacta" />
 </a>
 
-## ✨ Contribuição
-<a href="https://github.com/oblipix/ViagemImpacta/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=oblipix/ViagemImpacta" />
-</a>
+
 
