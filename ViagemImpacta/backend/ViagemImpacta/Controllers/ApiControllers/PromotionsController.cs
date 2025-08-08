@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using ViagemImpacta.DTO.ReservationDTO;
+﻿using Microsoft.AspNetCore.Mvc;
 using ViagemImpacta.Models;
-using ViagemImpacta.Services.Implementations;
+using ViagemImpacta.Services.Interfaces;
 
 namespace ViagemImpacta.Controllers.ApiControllers
 {
@@ -10,9 +8,9 @@ namespace ViagemImpacta.Controllers.ApiControllers
     [ApiController]
     public class PromotionsController : ControllerBase
     {
-        public readonly PromotionService _promotionService;
+        public readonly IPromotionService _promotionService;
 
-        public PromotionsController(PromotionService promotionService)
+        public PromotionsController(IPromotionService promotionService)
         {
             _promotionService = promotionService;
         }

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using ViagemImpacta.Models;
-using ViagemImpacta.Services.Implementations;
 using ViagemImpacta.Services.Interfaces;
 using ViagemImpacta.ViewModels;
 
@@ -12,11 +11,11 @@ namespace ViagemImpacta.Controllers.MvcControllers;
 public class AdminsController : Controller
 {
     private readonly IUserService _userService;
-    private readonly AuthService _authService;
-    private readonly StripeService _stripeService;
+    private readonly IAuthService _authService;
+    private readonly IStripeService _stripeService;
     private readonly IDashboardService _dashboardService;
 
-    public AdminsController(IUserService userService, AuthService authService, StripeService stripeService, IDashboardService dashboardService)
+    public AdminsController(IUserService userService, IAuthService authService, IStripeService stripeService, IDashboardService dashboardService)
     {
         _userService = userService;
         _authService = authService;
