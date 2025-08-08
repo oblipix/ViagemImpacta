@@ -9,7 +9,7 @@
 - **1000 usuários simultâneos** (teste de carga)
 - **Duração**: 2 minutos por fase
 - **Total de requests**: ~100.000-200.000
-- **Total de quartos**: 5.000 quartos (100 hotéis × 50 quartos)
+- **Total de quartos**: 5.000 quartos (100 hotéis × 50 quartos) com 50% de vacância.
 
 ### **Distribuição dos Hotéis:**
 
