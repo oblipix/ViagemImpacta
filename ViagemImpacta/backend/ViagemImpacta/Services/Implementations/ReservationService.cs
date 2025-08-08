@@ -20,10 +20,10 @@ namespace ViagemImpacta.Services.Implementations
         private readonly SmtpOptions _smtpOptions;
         private readonly TimeZoneInfo BrazilTimeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
         private readonly StripeModel _model;
-        private readonly StripeService _stripeService;
+        private readonly IStripeService _stripeService;
 
         public ReservationService(IUnitOfWork unitOfWork, IMapper mapper, IOptions<SmtpOptions> smtpOptions,
-            IOptions<StripeModel> model, StripeService stripeService)
+            IOptions<StripeModel> model, IStripeService stripeService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -160,6 +160,7 @@ namespace ViagemImpacta.Services.Implementations
             // Always update and commit the reservation regardless of promotion status
             _unitOfWork.Reservations.Update(reservation);
             await _unitOfWork.CommitAsync();
+
             await SendEmailAsync(reservation);
             
             return true;

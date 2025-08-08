@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using ViagemImpacta.Repositories;
-using ViagemImpacta.Services.Implementations;
 using ViagemImpacta.Services.Interfaces;
 using ViagemImpacta.Setup;
 
@@ -16,9 +15,9 @@ public class StripeController : ControllerBase
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IReservationService _reservationService;
-    private readonly StripeService _stripeService;
+    private readonly IStripeService _stripeService;
 
-    public StripeController(IOptions<StripeModel> model, IUnitOfWork unitOfWork, IMapper mapper, IReservationService reservationService, StripeService stripeService)
+    public StripeController(IOptions<StripeModel> model, IUnitOfWork unitOfWork, IMapper mapper, IReservationService reservationService, IStripeService stripeService)
     {
         _model = model.Value;
         _unitOfWork = unitOfWork;

@@ -1,0 +1,47 @@
+﻿@model IEnumerable<ViagemImpacta.Models.Review>
+@{
+    ViewData["Title"] = $"Reviews do Usuário";
+    var user = Model?.FirstOrDefault()?.User;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="d-flex align-items-center gap-2 mb-4">
+        <span class="material-symbols-outlined" style="font-size: 2.5rem">rate_review</span>
+        @if (user != null)
+        {
+            @:Reviews do Usuário: @user.FirstName @user.LastName
+        }
+        else
+        {
+            @:Não existem avaliações para esse usuário
+        }
+    </h1>
+    <a class="btn btn-secondary" asp-action="Index" asp-controller="Users">Voltar</a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var review in Model)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Review #@review.ReviewId</h5>
+                        <p class="card-text">
+                            <strong>Hotel:</strong> @review.Hotel?.Name<br />
+                            <strong>Comentário:</strong> <span class="text-secondary">@review.Comment</span><br />
+                            <strong>Nota:</strong> @review.Rating<br />
+                            <strong>Data:</strong> @review.CreatedAt.ToString("dd/MM/yyyy")<br />
+                        </p>
+                        <a asp-action="Details" asp-route-id="@review.ReviewId" class="btn btn-primary">Detalhes</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>Nenhuma review encontrada para este usuário.</p>
+}

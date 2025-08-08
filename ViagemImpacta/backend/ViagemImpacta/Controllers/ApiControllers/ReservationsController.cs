@@ -1,11 +1,8 @@
-using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViagemImpacta.DTO.ReservationDTO;
-using ViagemImpacta.Models;
 using ViagemImpacta.Services.Interfaces;
-using ViagemImpacta.Services.Implementations;
 
 namespace ViagemImpacta.Controllers.ApiControllers
 {
@@ -16,9 +13,9 @@ namespace ViagemImpacta.Controllers.ApiControllers
         private readonly IReservationService _reservationService;
         private readonly IPromotionService _promotionService;
         private readonly IMapper _mapper;
-        private readonly StripeService _stripeService;
+        private readonly IStripeService _stripeService;
 
-        public ReservationsController(IReservationService reservationService, IMapper mapper, IPromotionService promotionService, StripeService stripeService)
+        public ReservationsController(IReservationService reservationService, IMapper mapper, IPromotionService promotionService, IStripeService stripeService)
         {
             _reservationService = reservationService;
             _mapper = mapper;

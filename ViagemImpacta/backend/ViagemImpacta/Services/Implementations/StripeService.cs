@@ -4,11 +4,12 @@ using Stripe.Checkout;
 using System.Text.Json;
 using ViagemImpacta.Models;
 using ViagemImpacta.Repositories;
+using ViagemImpacta.Services.Interfaces;
 using ViagemImpacta.Setup;
 
 namespace ViagemImpacta.Services.Implementations;
 
-public class StripeService
+public class StripeService : IStripeService
 {
     public readonly StripeModel _model;
     private readonly IUnitOfWork _unitOfWork;
