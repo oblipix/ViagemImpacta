@@ -12,7 +12,7 @@ export const heroSlidesData = [
   {
     id: 1,
     imageUrl: entradaprincipalImage,
-    title: 'Sua Próxima Viagem Começa Aqui.',
+    title: 'Sua Próxima Viagem Começa Aqui',
     subtitle: 'Ofertas exclusivas para explorar o mundo sem sair de casa.',
   },
   {
@@ -24,19 +24,19 @@ export const heroSlidesData = [
   {
     id: 3,
     imageUrl: piscinaImageRJ,
-    title: 'Relaxe e Desconecte-se.',
+    title: 'Relaxe e Desfrute',
     subtitle: 'Pacotes de viagem completos para você aproveitar cada momento.',
   },
   {
     id: 4,
     imageUrl: cinemalRSImage,
-    title: 'Entretenimento de Primeira Classe.',
+    title: 'Entretenimento de Primeira Classe',
     subtitle: 'Desfrute de sessões de cinema privativas com toda a qualidade que você merece.',
   },
   {
     id: 5,
     imageUrl: piscinaGAImage,
-    title: 'Oásis de Lazer e Relaxamento.',
+    title: 'Oásis de Lazer e Relaxamento',
     subtitle: 'Mergulhe em momentos inesquecíveis na nossa piscina, perfeita para toda a família.',
   },
 ];

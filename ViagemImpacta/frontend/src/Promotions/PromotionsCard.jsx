@@ -1,5 +1,45 @@
 import { Link } from 'react-router-dom';
 
+// Função para formatar data removendo hora e timezone
+const formatDateForDisplay = (dateString) => {
+    if (!dateString) return '';
+
+    try {
+        // Remove a parte da hora se existir
+        let cleanDateString = dateString;
+        if (cleanDateString.includes('T')) {
+            cleanDateString = cleanDateString.split('T')[0];
+        } else if (cleanDateString.includes(' ')) {
+            cleanDateString = cleanDateString.split(' ')[0];
+        }
+
+        // Se já está no formato DD/MM/YYYY, retorna como está
+        if (cleanDateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+            return cleanDateString;
+        }
+
+        // Se está no formato YYYY-MM-DD, converte para DD/MM/YYYY
+        if (cleanDateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            const [year, month, day] = cleanDateString.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        // Tenta fazer parsing da data
+        const date = new Date(cleanDateString + 'T00:00:00');
+        if (isNaN(date.getTime())) {
+            return cleanDateString;
+        }
+
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    } catch {
+        // Em caso de erro, tenta pelo menos remover a parte da hora
+        return dateString.includes('T') ? dateString.split('T')[0] : dateString;
+    }
+};
+
 function PromotionsCard({ promotion }) {
     return (
         <Link to={`/promocao/${promotion.id}`}
@@ -31,15 +71,15 @@ function PromotionsCard({ promotion }) {
                     </div>
                     <div className="flex flex-wrap gap-2 mb-3">
                         <span className="text-gray-600 text-sm">
-                            <strong>Check-in:</strong> {promotion.checkIn}
+                            <strong>Check-in:</strong> {formatDateForDisplay(promotion.checkIn)}
                         </span>
                         <span className="text-gray-600 text-sm">
-                            <strong>Check-out:</strong> {promotion.checkOut}
+                            <strong>Check-out:</strong> {formatDateForDisplay(promotion.checkOut)}
                         </span>
                     </div>
                     <div className="flex flex-wrap gap-2 mb-3">
                         <span className="text-red-600 text-sm">
-                            <strong>Promoção válida até:</strong> {promotion.validUntil}
+                            <strong>Promoção válida até:</strong> {formatDateForDisplay(promotion.validUntil)}
                         </span>
                     </div>
                     <div className="mb-3 flex items-center gap-3">

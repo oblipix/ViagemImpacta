@@ -188,29 +188,39 @@ const PromotionDetailsPage = () => {
         setSelectedRoom(null);
     };
 
-    // Helper function to format date for input
+    // Helper function to format date for input (sem hora)
     const formatDateForInput = (dateString) => {
         if (!dateString) return '';
 
         console.log('Original date string:', dateString);
 
+        // Primeiro, limpa a string removendo qualquer parte de hora ou timezone
+        let cleanDateString = dateString;
+        
+        // Remove a parte da hora se existir
+        if (cleanDateString.includes('T')) {
+            cleanDateString = cleanDateString.split('T')[0];
+        } else if (cleanDateString.includes(' ')) {
+            cleanDateString = cleanDateString.split(' ')[0];
+        }
+
         // Se já está no formato YYYY-MM-DD, retorna como está
-        if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-            console.log('Date already in correct format:', dateString);
-            return dateString;
+        if (cleanDateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            console.log('Date already in correct format:', cleanDateString);
+            return cleanDateString;
         }
 
         // Se está no formato DD/MM/YYYY, converte
-        if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-            const [day, month, year] = dateString.split('/');
+        if (cleanDateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+            const [day, month, year] = cleanDateString.split('/');
             const formatted = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
             console.log('Converted DD/MM/YYYY to YYYY-MM-DD:', formatted);
             return formatted;
         }
 
-        // Tenta criar uma data e formatar
+        // Tenta criar uma data e formatar (removendo hora)
         try {
-            const date = new Date(dateString);
+            const date = new Date(cleanDateString + 'T00:00:00');
             if (isNaN(date.getTime())) {
                 console.error('Invalid date:', dateString);
                 return '';
@@ -220,11 +230,64 @@ const PromotionDetailsPage = () => {
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
             const formatted = `${year}-${month}-${day}`;
-            console.log('Formatted date:', formatted);
+            console.log('Formatted date (without time):', formatted);
             return formatted;
         } catch (error) {
             console.error('Error formatting date:', error);
             return '';
+        }
+    };
+
+    // Helper function to format date for display (DD/MM/YYYY)
+    const formatDateForDisplay = (dateString) => {
+        if (!dateString) return '';
+
+        try {
+            // Primeiro, limpa a string removendo qualquer parte de hora ou timezone
+            let cleanDateString = dateString;
+            
+            // Remove a parte da hora se existir (tudo após T, espaço, ou após 10 caracteres se for YYYY-MM-DD)
+            if (cleanDateString.includes('T')) {
+                cleanDateString = cleanDateString.split('T')[0];
+            } else if (cleanDateString.includes(' ')) {
+                cleanDateString = cleanDateString.split(' ')[0];
+            } else if (cleanDateString.length > 10 && cleanDateString.match(/^\d{4}-\d{2}-\d{2}/)) {
+                cleanDateString = cleanDateString.substring(0, 10);
+            }
+
+            console.log('Cleaning date string from:', dateString, 'to:', cleanDateString);
+
+            // Se já está no formato DD/MM/YYYY, retorna como está
+            if (cleanDateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                console.log('Date already in DD/MM/YYYY format:', cleanDateString);
+                return cleanDateString;
+            }
+
+            // Se está no formato YYYY-MM-DD, converte para DD/MM/YYYY
+            if (cleanDateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                const [year, month, day] = cleanDateString.split('-');
+                const formatted = `${day}/${month}/${year}`;
+                console.log('Converted YYYY-MM-DD to DD/MM/YYYY:', formatted);
+                return formatted;
+            }
+
+            // Tenta fazer parsing da data
+            const date = new Date(cleanDateString + 'T00:00:00');
+            if (isNaN(date.getTime())) {
+                console.error('Invalid date for display:', dateString);
+                return cleanDateString; // Retorna a versão limpa se não conseguir formatar
+            }
+
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const formatted = `${day}/${month}/${year}`;
+            console.log('Formatted date for display:', formatted);
+            return formatted;
+        } catch (error) {
+            console.error('Error formatting date for display:', error);
+            // Em caso de erro, tenta pelo menos remover a parte da hora
+            return dateString.includes('T') ? dateString.split('T')[0] : dateString;
         }
     };
 
@@ -271,7 +334,7 @@ const PromotionDetailsPage = () => {
             {/* Botão Voltar - Padrão do Site */}
             <button onClick={() => navigate(-1)} className="main-action-button bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-3 sm:px-4 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center mb-6 sm:mb-8 text-sm sm:text-base">
                 <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
                 Voltar
             </button>
@@ -329,13 +392,13 @@ const PromotionDetailsPage = () => {
                                 <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
-                                <span className="font-medium text-blue-600">Check-in: {promotion.checkIn}</span>
+                                <span className="font-medium text-blue-600">Check-in: {formatDateForDisplay(promotion.checkIn)}</span>
                             </div>
                             <div className="flex items-center bg-red-50 px-4 py-3 rounded-lg border border-red-200">
                                 <svg className="w-4 h-4 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
-                                <span className="font-medium text-red-600">Check-out: {promotion.checkOut}</span>
+                                <span className="font-medium text-red-600">Check-out: {formatDateForDisplay(promotion.checkOut)}</span>
                             </div>
                         </div>
                     </div>

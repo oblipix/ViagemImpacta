@@ -102,19 +102,51 @@ class PromotionService {
             bannerPromotion: promotion.bannerPromotion || promotion.BannerPromotion || promotion.banner_promotion || promotion.mainImageUrl || promotion.imageUrl,
             hotelId: promotion.hotelId || promotion.hotel?.hotelId || promotion.hotel?.id, // Preservar hotelId
             hotelName: promotion.hotel?.name || promotion.hotelName || 'Hotel não informado',
-            checkIn: new Date(promotion.checkIn).toLocaleDateString('pt-BR'),
-            checkOut: new Date(promotion.checkOut).toLocaleDateString('pt-BR'),
+            checkIn: this.formatDateOnly(promotion.checkIn),
+            checkOut: this.formatDateOnly(promotion.checkOut),
             originalPrice: promotion.originalPrice,
             totalPrice: promotion.totalPrice,
             discountPercent: promotion.discountPercentage || this.calculateDiscountPercent(promotion.originalPrice, promotion.totalPrice),
             isActive: promotion.isActive,
-            validUntil: new Date(promotion.endDate).toLocaleDateString('pt-BR'),
+            validUntil: this.formatDateOnly(promotion.endDate),
             roomsReserved: roomsReserved,
             roomsTotal: roomsTotal,
             roomsAvailable: roomsTotal - roomsReserved,
             // Preservar todos os dados originais como fallback
             ...promotion
         };
+    }
+
+    /**
+     * Formata uma data removendo a hora e timezone
+     * @param {string} dateString - String da data
+     * @returns {string} Data formatada como DD/MM/YYYY
+     */
+    formatDateOnly(dateString) {
+        if (!dateString) return '';
+
+        try {
+            // Remove a parte da hora se existir
+            let cleanDateString = dateString;
+            if (cleanDateString.includes('T')) {
+                cleanDateString = cleanDateString.split('T')[0];
+            } else if (cleanDateString.includes(' ')) {
+                cleanDateString = cleanDateString.split(' ')[0];
+            }
+
+            // Cria a data forçando hora zero para evitar problemas de timezone
+            const date = new Date(cleanDateString + 'T00:00:00');
+            if (isNaN(date.getTime())) {
+                console.error('Invalid date in formatDateOnly:', dateString);
+                return cleanDateString;
+            }
+
+            // Formata como DD/MM/YYYY
+            return date.toLocaleDateString('pt-BR');
+        } catch (error) {
+            console.error('Error formatting date only:', error);
+            return dateString;
+        }
     }
 
     /**

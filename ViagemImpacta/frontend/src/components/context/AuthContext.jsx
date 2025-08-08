@@ -958,18 +958,23 @@ export const AuthProvider = ({ children }) => {
                         lastError = errorText;
                         console.log(`❌ Tentativa ${i + 1} falhou:`, response.status, errorText);
                         
-                        // Se for erro 409 (Conflict) ou 400 com "já existe" - usuário já existe, é sucesso!
+                        // Se for erro 409 (Conflict) ou 400 com mensagem de email já existente
                         if (response.status === 409 || 
-                            (response.status === 400 && errorText.toLowerCase().includes('já existe'))) {
-                            console.log('✅ Usuário já existe - tratando como sucesso');
-                            return {
-                                success: true,
-                                message: 'Cadastro realizado com sucesso! Você pode fazer login agora.',
-                                user: { email: email.trim().toLowerCase() }
-                            };
+                            (response.status === 400 && (
+                                errorText.toLowerCase().includes('já existe') ||
+                                errorText.toLowerCase().includes('already exists') ||
+                                errorText.toLowerCase().includes('já cadastrado') ||
+                                errorText.toLowerCase().includes('email já está')
+                            ))) {
+                            console.log('❌ Email já cadastrado');
+                            throw new Error('Este email já está cadastrado. Tente fazer login ou use outro email.');
                         }
                     }
                 } catch (fetchError) {
+                    // Se for um erro de email já cadastrado, propaga imediatamente
+                    if (fetchError.message.includes('Este email já está cadastrado')) {
+                        throw fetchError;
+                    }
                     lastError = fetchError.message;
                     console.log(`❌ Erro na tentativa ${i + 1}:`, fetchError.message);
                 }
