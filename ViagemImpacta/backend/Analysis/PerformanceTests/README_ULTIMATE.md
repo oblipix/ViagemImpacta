@@ -1,4 +1,4 @@
-# 🚀 Teste de Performance - Viagem Impacta
+# 🚀 Teste de Performance - TRIPZ
 
 ## 📊 Configuração Atual
 
