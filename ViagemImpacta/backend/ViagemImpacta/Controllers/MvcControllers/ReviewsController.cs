@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViagemImpacta.Models;
+using ViagemImpacta.Services.Implementations;
 using ViagemImpacta.Services.Interfaces;
 
 namespace ViagemImpacta.Controllers.MvcControllers
@@ -73,6 +74,20 @@ namespace ViagemImpacta.Controllers.MvcControllers
             }
             
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<ActionResult> ReviewsByUser(int id)
+        {
+            try
+            {
+                var reviewsByUser = await _reviewService.GetReviewsByUserIdAsync(id);
+                return View(reviewsByUser);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Erro ao carregar reviews do usuário: {ex.Message}");
+                return View(null);
+            }
         }
     }
 }
